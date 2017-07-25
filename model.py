@@ -27,6 +27,7 @@ class Account(db.Model, TimestampMixin):
     policy_keep_younger = db.Column(db.Interval)
     policy_keep_latest = db.Column(db.Integer)
     policy_delete_every = db.Column(db.Interval)
+    policy_ignore_favourites = db.Column(db.Boolean, default=True)
 
 class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
