@@ -1,16 +1,18 @@
-import datetime
+from datetime import datetime
 
 from app import db
 
-model = db.Model
+class TimestampMixin(object):
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow,  onupdate=datetime.utcnow, nullable=False)
 
-class User(db.Model):
+class User(db.Model, TimestampMixin):
     __tablename__ = 'users'
 
     display_name = db.Column(db.String)
     id = db.Column(db.Integer, primary_key=True)
 
-class Account(db.Model):
+class Account(db.Model, TimestampMixin):
 
     user = db.relationship(User)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -26,7 +28,7 @@ class Account(db.Model):
     policy_keep_latest = db.Column(db.Integer)
     policy_delete_every = db.Column(db.Interval)
 
-class Session(db.Model):
+class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
 
     user = db.relationship(User)
