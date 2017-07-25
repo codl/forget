@@ -1,0 +1,6 @@
+{% if session %}
+    Hello, {{session['display_name']}}! <a href="/logout">Log out</a>
+    <code>{{session['created_at']}}</code>
+{% else %}
+    Hello, stranger! <a href="/login/twitter">Log in with Twitter</a>
+{% endif %}

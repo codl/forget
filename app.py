@@ -8,6 +8,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///forget'
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+app.secret_key = 'hunter2'
+
 metadata = MetaData(naming_convention = {
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",

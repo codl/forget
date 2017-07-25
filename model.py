@@ -3,8 +3,8 @@ from datetime import datetime
 from app import db
 
 class TimestampMixin(object):
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,  onupdate=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(),  onupdate=db.func.now())
 
 class User(db.Model, TimestampMixin):
     __tablename__ = 'users'
@@ -15,25 +15,17 @@ class User(db.Model, TimestampMixin):
 class Account(db.Model, TimestampMixin):
 
     user = db.relationship(User)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    remote_id = db.Column(db.String, primary_key=True)
     service = db.Column(
             db.Enum("twitter", name="enum_services")
             , primary_key=True)
+    remote_id = db.Column(db.String, primary_key=True)
+
     credentials = db.Column(db.JSON)
 
-    policy_enabled = db.Column(db.Boolean, default=False)
+    policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     policy_keep_younger = db.Column(db.Interval)
     policy_keep_latest = db.Column(db.Integer)
     policy_delete_every = db.Column(db.Interval)
-    policy_ignore_favourites = db.Column(db.Boolean, default=True)
-
-class Session(db.Model, TimestampMixin):
-    __tablename__ = 'sessions'
-
-    user = db.relationship(User)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    token = db.Column(db.String, primary_key=True)
-
+    policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
