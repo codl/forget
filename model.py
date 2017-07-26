@@ -3,6 +3,7 @@ from datetime import datetime
 from app import db
 
 from twitter import Twitter, OAuth
+import secrets
 
 class TimestampMixin(object):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
@@ -34,3 +35,10 @@ class OAuthToken(db.Model, TimestampMixin):
     remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
     account = db.relationship(Account)
 
+class Session(db.Model, TimestampMixin):
+    __tablename__ = 'sessions'
+
+    id = db.Column(db.String, primary_key=True, default=lambda: secrets.token_urlsafe())
+
+    remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    account = db.relationship(Account, lazy='joined')

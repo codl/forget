@@ -1,18 +1,27 @@
 from app import app
-from flask import render_template, session, url_for, redirect, request
+from flask import render_template, url_for, redirect, request, g, Response
 from datetime import datetime
 import lib.twitter
-from model import Account
+from model import Account, Session
 from app import db
+
+@app.before_request
+def load_viewer():
+    g.viewer = None
+    sid = request.cookies.get('forget_sid', None)
+    if sid:
+        g.viewer = Session.query.get(sid)
+
+@app.after_request
+def touch_viewer(resp):
+    if g.viewer:
+        g.viewer.touch()
+        db.session.commit()
+    return resp
 
 @app.route('/')
 def index():
-    viewer = None
-    if 'remote_id' in session:
-        viewer = Account.query.get(session['remote_id'])
-        viewer.touch()
-        db.session.commit()
-    return render_template('index.html', viewer = viewer)
+    return render_template('index.html')
 
 @app.route('/login/twitter')
 def twitter_login_step1():
@@ -26,12 +35,16 @@ def twitter_login_step2():
     oauth_token = request.args['oauth_token']
     oauth_verifier = request.args['oauth_verifier']
     token = lib.twitter.receive_verifier(oauth_token, oauth_verifier, **app.config.get_namespace("TWITTER_"))
-    session['remote_id'] = token.remote_id
-    return redirect(url_for('index'))
+    session = Session(remote_id = token.remote_id)
+    db.session.add(session)
+    db.session.commit()
+    resp = Response(status=301, headers={"location": url_for('index')})
+    resp.set_cookie('forget_sid', session.id)
+    return resp
 
 @app.route('/logout')
 def logout():
-    keys = list(session.keys())
-    for key in keys:
-        del session[key]
+    if(g.viewer):
+        db.session.delete(g.viewer)
+        db.session.commit()
     return redirect(url_for('index'))

@@ -1,9 +1,7 @@
-{% if viewer %}
+{% if g.viewer %}
 <p>Hello,
-<img src="{{viewer.remote_avatar_url}}"/>
-{{viewer.remote_display_name}}! <a href="/logout">Log out</a></p>
-<p><code>{{session}}</code></p>
-<p><code>{{viewer}}</code></p>
+<img src="{{g.viewer.account.remote_avatar_url}}"/>
+{{g.viewer.account.remote_display_name}}! <a href="/logout">Log out</a></p>
 {% else %}
 <p>Hello, stranger! <a href="/login/twitter">Log in with Twitter</a></p>
 {% endif %}

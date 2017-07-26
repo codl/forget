@@ -14,18 +14,6 @@ only postgresql with psycopg2 driver is officially supported
 SQLALCHEMY_DATABASE_URI='postgresql+psycopg2:///forget'
 
 """
-SECRET KEY
-
-this key is used to encrypt session cookies
-you can generate a random key by running
-openssl rand -base64 102 | tr -d "\n"; echo
-or if you don't have openssl installed
-cat /dev/random | head -c 102 | base64 | tr -d "\n"; echo
-the latter might take a while if your system entropy is low, give it time
-"""
-SECRET_KEY='change me!'
-
-"""
 TWITTER CREDENTIALS
 
 get these at apps.twitter.com
@@ -35,7 +23,7 @@ TWITTER_CONSUMER_KEY='vdsvdsvds'
 TWITTER_CONSUMER_SECRET='hjklhjklhjkl'
 
 """
-blablabl
+this will be necessary so we can tell twitter where to redirect
 """
 SERVER_NAME="localhost:5000"
 
