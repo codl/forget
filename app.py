@@ -4,11 +4,17 @@ from sqlalchemy import MetaData
 from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///forget'
-app.config['SQLALCHEMY_ECHO'] = True
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.secret_key = 'hunter2'
+default_config = {
+        "SQLALCHEMY_ECHO": True,
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2:///forget",
+        "SECRET_KEY": "hunter2"
+}
+
+app.config.update(default_config)
+
+app.config.from_pyfile('config.py', True)
 
 metadata = MetaData(naming_convention = {
     "ix": 'ix_%(column_0_label)s',
