@@ -35,6 +35,11 @@ TWITTER_CONSUMER_KEY='vdsvdsvds'
 TWITTER_CONSUMER_SECRET='hjklhjklhjkl'
 
 """
+blablabl
+"""
+SERVER_NAME="localhost:5000"
+
+"""
 you can also use any config variable that flask expects here, such as
 """
 # SESSION_COOKIE_SECURE=True
