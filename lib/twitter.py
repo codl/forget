@@ -35,10 +35,12 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
     remote_acct = new_twitter.account.verify_credentials()
     acct = Account(remote_id = remote_acct['id_str'])
     acct = db.session.merge(acct)
+
     acct.remote_display_name = remote_acct['name']
     acct.remote_avatar_url = remote_acct['profile_image_url_https']
     new_token.account = acct
     db.session.commit()
+
     return new_token
 
 def get_twitter_for_acc(account, consumer_key=None, consumer_secret=None):
@@ -55,9 +57,9 @@ def fetch_posts_for_acc(account, consumer_key=None, consumer_secret=None):
 
     kwargs = { 'user_id': account.remote_id, 'count': 200, 'trim_user': True }
 
-    #most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.remote_id).first()
-    #if most_recent_post:
-    #    kwargs['since_id'] = most_recent_post.remote_id
+    most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.remote_id).first()
+    if most_recent_post:
+        kwargs['since_id'] = most_recent_post.remote_id
 
     while True:
         tweets = t.statuses.user_timeline(**kwargs)
@@ -76,6 +78,6 @@ def fetch_posts_for_acc(account, consumer_key=None, consumer_secret=None):
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
 
-        account.last_post_fetch = datetime.now()
-        db.session.commit()
+    account.last_post_fetch = datetime.now()
+    db.session.commit()
 

@@ -4,7 +4,7 @@ from app import app as flaskapp
 from app import db
 from model import Session, Account
 from lib.twitter import fetch_posts_for_acc
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
 
@@ -19,17 +19,19 @@ def fetch_posts(remote_id):
     fetch_posts_for_acc(Account.query.get(remote_id), **flaskapp.config.get_namespace("TWITTER_"))
 
 @app.task
-def queue_fetch_for_most_stale_accs(num=5, min_staleness=timedelta(hours=1)):
-    accs = Account.query\
+def queue_fetch_for_most_stale_account(min_staleness=timedelta(minutes=5)):
+    acc = Account.query\
             .filter(Account.last_post_fetch < db.func.now() - min_staleness)\
             .order_by(db.asc(Account.last_post_fetch))\
-            .limit(num)
-    for acc in accs:
+            .first()
+    if acc:
         fetch_posts.s(acc.remote_id).delay()
+        acc.last_post_fetch = datetime.now()
+        db.session.commit()
 
 
-app.add_periodic_task(60*60, remove_old_sessions)
-app.add_periodic_task(60, queue_fetch_for_most_stale_accs)
+app.add_periodic_task(10*60, remove_old_sessions)
+app.add_periodic_task(20, queue_fetch_for_most_stale_account)
 
 
 
