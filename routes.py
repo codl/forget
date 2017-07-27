@@ -47,4 +47,5 @@ def logout():
     if(g.viewer):
         db.session.delete(g.viewer)
         db.session.commit()
+        g.viewer = None
     return redirect(url_for('index'))
