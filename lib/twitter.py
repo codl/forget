@@ -1,7 +1,9 @@
 from twitter import Twitter, OAuth
 from werkzeug.urls import url_decode
-from model import OAuthToken, Account
+from model import OAuthToken, Account, Post
 from app import db
+from math import inf
+from datetime import datetime
 
 def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
     twitter = Twitter(
@@ -38,3 +40,42 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
     new_token.account = acct
     db.session.commit()
     return new_token
+
+def get_twitter_for_acc(account, consumer_key=None, consumer_secret=None):
+    token = account.tokens[0]
+    t = Twitter(
+            auth=OAuth(token.token, token.token_secret, consumer_key, consumer_secret))
+    return t
+
+import locale
+locale.setlocale(locale.LC_TIME, 'C') # jeez i hate that i have to do this
+
+def fetch_posts_for_acc(account, consumer_key=None, consumer_secret=None):
+    t = get_twitter_for_acc(account, consumer_key=consumer_key, consumer_secret=consumer_secret)
+
+    kwargs = { 'user_id': account.remote_id, 'count': 200, 'trim_user': True }
+
+    #most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.remote_id).first()
+    #if most_recent_post:
+    #    kwargs['since_id'] = most_recent_post.remote_id
+
+    while True:
+        tweets = t.statuses.user_timeline(**kwargs)
+
+        if len(tweets) == 0:
+            break
+
+        kwargs['max_id'] = +inf
+
+        for tweet in tweets:
+            post = Post(remote_id=tweet['id_str'])
+            post = db.session.merge(post)
+            post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
+            post.body = tweet['text']
+            post.author = account
+            kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
+
+
+        account.last_post_fetch = datetime.now()
+        db.session.commit()
+

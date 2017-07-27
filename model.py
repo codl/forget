@@ -28,7 +28,7 @@ class Account(db.Model, TimestampMixin):
 
     last_post_fetch = db.Column(db.DateTime, server_default='epoch')
 
-    # backref: posts
+    # backref: tokens
 
 class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'
@@ -37,7 +37,7 @@ class OAuthToken(db.Model, TimestampMixin):
     token_secret = db.Column(db.String, nullable=False)
 
     remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
-    account = db.relationship(Account)
+    account = db.relationship(Account, backref=db.backref('tokens', order_by=lambda: db.desc(OAuthToken.created_at)))
 
 class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
@@ -53,5 +53,5 @@ class Post(db.Model, TimestampMixin):
     remote_id = db.Column(db.String, primary_key=True)
     body = db.Column(db.String)
 
-    author_remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
-    author = db.relationship(Account, lazy='joined', backref='posts')
+    author_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    author = db.relationship(Account)
