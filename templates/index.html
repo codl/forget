@@ -2,6 +2,12 @@
 <p>Hello,
 <img src="{{g.viewer.account.remote_avatar_url}}"/>
 {{g.viewer.account.remote_display_name}}! <a href="/logout">Log out</a></p>
+<p>your posts:</p>
+{% for post in g.viewer.account.posts %}
+<p>{{post.body}}</p>
+{% else %}
+<p>no posts :(</p>
+{% endfor %}
 {% else %}
 <p>Hello, stranger! <a href="/login/twitter">Log in with Twitter</a></p>
 {% endif %}

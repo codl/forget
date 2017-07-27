@@ -35,7 +35,7 @@ def twitter_login_step2():
     oauth_token = request.args['oauth_token']
     oauth_verifier = request.args['oauth_verifier']
     token = lib.twitter.receive_verifier(oauth_token, oauth_verifier, **app.config.get_namespace("TWITTER_"))
-    session = Session(remote_id = token.remote_id)
+    session = Session(account_remote_id = token.remote_id)
     db.session.add(session)
     db.session.commit()
     resp = Response(status=301, headers={"location": url_for('index')})
@@ -49,3 +49,9 @@ def logout():
         db.session.commit()
         g.viewer = None
     return redirect(url_for('index'))
+
+@app.route('/debug')
+def debug():
+    import tasks
+    tasks.remove_old_sessions.delay()
+    return "hi"

@@ -27,6 +27,8 @@ this will be necessary so we can tell twitter where to redirect
 """
 SERVER_NAME="localhost:5000"
 
+CELERY_BROKER='amqp://'
+
 """
 you can also use any config variable that flask expects here, such as
 """

@@ -26,6 +26,10 @@ class Account(db.Model, TimestampMixin):
     remote_display_name = db.Column(db.String)
     remote_avatar_url = db.Column(db.String)
 
+    last_post_fetch = db.Column(db.DateTime, server_default='epoch')
+
+    # backref: posts
+
 class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'
 
@@ -40,5 +44,14 @@ class Session(db.Model, TimestampMixin):
 
     id = db.Column(db.String, primary_key=True, default=lambda: secrets.token_urlsafe())
 
-    remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    account_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
     account = db.relationship(Account, lazy='joined')
+
+class Post(db.Model, TimestampMixin):
+    __tablename__ = 'posts'
+
+    remote_id = db.Column(db.String, primary_key=True)
+    body = db.Column(db.String)
+
+    author_remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    author = db.relationship(Account, lazy='joined', backref='posts')
