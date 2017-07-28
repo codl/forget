@@ -6,7 +6,6 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 
 default_config = {
-        "SQLALCHEMY_ECHO": True,
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2:///forget",
         "SECRET_KEY": "hunter2",

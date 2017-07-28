@@ -52,7 +52,7 @@ def get_twitter_for_acc(account, consumer_key=None, consumer_secret=None):
 import locale
 locale.setlocale(locale.LC_TIME, 'C') # jeez i hate that i have to do this
 
-def fetch_posts_for_acc(account, consumer_key=None, consumer_secret=None):
+def fetch_acc(account, consumer_key=None, consumer_secret=None):
     t = get_twitter_for_acc(account, consumer_key=consumer_key, consumer_secret=consumer_secret)
 
     kwargs = { 'user_id': account.remote_id, 'count': 200, 'trim_user': True }
@@ -78,6 +78,6 @@ def fetch_posts_for_acc(account, consumer_key=None, consumer_secret=None):
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
 
-    account.last_post_fetch = datetime.now()
+    account.last_fetch = datetime.now()
     db.session.commit()
 

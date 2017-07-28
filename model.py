@@ -26,7 +26,7 @@ class Account(db.Model, TimestampMixin):
     remote_display_name = db.Column(db.String)
     remote_avatar_url = db.Column(db.String)
 
-    last_post_fetch = db.Column(db.DateTime, server_default='epoch')
+    last_fetch = db.Column(db.DateTime, server_default='epoch')
 
     # backref: tokens
 

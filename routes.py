@@ -21,8 +21,9 @@ def touch_viewer(resp):
 
 @app.route('/')
 def index():
+    print('hey')
     if g.viewer:
-        posts = Post.query.order_by(db.desc(Post.created_at)).limit(30)
+        posts = Post.query.filter_by(author_id = g.viewer.account_id).order_by(db.desc(Post.created_at)).limit(30)
         return render_template('index.html', posts=posts)
     else:
         return render_template('index.html')
@@ -53,9 +54,3 @@ def logout():
         db.session.commit()
         g.viewer = None
     return redirect(url_for('index'))
-
-@app.route('/debug')
-def debug():
-    import tasks
-    tasks.fetch_posts.s('808418').delay()
-    return "hi"
