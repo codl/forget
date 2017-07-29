@@ -21,7 +21,6 @@ def touch_viewer(resp):
 
 @app.route('/')
 def index():
-    print('hey')
     if g.viewer:
         posts = Post.query.filter_by(author_id = g.viewer.account_id).order_by(db.desc(Post.created_at)).limit(30)
         return render_template('index.html', posts=posts)

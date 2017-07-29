@@ -52,24 +52,29 @@ def get_twitter_for_acc(account, consumer_key=None, consumer_secret=None):
 import locale
 locale.setlocale(locale.LC_TIME, 'C') # jeez i hate that i have to do this
 
-def fetch_acc(account, consumer_key=None, consumer_secret=None):
+def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     t = get_twitter_for_acc(account, consumer_key=consumer_key, consumer_secret=consumer_secret)
 
     kwargs = { 'user_id': account.remote_id, 'count': 200, 'trim_user': True }
+    kwargs.update(cursor or {})
 
-    most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.remote_id).first()
-    if most_recent_post:
-        kwargs['since_id'] = most_recent_post.remote_id
+    if 'max_id' not in kwargs:
+        most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.remote_id).first()
+        if most_recent_post:
+            kwargs['since_id'] = most_recent_post.remote_id
 
-    while True:
-        tweets = t.statuses.user_timeline(**kwargs)
+    print(kwargs)
 
-        if len(tweets) == 0:
-            break
+    tweets = t.statuses.user_timeline(**kwargs)
+
+    print("processing %s tweets" % (len(tweets),))
+
+    if len(tweets) > 0:
 
         kwargs['max_id'] = +inf
 
         for tweet in tweets:
+            print(tweet['text'])
             post = Post(remote_id=tweet['id_str'])
             post = db.session.merge(post)
             post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
@@ -77,7 +82,12 @@ def fetch_acc(account, consumer_key=None, consumer_secret=None):
             post.author = account
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
+    else:
+        kwargs = None
 
-    account.last_fetch = datetime.now()
+
+    account.last_fetch = db.func.now()
     db.session.commit()
+
+    return kwargs
 

@@ -5,6 +5,7 @@ from app import db
 from model import Session, Account
 import lib.twitter
 from twitter import TwitterError
+from urllib.error import URLError
 from datetime import timedelta, datetime
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
@@ -15,17 +16,20 @@ def remove_old_sessions():
             delete(synchronize_session=False)
     db.session.commit()
 
-@app.task(autoretry_for=(TwitterError,))
-def fetch_acc(remote_id):
-    lib.twitter.fetch_acc(Account.query.get(remote_id), **flaskapp.config.get_namespace("TWITTER_"))
+@app.task(autoretry_for=(TwitterError, URLError))
+def fetch_acc(remote_id, cursor=None):
+    cursor = lib.twitter.fetch_acc(Account.query.get(remote_id), cursor, **flaskapp.config.get_namespace("TWITTER_"))
+    if cursor:
+        fetch_acc.si(remote_id, cursor).apply_async()
 
 @app.task
-def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=1), limit=20):
+def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limit=20):
     accs = Account.query\
             .filter(Account.last_fetch < db.func.now() - min_staleness)\
             .order_by(db.asc(Account.last_fetch))\
             .limit(limit)
     for acc in accs:
+        print("queueing fetch for %s" % (acc.remote_display_name))
         fetch_acc.s(acc.remote_id).delay()
         acc.last_fetch = db.func.now()
     db.session.commit()
