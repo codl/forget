@@ -24,11 +24,15 @@ class Account(db.Model, TimestampMixin):
     # policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
 
     remote_display_name = db.Column(db.String)
+    remote_screen_name = db.Column(db.String)
     remote_avatar_url = db.Column(db.String)
 
     last_fetch = db.Column(db.DateTime, server_default='epoch')
 
     # backref: tokens
+
+    def __repr__(self):
+        return f"<Account({self.remote_id}, {self.remote_screen_name}, {self.remote_display_name})>"
 
 class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'

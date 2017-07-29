@@ -18,9 +18,18 @@ def remove_old_sessions():
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def fetch_acc(remote_id, cursor=None):
-    cursor = lib.twitter.fetch_acc(Account.query.get(remote_id), cursor, **flaskapp.config.get_namespace("TWITTER_"))
-    if cursor:
-        fetch_acc.si(remote_id, cursor).apply_async()
+    acc = Account.query.get(remote_id)
+    print(f'fetching {acc}')
+    try:
+        cursor = lib.twitter.fetch_acc(acc, cursor, **flaskapp.config.get_namespace("TWITTER_"))
+        if cursor:
+            fetch_acc.si(remote_id, cursor).apply_async()
+    finally:
+        db.session.rollback()
+        acc.last_fetch = db.func.now()
+        db.session.commit()
+
+
 
 @app.task
 def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limit=20):
@@ -29,7 +38,6 @@ def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limi
             .order_by(db.asc(Account.last_fetch))\
             .limit(limit)
     for acc in accs:
-        print("queueing fetch for %s" % (acc.remote_display_name))
         fetch_acc.s(acc.remote_id).delay()
         acc.last_fetch = db.func.now()
     db.session.commit()

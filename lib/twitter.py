@@ -37,6 +37,7 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
     acct = db.session.merge(acct)
 
     acct.remote_display_name = remote_acct['name']
+    acct.remote_screen_name = remote_acct['screen_name']
     acct.remote_avatar_url = remote_acct['profile_image_url_https']
     new_token.account = acct
     db.session.commit()
@@ -55,6 +56,12 @@ locale.setlocale(locale.LC_TIME, 'C') # jeez i hate that i have to do this
 def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     t = get_twitter_for_acc(account, consumer_key=consumer_key, consumer_secret=consumer_secret)
 
+    user = t.account.verify_credentials()
+
+    account.remote_display_name = user['name']
+    account.remote_screen_name = user['screen_name']
+    account.remote_avatar_url = user['profile_image_url_https']
+
     kwargs = { 'user_id': account.remote_id, 'count': 200, 'trim_user': True }
     kwargs.update(cursor or {})
 
@@ -67,14 +74,14 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
 
     tweets = t.statuses.user_timeline(**kwargs)
 
-    print("processing %s tweets" % (len(tweets),))
+    print("processing {} tweets for {acc}".format(len(tweets), acc=account))
 
     if len(tweets) > 0:
 
         kwargs['max_id'] = +inf
 
         for tweet in tweets:
-            print(tweet['text'])
+            print("TWEET ", tweet['text'])
             post = Post(remote_id=tweet['id_str'])
             post = db.session.merge(post)
             post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
@@ -85,8 +92,6 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     else:
         kwargs = None
 
-
-    account.last_fetch = db.func.now()
     db.session.commit()
 
     return kwargs
