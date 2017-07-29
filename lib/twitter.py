@@ -66,7 +66,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     kwargs.update(cursor or {})
 
     if 'max_id' not in kwargs:
-        most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.twitter_id).first()
+        most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.id).first()
         if most_recent_post:
             kwargs['since_id'] = most_recent_post.twitter_id
 
