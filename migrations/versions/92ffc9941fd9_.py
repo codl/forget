@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: a5718ca3ead1
+Revision ID: 92ffc9941fd9
 Revises: 
-Create Date: 2017-07-27 20:12:42.873090
+Create Date: 2017-07-29 12:31:47.687234
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a5718ca3ead1'
+revision = '92ffc9941fd9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,36 +21,37 @@ def upgrade():
     op.create_table('accounts',
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('remote_id', sa.String(), nullable=False),
+    sa.Column('id', sa.String(), nullable=False),
     sa.Column('remote_display_name', sa.String(), nullable=True),
+    sa.Column('remote_screen_name', sa.String(), nullable=True),
     sa.Column('remote_avatar_url', sa.String(), nullable=True),
-    sa.Column('last_post_fetch', sa.DateTime(), server_default='epoch', nullable=True),
-    sa.PrimaryKeyConstraint('remote_id', name=op.f('pk_accounts'))
+    sa.Column('last_fetch', sa.DateTime(), server_default='epoch', nullable=True),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_accounts'))
     )
     op.create_table('oauth_tokens',
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('token', sa.String(), nullable=False),
     sa.Column('token_secret', sa.String(), nullable=False),
-    sa.Column('remote_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['remote_id'], ['accounts.remote_id'], name=op.f('fk_oauth_tokens_remote_id_accounts')),
+    sa.Column('account_id', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], name=op.f('fk_oauth_tokens_account_id_accounts')),
     sa.PrimaryKeyConstraint('token', name=op.f('pk_oauth_tokens'))
     )
     op.create_table('posts',
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('remote_id', sa.String(), nullable=False),
+    sa.Column('id', sa.String(), nullable=False),
     sa.Column('body', sa.String(), nullable=True),
-    sa.Column('author_remote_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['author_remote_id'], ['accounts.remote_id'], name=op.f('fk_posts_author_remote_id_accounts')),
-    sa.PrimaryKeyConstraint('remote_id', name=op.f('pk_posts'))
+    sa.Column('author_id', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['author_id'], ['accounts.id'], name=op.f('fk_posts_author_id_accounts')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_posts'))
     )
     op.create_table('sessions',
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('account_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['account_id'], ['accounts.remote_id'], name=op.f('fk_sessions_account_id_accounts')),
+    sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], name=op.f('fk_sessions_account_id_accounts')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_sessions'))
     )
     # ### end Alembic commands ###

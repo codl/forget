@@ -33,7 +33,7 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
     new_twitter = Twitter(
             auth=OAuth(new_token.token, new_token.token_secret, consumer_key, consumer_secret))
     remote_acct = new_twitter.account.verify_credentials()
-    acct = Account(remote_id = remote_acct['id_str'])
+    acct = Account(twitter_id = remote_acct['id_str'])
     acct = db.session.merge(acct)
 
     acct.remote_display_name = remote_acct['name']
@@ -62,15 +62,13 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     account.remote_screen_name = user['screen_name']
     account.remote_avatar_url = user['profile_image_url_https']
 
-    kwargs = { 'user_id': account.remote_id, 'count': 200, 'trim_user': True }
+    kwargs = { 'user_id': account.twitter_id, 'count': 200, 'trim_user': True }
     kwargs.update(cursor or {})
 
     if 'max_id' not in kwargs:
-        most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.remote_id).first()
+        most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.twitter_id).first()
         if most_recent_post:
-            kwargs['since_id'] = most_recent_post.remote_id
-
-    print(kwargs)
+            kwargs['since_id'] = most_recent_post.twitter_id
 
     tweets = t.statuses.user_timeline(**kwargs)
 
@@ -81,8 +79,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
         kwargs['max_id'] = +inf
 
         for tweet in tweets:
-            print("TWEET ", tweet['text'])
-            post = Post(remote_id=tweet['id_str'])
+            post = Post(twitter_id=tweet['id_str'])
             post = db.session.merge(post)
             post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
             post.body = tweet['text']

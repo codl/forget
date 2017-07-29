@@ -12,10 +12,28 @@ class TimestampMixin(object):
     def touch(self):
         self.updated_at=db.func.now()
 
+class RemoteIDMixin(object):
+    @property
+    def service(self):
+        if not self.id:
+            return None
+        return self.id.split(":")[0]
 
-class Account(db.Model, TimestampMixin):
+    @property
+    def twitter_id(self):
+        if self.service != "twitter":
+            raise Exception("wrong service bucko")
+        return self.id.split(":")[1]
+
+    @twitter_id.setter
+    def twitter_id(self, id):
+        self.id = "twitter:{}".format(id)
+
+
+
+class Account(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'accounts'
-    remote_id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
 
     # policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     # policy_keep_younger = db.Column(db.Interval)
@@ -32,7 +50,7 @@ class Account(db.Model, TimestampMixin):
     # backref: tokens
 
     def __repr__(self):
-        return f"<Account({self.remote_id}, {self.remote_screen_name}, {self.remote_display_name})>"
+        return f"<Account({self.id}, {self.remote_screen_name}, {self.remote_display_name})>"
 
 class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'
@@ -40,7 +58,7 @@ class OAuthToken(db.Model, TimestampMixin):
     token = db.Column(db.String, primary_key=True)
     token_secret = db.Column(db.String, nullable=False)
 
-    remote_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    account_id = db.Column(db.String, db.ForeignKey('accounts.id'))
     account = db.relationship(Account, backref=db.backref('tokens', order_by=lambda: db.desc(OAuthToken.created_at)))
 
 class Session(db.Model, TimestampMixin):
@@ -48,14 +66,14 @@ class Session(db.Model, TimestampMixin):
 
     id = db.Column(db.String, primary_key=True, default=lambda: secrets.token_urlsafe())
 
-    account_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    account_id = db.Column(db.String, db.ForeignKey('accounts.id'))
     account = db.relationship(Account, lazy='joined')
 
-class Post(db.Model, TimestampMixin):
+class Post(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'posts'
 
-    remote_id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     body = db.Column(db.String)
 
-    author_id = db.Column(db.String, db.ForeignKey('accounts.remote_id'))
+    author_id = db.Column(db.String, db.ForeignKey('accounts.id'))
     author = db.relationship(Account)
