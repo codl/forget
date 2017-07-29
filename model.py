@@ -21,6 +21,8 @@ class RemoteIDMixin(object):
 
     @property
     def twitter_id(self):
+        if not self.id:
+            return None
         if self.service != "twitter":
             raise Exception("wrong service bucko")
         return self.id.split(":")[1]
