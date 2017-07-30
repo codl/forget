@@ -2,7 +2,7 @@ from app import app
 from flask import render_template, url_for, redirect, request, g, Response
 from datetime import datetime
 import lib.twitter
-from model import Account, Session, Post
+from model import Account, Session, Post, TwitterArchive
 from app import db
 import tasks
 
@@ -47,12 +47,27 @@ def twitter_login_step2():
 
     tasks.fetch_acc.s(token.account_id).delay()
 
-    resp = Response(status=301, headers={"location": url_for('index')})
+    resp = Response(status=302, headers={"location": url_for('index')})
     resp.set_cookie('forget_sid', session.id,
         max_age=60*60*48,
         httponly=True,
         secure=app.config.get("HTTPS"))
     return resp
+
+@app.route('/upload_twitter_archive', methods=('POST',))
+def upload_twitter_archive():
+    if not g.viewer or 'file' not in request.files:
+        return "no"
+        return redirect(url_for('index'))
+
+    ta = TwitterArchive(account = g.viewer.account,
+            body = request.files['file'].read())
+    db.session.add(ta)
+    db.session.commit()
+
+    tasks.import_twitter_archive.s(ta.id).apply_async()
+
+    return "cool. your file's being processed probably"
 
 @app.route('/logout')
 def logout():

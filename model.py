@@ -54,6 +54,9 @@ class Account(db.Model, TimestampMixin, RemoteIDMixin):
     def __repr__(self):
         return f"<Account({self.id}, {self.remote_screen_name}, {self.remote_display_name})>"
 
+    def post_count(self):
+        return Post.query.filter(Post.author_id == self.id).count()
+
 class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'
 
@@ -79,3 +82,11 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
 
     author_id = db.Column(db.String, db.ForeignKey('accounts.id'))
     author = db.relationship(Account)
+
+class TwitterArchive(db.Model, TimestampMixin):
+    __tablename__ = 'twitter_archives'
+
+    id = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.String, db.ForeignKey('accounts.id'), nullable=False)
+    account = db.relationship(Account)
+    body = db.Column(db.LargeBinary, nullable=False)

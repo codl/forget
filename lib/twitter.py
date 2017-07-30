@@ -4,6 +4,7 @@ from model import OAuthToken, Account, Post
 from app import db
 from math import inf
 from datetime import datetime
+import locale
 
 def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
     twitter = Twitter(
@@ -50,8 +51,31 @@ def get_twitter_for_acc(account, consumer_key=None, consumer_secret=None):
             auth=OAuth(token.token, token.token_secret, consumer_key, consumer_secret))
     return t
 
-import locale
-locale.setlocale(locale.LC_TIME, 'C') # jeez i hate that i have to do this
+locale.setlocale(locale.LC_TIME, 'C')
+
+def csv_tweet_to_json_tweet(tweet, account):
+    tweet.update({
+        'id': int(tweet['tweet_id']),
+        'id_str': tweet['tweet_id'],
+        'created_at': datetime.strptime(tweet['timestamp'],
+            '%Y-%m-%d %H:%M:%S %z')\
+            .strftime('%a %b %d %H:%M:%S %z %Y'),
+        'user': {
+            'id': int(account.twitter_id),
+            'id_str': account.twitter_id
+            }
+    })
+    return tweet
+
+def tweet_to_post(tweet):
+    post = Post(twitter_id=tweet['id_str'])
+    post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
+    if 'full_text' in tweet:
+        post.body = tweet['full_text']
+    else:
+        post.body = tweet['text']
+    post.author_id = 'twitter:{}'.format(tweet['user']['id_str'])
+    return post
 
 def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     t = get_twitter_for_acc(account, consumer_key=consumer_key, consumer_secret=consumer_secret)
@@ -79,11 +103,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
         kwargs['max_id'] = +inf
 
         for tweet in tweets:
-            post = Post(twitter_id=tweet['id_str'])
-            post = db.session.merge(post)
-            post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
-            post.body = tweet['full_text']
-            post.author = account
+            import_tweet(tweet, account, db.session)
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
     else:

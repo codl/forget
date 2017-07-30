@@ -2,11 +2,14 @@ from celery import Celery
 
 from app import app as flaskapp
 from app import db
-from model import Session, Account
+from model import Session, Account, TwitterArchive
 import lib.twitter
 from twitter import TwitterError
 from urllib.error import URLError
 from datetime import timedelta, datetime
+from zipfile import ZipFile
+from io import BytesIO, TextIOWrapper
+import csv
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
 
@@ -46,6 +49,21 @@ def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limi
 app.add_periodic_task(10*60, remove_old_sessions)
 app.add_periodic_task(60, queue_fetch_for_most_stale_accounts)
 
+@app.task
+def import_twitter_archive(id):
+    ta = TwitterArchive.query.get(id)
+
+    with ZipFile(BytesIO(ta.body), 'r') as zipfile:
+        tweetscsv = TextIOWrapper(zipfile.open('tweets.csv', 'r'))
+
+    for tweet in csv.DictReader(tweetscsv):
+        tweet = lib.twitter.csv_tweet_to_json_tweet(tweet, ta.account)
+        post = lib.twitter.tweet_to_post(tweet)
+        db.session.merge(post)
+        db.session.commit()
+
+    db.session.delete(ta)
+    db.session.commit()
 
 
 
