@@ -4,6 +4,7 @@ from datetime import datetime
 import lib.twitter
 from model import Account, Session, Post
 from app import db
+import tasks
 
 @app.before_request
 def load_viewer():
@@ -39,9 +40,13 @@ def twitter_login_step2():
     oauth_token = request.args['oauth_token']
     oauth_verifier = request.args['oauth_verifier']
     token = lib.twitter.receive_verifier(oauth_token, oauth_verifier, **app.config.get_namespace("TWITTER_"))
+
     session = Session(account_id = token.account_id)
     db.session.add(session)
     db.session.commit()
+
+    tasks.fetch_acc.s(token.account_id).delay()
+
     resp = Response(status=301, headers={"location": url_for('index')})
     resp.set_cookie('forget_sid', session.id)
     return resp
