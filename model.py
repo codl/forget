@@ -49,6 +49,9 @@ class Account(db.Model, TimestampMixin, RemoteIDMixin):
 
     last_fetch = db.Column(db.DateTime, server_default='epoch')
 
+    def touch_fetch(self):
+        self.last_fetch = db.func.now()
+
     # backref: tokens
 
     def __repr__(self):

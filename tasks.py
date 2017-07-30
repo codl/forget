@@ -43,7 +43,7 @@ def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limi
             .limit(limit)
     for acc in accs:
         fetch_acc.s(acc.id).delay()
-        acc.last_fetch = db.func.now()
+        acc.touch_fetch()
     db.session.commit()
 
 app.add_periodic_task(10*60, remove_old_sessions)
