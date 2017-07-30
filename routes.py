@@ -50,6 +50,7 @@ def twitter_login_step2():
     resp = Response(status=301, headers={"location": url_for('index')})
     resp.set_cookie('forget_sid', session.id,
         max_age=60*60*48,
+        httponly=True,
         secure=app.config.get("HTTPS"))
     return resp
 
