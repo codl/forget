@@ -62,7 +62,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     account.remote_screen_name = user['screen_name']
     account.remote_avatar_url = user['profile_image_url_https']
 
-    kwargs = { 'user_id': account.twitter_id, 'count': 200, 'trim_user': True }
+    kwargs = { 'user_id': account.twitter_id, 'count': 200, 'trim_user': True, 'tweet_mode': 'extended' }
     kwargs.update(cursor or {})
 
     if 'max_id' not in kwargs:
@@ -82,7 +82,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
             post = Post(twitter_id=tweet['id_str'])
             post = db.session.merge(post)
             post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
-            post.body = tweet['text']
+            post.body = tweet['full_text']
             post.author = account
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
