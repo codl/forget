@@ -12,7 +12,7 @@ app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='
 
 @app.task
 def remove_old_sessions():
-    Session.query.filter(Session.updated_at < (db.func.now() - timedelta(hours=12))).\
+    Session.query.filter(Session.updated_at < (db.func.now() - timedelta(hours=48))).\
             delete(synchronize_session=False)
     db.session.commit()
 
