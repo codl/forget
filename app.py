@@ -10,6 +10,7 @@ default_config = {
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2:///forget",
         "SECRET_KEY": "hunter2",
         "CELERY_BROKER": "amqp://",
+        "HTTPS": True
 }
 
 app.config.update(default_config)

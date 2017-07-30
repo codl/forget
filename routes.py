@@ -48,7 +48,9 @@ def twitter_login_step2():
     tasks.fetch_acc.s(token.account_id).delay()
 
     resp = Response(status=301, headers={"location": url_for('index')})
-    resp.set_cookie('forget_sid', session.id)
+    resp.set_cookie('forget_sid', session.id,
+        max_age=60*60*48,
+        secure=app.config.get("HTTPS"))
     return resp
 
 @app.route('/logout')

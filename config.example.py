@@ -29,6 +29,8 @@ SERVER_NAME="localhost:5000"
 
 CELERY_BROKER='amqp://'
 
+HTTPS=True
+
 """
 you can also use any config variable that flask expects here, such as
 """
