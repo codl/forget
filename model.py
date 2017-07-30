@@ -93,3 +93,6 @@ class TwitterArchive(db.Model, TimestampMixin):
     account_id = db.Column(db.String, db.ForeignKey('accounts.id'), nullable=False)
     account = db.relationship(Account)
     body = db.Column(db.LargeBinary, nullable=False)
+    chunks = db.Column(db.Integer)
+    chunks_successful = db.Column(db.Integer, server_default='0')
+    chunks_failed = db.Column(db.Integer, server_default='0')

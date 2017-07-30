@@ -9,7 +9,7 @@ from urllib.error import URLError
 from datetime import timedelta, datetime
 from zipfile import ZipFile
 from io import BytesIO, TextIOWrapper
-import csv
+import json
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
 
@@ -50,20 +50,47 @@ app.add_periodic_task(10*60, remove_old_sessions)
 app.add_periodic_task(60, queue_fetch_for_most_stale_accounts)
 
 @app.task
-def import_twitter_archive(id):
-    ta = TwitterArchive.query.get(id)
+def import_twitter_archive(archive_id):
+    ta = TwitterArchive.query.get(archive_id)
 
     with ZipFile(BytesIO(ta.body), 'r') as zipfile:
-        tweetscsv = TextIOWrapper(zipfile.open('tweets.csv', 'r'))
+        files = [filename for filename in zipfile.namelist() if filename.startswith('data/js/tweets/') and filename.endswith('.js')]
 
-    for tweet in csv.DictReader(tweetscsv):
-        tweet = lib.twitter.csv_tweet_to_json_tweet(tweet, ta.account)
-        post = lib.twitter.tweet_to_post(tweet)
-        db.session.merge(post)
+    files.sort()
+
+    ta.chunks = len(files)
+    db.session.commit()
+
+    for filename in files:
+        import_twitter_archive_month.s(archive_id, filename).apply_async()
+
+
+@app.task
+def import_twitter_archive_month(archive_id, month_path):
+    ta = TwitterArchive.query.get(archive_id)
+
+    try:
+
+        with ZipFile(BytesIO(ta.body), 'r') as zipfile:
+            with TextIOWrapper(zipfile.open(month_path, 'r')) as f:
+
+                # seek past header
+                f.readline()
+
+                tweets = json.load(f)
+
+        for tweet in tweets:
+            post = lib.twitter.tweet_to_post(tweet)
+            post = db.session.merge(post)
+
+        ta.chunks_successful = TwitterArchive.chunks_successful + 1
         db.session.commit()
 
-    db.session.delete(ta)
-    db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        ta.chunks_failed = TwitterArchive.chunks_failed + 1
+        db.session.commit()
+        raise e
 
 
 

@@ -69,7 +69,11 @@ def csv_tweet_to_json_tweet(tweet, account):
 
 def tweet_to_post(tweet):
     post = Post(twitter_id=tweet['id_str'])
-    post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
+    try:
+        post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
+    except ValueError:
+        post.created_at = datetime.strptime(tweet['created_at'], '%Y-%m-%d %H:%M:%S %z')
+        #whyyy
     if 'full_text' in tweet:
         post.body = tweet['full_text']
     else:
@@ -103,7 +107,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
         kwargs['max_id'] = +inf
 
         for tweet in tweets:
-            import_tweet(tweet, account, db.session)
+            db.session.merge(tweet_to_post(tweet))
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
     else:
