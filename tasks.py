@@ -2,7 +2,7 @@ from celery import Celery
 
 from app import app as flaskapp
 from app import db
-from model import Session, Account, TwitterArchive
+from model import Session, Account, TwitterArchive, Post
 import lib.twitter
 from twitter import TwitterError
 from urllib.error import URLError
@@ -70,6 +70,12 @@ def import_twitter_archive_month(archive_id, month_path):
 
         for tweet in tweets:
             post = lib.twitter.tweet_to_post(tweet)
+            existing_post = db.session.query(Post).get(post.id)
+
+            if post.author_id != ta.account_id \
+            or existing_post and existing_post.author_id != ta.account_id:
+                raise Exception("Shenanigans!")
+
             post = db.session.merge(post)
 
         ta.chunks_successful = TwitterArchive.chunks_successful + 1
