@@ -2,6 +2,9 @@
 
 <form method='post' enctype='multipart/form-data'>
     <h2>Settings</h2>
+    {% if request.method == 'POST' %}
+    <h3>Settings saved successfully</h3>
+    {% endif %}
     <p>Delete posts:
         <label><input type=radio name=policy_enabled value=true {{ "checked" if g.viewer.account.policy_enabled }}> Enabled</label>
         <label><input type=radio name=policy_enabled value=false {{ "checked" if not g.viewer.account.policy_enabled }}> Disabled</label>
@@ -28,9 +31,18 @@
 </form>
 
 {% if g.viewer.account.service == 'twitter' %}
+
 <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
     <h2>Tweet archive import</h2>
     Upload your tweet archive:
     <input type="file" name='file'><input type="submit">
 </form>
+
+<h3>Recent tweet archive imports</h3>
+{% for archive in g.viewer.account.twitter_archives %}
+<p>{{archive.created_at}} {{archive.chunks_successful}}/{{archive.chunks}} months successfully imported, {{archive.chunks_failed}} failed</p>
+{% else %}
+<p>No recent archives found</p>
+{% endfor %}
+
 {% endif %}

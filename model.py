@@ -53,6 +53,7 @@ class Account(db.Model, TimestampMixin, RemoteIDMixin):
         self.last_fetch = db.func.now()
 
     # backref: tokens
+    # backref: twitter_archives
 
     def __repr__(self):
         return f"<Account({self.id}, {self.remote_screen_name}, {self.remote_display_name})>"
@@ -91,8 +92,8 @@ class TwitterArchive(db.Model, TimestampMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.String, db.ForeignKey('accounts.id'), nullable=False)
-    account = db.relationship(Account)
-    body = db.Column(db.LargeBinary, nullable=False)
+    account = db.relationship(Account, backref=db.backref('twitter_archives', order_by=lambda: db.desc(TwitterArchive.id)))
+    body = db.deferred(db.Column(db.LargeBinary, nullable=False))
     chunks = db.Column(db.Integer)
     chunks_successful = db.Column(db.Integer, server_default='0')
     chunks_failed = db.Column(db.Integer, server_default='0')

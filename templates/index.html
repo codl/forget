@@ -1,3 +1,5 @@
+<h1>Forget</h1>
+
 {% if g.viewer %}
     <p>Hello,
     <img src="{{g.viewer.account.remote_avatar_url}}" style='height:1.5em; border-radius:100%; transform:translateY(25%);'/>
@@ -6,7 +8,7 @@
     <a href="{{url_for('logout')}}">Log out</a>
     </p>
 
-    <p>your posts ({{g.viewer.account.post_count()}}):</p>
+    <h2>Recent posts ({{g.viewer.account.post_count()}} total posts):</h2>
 
     {% for post in posts %}
         <p>{{post.body}}</p>
