@@ -67,10 +67,19 @@ def upload_tweet_archive():
 
     return render_template('upload_tweet_archive.html')
 
-@app.route('/settings')
+@app.route('/settings', methods=('GET', 'POST'))
 @require_auth
 def settings():
+    if request.method == 'POST':
+        for attr in ('policy_enabled', 'policy_ignore_favourites'):
+            if attr in request.form:
+                setattr(g.viewer.account, attr, request.form[attr])
+
+        db.session.commit()
+
     return render_template('settings.html')
+
+
 
 @app.route('/logout')
 @require_auth

@@ -37,11 +37,11 @@ class Account(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'accounts'
     id = db.Column(db.String, primary_key=True)
 
-    # policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
+    policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     # policy_keep_younger = db.Column(db.Interval)
     # policy_keep_latest = db.Column(db.Integer)
     # policy_delete_every = db.Column(db.Interval)
-    # policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
+    policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
 
     remote_display_name = db.Column(db.String)
     remote_screen_name = db.Column(db.String)

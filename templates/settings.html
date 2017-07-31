@@ -1,14 +1,36 @@
 <p><a href="{{url_for('index')}}">&lt; Back</a></p>
 
+<form method='post' enctype='multipart/form-data'>
+    <h2>Settings</h2>
+    <p>Delete posts:
+        <label><input type=radio name=policy_enabled value=true {{ "checked" if g.viewer.account.policy_enabled }}> Enabled</label>
+        <label><input type=radio name=policy_enabled value=false {{ "checked" if not g.viewer.account.policy_enabled }}> Disabled</label>
+    </p>
+    {#
+    <p>Keep posts less than
+        <input type=number name=policy_keep_younger min=0 step=1 max=30>
+        <select name=policy_keep_younger_multiplier>
+            <option name=1>seconds</option>
+            <option name=60>minutes</option>
+            <option name=3600>hours</option>
+            <option name=86400>days</option>
+            <option name=2635200>months</option>
+            <option name=31536000>years</option>
+        </select>
+        old
+    </p>
+    #}
+    <p>Keep posts that you have favourited:
+        <label><input type=radio name=policy_ignore_favourites value=true {{ "checked" if g.viewer.account.policy_ignore_favourites }}> Yes</label>
+        <label><input type=radio name=policy_ignore_favourites value=false {{ "checked" if not g.viewer.account.policy_ignore_favourites }}> No</label>
+    </p>
+    <input type=submit value='Save'>
+</form>
+
 {% if g.viewer.account.service == 'twitter' %}
 <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
+    <h2>Tweet archive import</h2>
     Upload your tweet archive:
     <input type="file" name='file'><input type="submit">
 </form>
 {% endif %}
-
-<form method='post' enctype='multipart/form-data'>
-    ahh
-</form>
-
-
