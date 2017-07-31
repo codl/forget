@@ -2,6 +2,7 @@ from app import app
 from flask import render_template, url_for, redirect, request, g, Response
 from datetime import datetime
 import lib.twitter
+from lib import require_auth
 from model import Account, Session, Post, TwitterArchive
 from app import db
 import tasks
@@ -54,12 +55,9 @@ def twitter_login_step2():
         secure=app.config.get("HTTPS"))
     return resp
 
-@app.route('/upload_twitter_archive', methods=('POST',))
-def upload_twitter_archive():
-    if not g.viewer or 'file' not in request.files:
-        return "no"
-        return redirect(url_for('index'))
-
+@app.route('/upload_tweet_archive', methods=('POST',))
+@require_auth
+def upload_tweet_archive():
     ta = TwitterArchive(account = g.viewer.account,
             body = request.files['file'].read())
     db.session.add(ta)
@@ -67,9 +65,15 @@ def upload_twitter_archive():
 
     tasks.import_twitter_archive.s(ta.id).apply_async()
 
-    return "cool. your file's being processed probably"
+    return render_template('upload_tweet_archive.html')
+
+@app.route('/settings')
+@require_auth
+def settings():
+    return render_template('settings.html')
 
 @app.route('/logout')
+@require_auth
 def logout():
     if(g.viewer):
         db.session.delete(g.viewer)

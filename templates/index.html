@@ -1,19 +1,18 @@
 {% if g.viewer %}
-<p>Hello,
-<img src="{{g.viewer.account.remote_avatar_url}}"/>
-{{g.viewer.account.remote_display_name}}! <a href="/logout">Log out</a></p>
+    <p>Hello,
+    <img src="{{g.viewer.account.remote_avatar_url}}" style='height:1.5em; border-radius:100%; transform:translateY(25%);'/>
+    {{g.viewer.account.remote_display_name}}!
+    <a href="{{url_for('settings')}}">Settings</a>
+    <a href="{{url_for('logout')}}">Log out</a>
+    </p>
 
-<form action='/upload_twitter_archive' method='post' enctype='multipart/form-data'>
-    Upload your tweet archive:
-    <input type="file" name='file'><input type="submit">
-</form>
+    <p>your posts ({{g.viewer.account.post_count()}}):</p>
 
-<p>your posts ({{g.viewer.account.post_count()}}):</p>
-{% for post in posts %}
-<p>{{post.body}}</p>
+    {% for post in posts %}
+        <p>{{post.body}}</p>
+    {% else %}
+        <p>no posts :(</p>
+    {% endfor %}
 {% else %}
-<p>no posts :(</p>
-{% endfor %}
-{% else %}
-<p>Hello, stranger! <a href="/login/twitter">Log in with Twitter</a></p>
+    <p>Hello, stranger! <a href="/login/twitter">Log in with Twitter</a></p>
 {% endif %}

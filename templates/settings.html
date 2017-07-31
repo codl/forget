@@ -1,0 +1,14 @@
+<p><a href="{{url_for('index')}}">&lt; Back</a></p>
+
+{% if g.viewer.account.service == 'twitter' %}
+<form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
+    Upload your tweet archive:
+    <input type="file" name='file'><input type="submit">
+</form>
+{% endif %}
+
+<form method='post' enctype='multipart/form-data'>
+    ahh
+</form>
+
+
