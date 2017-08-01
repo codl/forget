@@ -19,6 +19,10 @@ def decompose_interval(attrname):
 
         @property
         def scale(self):
+
+            if getattr(self, attrname) == timedelta(0):
+                return timedelta(seconds=1)
+
             for m in scales:
                 if getattr(self, attrname) % m == timedelta(0):
                     return m
