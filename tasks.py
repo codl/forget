@@ -11,6 +11,7 @@ from zipfile import ZipFile
 from io import BytesIO, TextIOWrapper
 import json
 from kombu import Queue
+import random
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
 app.conf.task_queues = (
@@ -105,8 +106,43 @@ def periodic_cleanup():
             delete(synchronize_session=False)
     db.session.commit()
 
+
+@app.task
+def queue_deletes():
+    eligible_accounts = Account.query.filter(Account.policy_enabled == True).\
+            filter(Account.last_delete + Account.policy_delete_every < db.func.now())
+    for account in eligible_accounts:
+        delete_from_account.s(account.id).apply_async()
+
+@app.task
+def delete_from_account(account_id):
+    account = Account.query.get(account_id)
+    latest_n_posts = db.session.query(Post.id).with_parent(account).order_by(db.desc(Post.created_at)).limit(account.policy_keep_latest)
+    posts = Post.query.with_parent(account).\
+        filter(Post.created_at + account.policy_keep_younger <= db.func.now()).\
+        filter(~Post.id.in_(latest_n_posts)).\
+        order_by(db.func.random()).limit(100).all()
+
+    if account.service == 'twitter':
+        posts = lib.twitter.refresh_posts(posts)
+        eligible = list((post for post in posts if not account.policy_keep_favourites or not post.favourite))
+        if eligible:
+            if account.policy_delete_every == timedelta(0):
+                print("deleting all {} eligible posts for {}".format(len(eligible), account))
+                for post in eligible:
+                    lib.twitter.delete(post)
+            else:
+                post = random.choice(list((post for post in posts if not account.policy_keep_favourites or not post.favourite)))
+                print("deleting {}".format(post))
+                lib.twitter.delete(post)
+                account.last_delete = db.func.now()
+
+    db.session.commit()
+
 app.add_periodic_task(6*60*60, periodic_cleanup)
-app.add_periodic_task(60, queue_fetch_for_most_stale_accounts)
+app.add_periodic_task(45, queue_fetch_for_most_stale_accounts)
+app.add_periodic_task(45, queue_deletes)
 
 if __name__ == '__main__':
     app.worker_main()
+

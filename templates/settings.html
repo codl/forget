@@ -22,8 +22,8 @@
         latest posts
     </p>
     <p>Keep posts that I have favourited
-        <label><input type=radio name=policy_ignore_favourites value=true {{ "checked" if g.viewer.account.policy_ignore_favourites }}> Yes</label>
-        <label><input type=radio name=policy_ignore_favourites value=false {{ "checked" if not g.viewer.account.policy_ignore_favourites }}> No</label>
+        <label><input type=radio name=policy_keep_favourites value=true {{ "checked" if g.viewer.account.policy_keep_favourites }}> Yes</label>
+        <label><input type=radio name=policy_keep_favourites value=false {{ "checked" if not g.viewer.account.policy_keep_favourites }}> No</label>
     </p>
     <input type=submit value='Save'>
 </form>

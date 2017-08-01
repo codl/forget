@@ -5,6 +5,7 @@ from app import db
 from twitter import Twitter, OAuth
 import secrets
 from lib import decompose_interval
+from datetime import timedelta
 
 class TimestampMixin(object):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
@@ -42,7 +43,7 @@ class Account(TimestampMixin, RemoteIDMixin):
 
     policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     policy_keep_latest = db.Column(db.Integer, server_default='0')
-    policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
+    policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE')
     policy_delete_every = db.Column(db.Interval, server_default='0')
     policy_keep_younger = db.Column(db.Interval, server_default='0')
 
@@ -103,6 +104,14 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     author_id = db.Column(db.String, db.ForeignKey('accounts.id'))
     author = db.relationship(Account,
             backref=db.backref('posts', order_by=lambda: db.desc(Post.created_at)))
+
+    favourite = db.Column(db.Boolean, server_default='FALSE', nullable=False)
+
+    def __repr__(self):
+        snippet = self.body
+        if len(snippet) > 20:
+            snippet = snippet[:19] + "…"
+        return '<Post ({}, "{}", Author: {})>'.format(self.id, snippet, self.author_id)
 
 class TwitterArchive(db.Model, TimestampMixin):
     __tablename__ = 'twitter_archives'

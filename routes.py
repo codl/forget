@@ -73,7 +73,7 @@ def upload_tweet_archive():
 def settings():
     if request.method == 'POST':
         for attr in ('policy_enabled',
-                'policy_ignore_favourites',
+                'policy_keep_favourites',
                 'policy_keep_latest',
                 'policy_delete_every_significand',
                 'policy_delete_every_scale',

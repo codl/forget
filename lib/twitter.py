@@ -1,7 +1,7 @@
 from twitter import Twitter, OAuth
 from werkzeug.urls import url_decode
 from model import OAuthToken, Account, Post
-from app import db
+from app import db, app
 from math import inf
 from datetime import datetime
 import locale
@@ -45,30 +45,22 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
 
     return new_token
 
-def get_twitter_for_acc(account, consumer_key=None, consumer_secret=None):
-    token = account.tokens[0]
+def get_twitter_for_acc(account):
+
+    consumer_key = app.config['TWITTER_CONSUMER_KEY']
+    consumer_secret = app.config['TWITTER_CONSUMER_SECRET']
+
+    token = OAuthToken.query.with_parent(account).order_by(db.desc(OAuthToken.created_at)).first()
     t = Twitter(
             auth=OAuth(token.token, token.token_secret, consumer_key, consumer_secret))
     return t
 
 locale.setlocale(locale.LC_TIME, 'C')
 
-def csv_tweet_to_json_tweet(tweet, account):
-    tweet.update({
-        'id': int(tweet['tweet_id']),
-        'id_str': tweet['tweet_id'],
-        'created_at': datetime.strptime(tweet['timestamp'],
-            '%Y-%m-%d %H:%M:%S %z')\
-            .strftime('%a %b %d %H:%M:%S %z %Y'),
-        'user': {
-            'id': int(account.twitter_id),
-            'id_str': account.twitter_id
-            }
-    })
-    return tweet
-
-def tweet_to_post(tweet):
-    post = Post(twitter_id=tweet['id_str'])
+def tweet_to_post(tweet, post=None):
+    if not post:
+        post = Post()
+    post.twitter_id = tweet['id_str']
     try:
         post.created_at = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y')
     except ValueError:
@@ -79,10 +71,12 @@ def tweet_to_post(tweet):
     else:
         post.body = tweet['text']
     post.author_id = 'twitter:{}'.format(tweet['user']['id_str'])
+    if 'favorited' in tweet:
+        post.favourite = tweet['favorited']
     return post
 
 def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
-    t = get_twitter_for_acc(account, consumer_key=consumer_key, consumer_secret=consumer_secret)
+    t = get_twitter_for_acc(account)
 
     user = t.account.verify_credentials()
 
@@ -117,3 +111,24 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
 
     return kwargs
 
+
+def refresh_posts(posts):
+    t = get_twitter_for_acc(posts[0].author)
+    tweets = t.statuses.lookup(_id=",".join((post.twitter_id for post in posts)),
+            trim_user = True, tweet_mode = 'extended')
+    refreshed_posts = list()
+    for post in posts:
+        tweet = next((tweet for tweet in tweets if tweet['id_str'] == post.twitter_id), None)
+        if not tweet:
+            session.delete(post)
+        else:
+            post = db.session.merge(tweet_to_post(tweet))
+            refreshed_posts.append(post)
+
+    return refreshed_posts
+
+
+def delete(post):
+    t = get_twitter_for_acc(post.author)
+    t.statuses.destroy(id=post.twitter_id)
+    db.session.delete(post)

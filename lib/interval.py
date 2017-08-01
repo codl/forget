@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 SCALES = [
-    ('seconds', timedelta(seconds=1)),
     ('minutes', timedelta(minutes=1)),
     ('hours', timedelta(hours=1)),
     ('days', timedelta(days=1)),
@@ -21,13 +20,13 @@ def decompose_interval(attrname):
         def scale(self):
 
             if getattr(self, attrname) == timedelta(0):
-                return timedelta(seconds=1)
+                return timedelta(minutes=1)
 
             for m in scales:
                 if getattr(self, attrname) % m == timedelta(0):
                     return m
 
-            return timedelta(seconds=1)
+            return timedelta(minutes=1)
 
         @scale.setter
         def scale(self, value):
