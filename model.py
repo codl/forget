@@ -4,6 +4,7 @@ from app import db
 
 from twitter import Twitter, OAuth
 import secrets
+from lib import decompose_interval
 
 class TimestampMixin(object):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
@@ -33,15 +34,17 @@ class RemoteIDMixin(object):
 
 
 
-class Account(db.Model, TimestampMixin, RemoteIDMixin):
+@decompose_interval('policy_delete_every')
+@decompose_interval('policy_keep_younger')
+class Account(TimestampMixin, RemoteIDMixin):
     __tablename__ = 'accounts'
     id = db.Column(db.String, primary_key=True)
 
     policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
-    # policy_keep_younger = db.Column(db.Interval)
-    # policy_keep_latest = db.Column(db.Integer)
-    # policy_delete_every = db.Column(db.Interval)
+    policy_keep_latest = db.Column(db.Integer, server_default='0')
     policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
+    policy_delete_every = db.Column(db.Interval, server_default='0', default=0)
+    policy_keep_younger = db.Column(db.Interval, server_default='0', default=0)
 
     remote_display_name = db.Column(db.String)
     remote_screen_name = db.Column(db.String)
@@ -60,6 +63,11 @@ class Account(db.Model, TimestampMixin, RemoteIDMixin):
 
     def post_count(self):
         return Post.query.filter(Post.author_id == self.id).count()
+
+
+class Account(Account, db.Model):
+    pass
+
 
 class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'

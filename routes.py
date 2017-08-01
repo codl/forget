@@ -2,6 +2,7 @@ from app import app
 from flask import render_template, url_for, redirect, request, g, Response
 from datetime import datetime
 import lib.twitter
+import lib
 from lib import require_auth
 from model import Account, Session, Post, TwitterArchive
 from app import db
@@ -46,7 +47,7 @@ def twitter_login_step2():
     db.session.add(session)
     db.session.commit()
 
-    tasks.fetch_acc.s(token.account_id).delay()
+    tasks.fetch_acc.s(token.account_id).apply_async(routing_key='high')
 
     resp = Response(status=302, headers={"location": url_for('index')})
     resp.set_cookie('forget_sid', session.id,
@@ -63,7 +64,7 @@ def upload_tweet_archive():
     db.session.add(ta)
     db.session.commit()
 
-    tasks.import_twitter_archive.s(ta.id).apply_async()
+    tasks.import_twitter_archive.s(ta.id).apply_async(routing_key='high')
 
     return render_template('upload_tweet_archive.html')
 
@@ -71,13 +72,20 @@ def upload_tweet_archive():
 @require_auth
 def settings():
     if request.method == 'POST':
-        for attr in ('policy_enabled', 'policy_ignore_favourites'):
+        for attr in ('policy_enabled',
+                'policy_ignore_favourites',
+                'policy_keep_latest',
+                'policy_delete_every_significand',
+                'policy_delete_every_scale',
+                'policy_keep_younger_significand',
+                'policy_keep_younger_scale',
+                ):
             if attr in request.form:
                 setattr(g.viewer.account, attr, request.form[attr])
 
         db.session.commit()
 
-    return render_template('settings.html')
+    return render_template('settings.html', scales=lib.interval_scales)
 
 
 

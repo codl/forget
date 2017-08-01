@@ -1,0 +1,15 @@
+{% macro interval_input(obj, attrname, scales) -%}
+
+<input type=number name={{attrname}}_significand
+value={{obj[attrname + '_significand']}}
+style='max-width:8ch' min=0 step=1>
+<select name={{attrname}}_scale>
+{%- for scale in scales %}
+    <option value="{{scale[1].total_seconds()}}"
+    {{- ' selected' if scale[1] == obj[attrname + '_scale'] -}}
+    >{{scale[0]}}</option>
+{% endfor -%}
+</select>
+
+
+{%- endmacro %}

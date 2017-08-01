@@ -10,8 +10,17 @@ from datetime import timedelta, datetime
 from zipfile import ZipFile
 from io import BytesIO, TextIOWrapper
 import json
+from kombu import Queue
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
+app.conf.task_queues = (
+        Queue('default', routing_key='celery'),
+        Queue('high_prio', routing_key='high'),
+        Queue('higher_prio', routing_key='higher'),
+)
+app.conf.task_default_queue = 'default'
+app.conf.task_default_exchange = 'celery'
+app.conf.task_default_exchange_type = 'direct'
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def fetch_acc(id, cursor=None):
