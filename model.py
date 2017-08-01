@@ -51,18 +51,26 @@ class Account(TimestampMixin, RemoteIDMixin):
     remote_avatar_url = db.Column(db.String)
 
     last_fetch = db.Column(db.DateTime, server_default='epoch')
+    last_delete = db.Column(db.DateTime, server_default='epoch')
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
 
+    @db.validates('policy_keep_younger', 'policy_delete_every')
+    def validate_intervals(self, key, value):
+        if not (value == timedelta(0) or value >= timedelta(minutes=1)):
+            value = timedelta(minutes=1)
+        return value
+
     # backref: tokens
     # backref: twitter_archives
+    # backref: posts
 
     def __repr__(self):
         return f"<Account({self.id}, {self.remote_screen_name}, {self.remote_display_name})>"
 
     def post_count(self):
-        return Post.query.filter(Post.author_id == self.id).count()
+        return Post.query.with_parent(self).count()
 
 
 class Account(Account, db.Model):
@@ -93,7 +101,8 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     body = db.Column(db.String)
 
     author_id = db.Column(db.String, db.ForeignKey('accounts.id'))
-    author = db.relationship(Account)
+    author = db.relationship(Account,
+            backref=db.backref('posts', order_by=lambda: db.desc(Post.created_at)))
 
 class TwitterArchive(db.Model, TimestampMixin):
     __tablename__ = 'twitter_archives'
