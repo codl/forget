@@ -43,8 +43,8 @@ class Account(TimestampMixin, RemoteIDMixin):
     policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     policy_keep_latest = db.Column(db.Integer, server_default='0')
     policy_ignore_favourites = db.Column(db.Boolean, server_default='TRUE')
-    policy_delete_every = db.Column(db.Interval, server_default='0', default=0)
-    policy_keep_younger = db.Column(db.Interval, server_default='0', default=0)
+    policy_delete_every = db.Column(db.Interval, server_default='0')
+    policy_keep_younger = db.Column(db.Interval, server_default='0')
 
     remote_display_name = db.Column(db.String)
     remote_screen_name = db.Column(db.String)
