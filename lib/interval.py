@@ -31,10 +31,8 @@ def decompose_interval(attrname):
 
         @scale.setter
         def scale(self, value):
-            print(value)
             if(type(value) != timedelta):
                 value = timedelta(seconds=float(value))
-                print(value)
             setattr(self, attrname, getattr(self, sig_name) * value)
 
         @property
