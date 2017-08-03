@@ -77,6 +77,20 @@ class Account(TimestampMixin, RemoteIDMixin):
     def post_count(self):
         return Post.query.with_parent(self).count()
 
+    def estimate_eligible_for_delete(self):
+        """
+        this is an estimation because we do not know if favourite status has changed since last time a post was refreshed
+        and it is unfeasible to refresh every single post every time we need to know how many posts are eligible to delete
+        """
+        latest_n_posts = db.session.query(Post.id).with_parent(self).order_by(db.desc(Post.created_at)).limit(self.policy_keep_latest)
+        query = Post.query.with_parent(self).\
+            filter(Post.created_at + self.policy_keep_younger <= db.func.now()).\
+            filter(~Post.id.in_(latest_n_posts))
+        if(self.policy_keep_favourites):
+            query = query.filter_by(favourite = False)
+        return query.count()
+
+
 
 
 class Account(Account, db.Model):

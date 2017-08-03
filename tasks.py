@@ -123,8 +123,8 @@ def delete_from_account(account_id):
         filter(~Post.id.in_(latest_n_posts)).\
         order_by(db.func.random()).limit(100).all()
 
+    posts = refresh_account(account_id)
     if account.service == 'twitter':
-        posts = lib.twitter.refresh_posts(posts)
         eligible = list((post for post in posts if not account.policy_keep_favourites or not post.favourite))
         if eligible:
             if account.policy_delete_every == timedelta(0):
@@ -139,9 +139,39 @@ def delete_from_account(account_id):
 
     db.session.commit()
 
+def refresh_posts(posts):
+    posts = list(posts)
+    if len(posts) == 0:
+        return []
+
+    if posts[0].service == 'twitter':
+        return lib.twitter.refresh_posts(posts)
+
+@app.task
+def refresh_account(account_id):
+    account = Account.query.get(account_id)
+
+    oldest_post = Post.query.with_parent(account).order_by(db.asc(Post.updated_at)).first()
+
+    if not oldest_post:
+        return []
+
+    posts = Post.query.with_parent(account).filter(Post.id != oldest_post.id).order_by(db.func.random()).limit(99).all()
+    posts.append(oldest_post)
+
+    posts = refresh_posts(posts)
+    db.session.commit()
+    return posts
+
+@app.task
+def refresh_account_with_oldest_post():
+    post = Post.query.options(db.joinedload(Post.author)).order_by(db.asc(Post.updated_at)).first()
+    return refresh_account(post.author_id)
+
 app.add_periodic_task(6*60*60, periodic_cleanup)
 app.add_periodic_task(45, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(45, queue_deletes)
+app.add_periodic_task(30*60, refresh_account_with_oldest_post)
 
 if __name__ == '__main__':
     app.worker_main()

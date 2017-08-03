@@ -1,0 +1,20 @@
+{% extends 'lib/layout.html' %}
+{% block body %}
+<section>
+    <h2>Ahhhh (dats me yellin)</h2>
+
+<div class="banner warning">
+    <p>{{message|safe}}</p>
+
+    <div>
+        <form method='post'>
+            <input name='confirm' value='Do it' type='submit'/>
+        </form>
+        <form action='{{url_for("index")}}'>
+            <input name='confirm' value='Cancel' type='submit'/>
+        </form>
+    </div>
+
+</div>
+</section>
+{% endblock %}

@@ -106,3 +106,7 @@ body > section > .banner {
 .banner form {
     display: inline;
 }
+
+label {
+    display: inline-block;
+}

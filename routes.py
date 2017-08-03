@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, url_for, redirect, request, g, Response
-from datetime import datetime
+from datetime import datetime, timedelta
 import lib.twitter
 import lib
 from lib import require_auth
@@ -100,6 +100,20 @@ def enable():
     # TODO require confirmation when risky
     # i.e. about to instantly delete a lot of posts,
     # or when enabling for the first time (last_delete is >1 year in the past)
+
+    risky = False
+    if not 'confirm' in request.form and not g.viewer.account.policy_enabled:
+        if g.viewer.account.policy_delete_every == timedelta(0):
+            approx = g.viewer.account.estimate_eligible_for_delete()
+            return render_template('warn.html', message=f"""You've set the time between deleting posts to 0. Every post that matches your expiration rules will be deleted within minutes.
+                    { ("That's about " + str(approx) + " posts.") if approx > 0 else "" }
+                    Go ahead?""")
+        if g.viewer.account.last_delete < datetime.now() - timedelta(days=365):
+            return render_template('warn.html', message="""Once you enable Forget, posts that match your expiration rules will be deleted <b>permanently</b>. We can't bring them back. Make sure that you won't miss them.""")
+
+
+    if not g.viewer.account.policy_enabled:
+        g.viewer.account.last_delete = db.func.now()
 
     g.viewer.account.policy_enabled = True
     db.session.commit()
