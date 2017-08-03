@@ -46,10 +46,10 @@
     posts are considered fresh
 </p>
 <p>Posts that you have liked / favourited will stay fresh forever
-    <div style='display:inline-block'>
+    <span style='display:inline-block'>
         <label><input type=radio name=policy_keep_favourites value=true {{ "checked" if g.viewer.account.policy_keep_favourites }}> Yes</label>
         <label><input type=radio name=policy_keep_favourites value=false {{ "checked" if not g.viewer.account.policy_keep_favourites }}> No</label>
-    </div>
+    </span>
 </p>
 <p>Any post that is not kept fresh by any of these rules is considered expired. One random expired post will be deleted every
     {{interval_input(g.viewer.account, 'policy_delete_every', scales)}}
