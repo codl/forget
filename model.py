@@ -42,14 +42,15 @@ class Account(TimestampMixin, RemoteIDMixin):
     id = db.Column(db.String, primary_key=True)
 
     policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
-    policy_keep_latest = db.Column(db.Integer, server_default='0', nullable=False)
+    policy_keep_latest = db.Column(db.Integer, server_default='100', nullable=False)
     policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE', nullable=False)
-    policy_delete_every = db.Column(db.Interval, server_default='0', nullable=False)
-    policy_keep_younger = db.Column(db.Interval, server_default='0', nullable=False)
+    policy_delete_every = db.Column(db.Interval, server_default='30 minutes', nullable=False)
+    policy_keep_younger = db.Column(db.Interval, server_default='365 days', nullable=False)
 
     display_name = db.Column(db.String)
     screen_name = db.Column(db.String)
     avatar_url = db.Column(db.String)
+    reported_post_count = db.Column(db.Integer)
 
     last_fetch = db.Column(db.DateTime, server_default='epoch')
     last_delete = db.Column(db.DateTime, server_default='epoch')
@@ -75,6 +76,7 @@ class Account(TimestampMixin, RemoteIDMixin):
 
     def post_count(self):
         return Post.query.with_parent(self).count()
+
 
 
 class Account(Account, db.Model):

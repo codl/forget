@@ -49,7 +49,7 @@ def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limi
     db.session.commit()
 
 @app.task
-def import_twitter_archive(archive_id):
+def chunk_twitter_archive(archive_id):
     ta = TwitterArchive.query.get(archive_id)
 
     with ZipFile(BytesIO(ta.body), 'r') as zipfile:
@@ -79,7 +79,7 @@ def import_twitter_archive_month(archive_id, month_path):
                 tweets = json.load(f)
 
         for tweet in tweets:
-            post = lib.twitter.tweet_to_post(tweet)
+            post = lib.twitter.post_from_api_tweet_object(tweet)
             existing_post = db.session.query(Post).get(post.id)
 
             if post.author_id != ta.account_id \

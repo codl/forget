@@ -63,9 +63,9 @@ def upload_tweet_archive():
     db.session.add(ta)
     db.session.commit()
 
-    tasks.import_twitter_archive.s(ta.id).apply_async(routing_key='high')
+    tasks.chunk_twitter_archive(ta.id)
 
-    return redirect(url_for('index'))
+    return redirect(url_for('index', _anchor='recent_archives'))
 
 @app.route('/settings', methods=('POST',))
 @require_auth

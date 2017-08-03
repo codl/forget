@@ -20,7 +20,13 @@
     </form>
 {% endif %}
 </div>
-<p>Currently keeping track of {{g.viewer.account.post_count()}} posts</p>
+{% set post_count = g.viewer.account.post_count() %}
+<p>Currently keeping track of {{ post_count }} posts</p>
+{% if g.viewer.account.service == 'twitter'
+        and post_count < g.viewer.account.reported_post_count * 3/4
+        and g.viewer.account.reported_post_count > 3200 -%}
+<div class='banner warning'>Are we missing some of your posts? Try uploading a tweet archive below</div>
+{% endif %}
 </section>
 
 <section>
@@ -64,7 +70,7 @@
 </form>
 
 {% if g.viewer.account.twitter_archives %}
-    <h3 >Recent imports</h3>
+    <h3 name="recent_archives">Recent archives</h3>
     <ul>
     {% for archive in g.viewer.account.twitter_archives %}
         <li>{{archive.created_at.strftime('%Y-%m-%d %H:%M')}}<br>

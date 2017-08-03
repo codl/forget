@@ -20,6 +20,14 @@ def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
 
     return "https://api.twitter.com/oauth/authenticate?oauth_token=%s" % (oauth_token,)
 
+def account_from_api_user_object(obj):
+    return Account(
+            twitter_id = obj['id_str'],
+            display_name = obj['name'],
+            screen_name = obj['screen_name'],
+            avatar_url = obj['profile_image_url_https'],
+            reported_post_count = obj['statuses_count'])
+
 def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_secret=None):
     temp_token = OAuthToken.query.get(oauth_token)
     if not temp_token:
@@ -34,12 +42,9 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
     new_twitter = Twitter(
             auth=OAuth(new_token.token, new_token.token_secret, consumer_key, consumer_secret))
     remote_acct = new_twitter.account.verify_credentials()
-    acct = Account(twitter_id = remote_acct['id_str'])
+    acct = account_from_api_user_object(remote_acct)
     acct = db.session.merge(acct)
 
-    acct.display_name = remote_acct['name']
-    acct.screen_name = remote_acct['screen_name']
-    acct.avatar_url = remote_acct['profile_image_url_https']
     new_token.account = acct
     db.session.commit()
 
@@ -57,7 +62,7 @@ def get_twitter_for_acc(account):
 
 locale.setlocale(locale.LC_TIME, 'C')
 
-def tweet_to_post(tweet, post=None):
+def post_from_api_tweet_object(tweet, post=None):
     if not post:
         post = Post()
     post.twitter_id = tweet['id_str']
@@ -79,13 +84,11 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     t = get_twitter_for_acc(account)
 
     user = t.account.verify_credentials()
-
-    account.remote_display_name = user['name']
-    account.remote_screen_name = user['screen_name']
-    account.remote_avatar_url = user['profile_image_url_https']
+    db.session.merge(account_from_api_user_object(user))
 
     kwargs = { 'user_id': account.twitter_id, 'count': 200, 'trim_user': True, 'tweet_mode': 'extended' }
-    kwargs.update(cursor or {})
+    if cursor:
+        kwargs.update(cursor)
 
     if 'max_id' not in kwargs:
         most_recent_post = Post.query.order_by(db.desc(Post.created_at)).filter(Post.author_id == account.id).first()
@@ -101,7 +104,7 @@ def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
         kwargs['max_id'] = +inf
 
         for tweet in tweets:
-            db.session.merge(tweet_to_post(tweet))
+            db.session.merge(post_from_api_tweet_object(tweet))
             kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
 
     else:
@@ -125,7 +128,7 @@ def refresh_posts(posts):
         if not tweet:
             session.delete(post)
         else:
-            post = db.session.merge(tweet_to_post(tweet))
+            post = db.session.merge(post_from_api_tweet_object(tweet))
             refreshed_posts.append(post)
 
     return refreshed_posts
