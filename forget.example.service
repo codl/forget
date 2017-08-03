@@ -1,0 +1,11 @@
+[Unit]
+Description=Forget web application server
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/codl/forget
+ExecStart=/bin/bash -c "source venv/bin/activate; honcho start"
+User=codl
