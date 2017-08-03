@@ -54,12 +54,17 @@
 <section>
 
     <h2>Tweet archive import</h2>
+    <p>
+    Twitter's API only lets us access up to 3200 of your most recent tweets. If you have more tweets than that, you can request an archive of your tweets from
+    <a href="https://twitter.com/settings/account">Twitter's settings page</a>,
+    and upload it here.
+    </p>
 <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
-    <input type="file" name='file'><input type="submit">
+    <input type="file" name='file'><input type="submit" value="Upload">
 </form>
 
 {% if g.viewer.account.twitter_archives %}
-    <h3 >Recent tweet archive imports</h3>
+    <h3 >Recent imports</h3>
     <ul>
     {% for archive in g.viewer.account.twitter_archives %}
         <li>{{archive.created_at.strftime('%Y-%m-%d %H:%M')}}<br>
