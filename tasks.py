@@ -135,7 +135,7 @@ def delete_from_account(account_id):
                 post = random.choice(list((post for post in posts if not account.policy_keep_favourites or not post.favourite)))
                 print("deleting {}".format(post))
                 lib.twitter.delete(post)
-                account.last_delete = db.func.now()
+                account.touch_delete()
 
     db.session.commit()
 

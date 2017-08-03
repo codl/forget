@@ -37,9 +37,9 @@ def receive_verifier(oauth_token, oauth_verifier, consumer_key=None, consumer_se
     acct = Account(twitter_id = remote_acct['id_str'])
     acct = db.session.merge(acct)
 
-    acct.remote_display_name = remote_acct['name']
-    acct.remote_screen_name = remote_acct['screen_name']
-    acct.remote_avatar_url = remote_acct['profile_image_url_https']
+    acct.display_name = remote_acct['name']
+    acct.screen_name = remote_acct['screen_name']
+    acct.avatar_url = remote_acct['profile_image_url_https']
     new_token.account = acct
     db.session.commit()
 

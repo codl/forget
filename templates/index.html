@@ -2,8 +2,8 @@
 
 {% if g.viewer %}
     <p>Hello,
-    <img src="{{g.viewer.account.remote_avatar_url}}" style='height:1.5em; border-radius:100%; transform:translateY(25%);'/>
-    {{g.viewer.account.remote_display_name}}!
+    <img src="{{g.viewer.account.avatar_url}}" style='height:1.5em; border-radius:100%; transform:translateY(25%);'/>
+    {{g.viewer.account.display_name}}!
     <a href="{{url_for('settings')}}">Settings</a>
     <a href="{{url_for('logout')}}">Log out</a>
     </p>
