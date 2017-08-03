@@ -1,0 +1,103 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body > section, body > header {
+    max-width: 45rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    margin-bottom: 3rem;
+}
+
+section > * {
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
+
+section > ul {
+    padding-left: 7rem;
+}
+
+h2 {
+    font-size: 1.4em;
+    font-weight: normal;
+    padding-left: 2rem;
+}
+
+h3 {
+    font-size: inherit;
+    font-weight: bold;
+    padding-left: 5rem;
+}
+
+header {
+    text-align: center;
+}
+
+header h1 {
+    margin-top: 0;
+    text-indent:-1000vw;
+    background: url('/static/logotype.png') no-repeat 2rem bottom, white;
+    background-size: contain;
+    padding: 2em;
+}
+
+input[type=number]{
+    max-width: 8ch;
+}
+
+.viewer img.avatar {
+    height: 1.5em;
+    width: 1.5em;
+    background-color: #ccc;
+    border-radius:100%;
+    transform:translateY(25%);
+}
+
+.banner {
+    border-left-width: .7rem;
+    border-left-style: solid;
+    padding-top: .6rem;
+    padding-bottom: .6rem;
+    margin-bottom: 1rem;
+}
+
+body > section > .banner {
+    padding-left: 4.3rem;
+}
+
+.banner.enabled {
+    border-left-color: transparent;
+    background: #bbfbff;
+}
+
+.banner.disabled {
+    border-left-color: transparent;
+    background: #eee;
+}
+
+.banner.success {
+    background: #dec;
+    border-left-color: #4a2;
+}
+
+.banner.error {
+    border-color: #a24;
+    background: #ecd;
+}
+
+.banner.warning {
+    border-color: #dc4;
+    background: #eec;
+}
+
+.banner form {
+    display: inline;
+}

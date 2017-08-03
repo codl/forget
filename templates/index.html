@@ -1,20 +1,28 @@
-<h1>Forget</h1>
+{% extends 'lib/layout.html' %}
+{% block body %}
 
-{% if g.viewer %}
-    <p>Hello,
-    <img src="{{g.viewer.account.avatar_url}}" style='height:1.5em; border-radius:100%; transform:translateY(25%);'/>
-    {{g.viewer.account.display_name}}!
-    <a href="{{url_for('settings')}}">Settings</a>
-    <a href="{{url_for('logout')}}">Log out</a>
-    </p>
+<section>
+    <p>Hello, stranger! </p>
+    <p>Forget is a service that automatically deletes your old posts once everyone has forgotten about them. After all, why shouldn't computers forget too?</p>
+</section>
+<section>
+<h2>Features</h2>
+<ul>
+    <li>Delete your stale bad posts without even having to look at them again</li>
+    <li>Pick between deleting every old post or randomly deleting one old post periodically</li>
+    <li>Pick between deleting posts older than a date, posts past a post count, or both</li>
+    <li>Optionally mark posts that you want to preserve forever, by giving them a like</li>
+    <li>Upload a tweet archive if your twitter account has more tweets than the twitter api will return</li>
+</ul>
+</section>
+<section>
+<h2>Sign in</h2>
+<p>Sound good to you? <a href="/login/twitter">Log in with Twitter</a></p>
+</section>
+<section class='policy'>
+<h2>Policy</h2>
+<p>Forget will only start deleting posts if and when you explicitly enable it on this page. Forget will not post as you, follow any account or do anything else than delete posts.</p>
+<p>
+</section>
 
-    <h2>Recent posts ({{g.viewer.account.post_count()}} total posts):</h2>
-
-    {% for post in posts %}
-    <p>{{ "♥ " if post.favourite }}{{post.body}}</p>
-    {% else %}
-        <p>no posts :(</p>
-    {% endfor %}
-{% else %}
-    <p>Hello, stranger! <a href="/login/twitter">Log in with Twitter</a></p>
-{% endif %}
+{% endblock %}

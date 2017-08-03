@@ -2,7 +2,7 @@
 
 <input type=number name={{attrname}}_significand
 value={{obj[attrname + '_significand']}}
-style='max-width:8ch' min=0 step=1>
+min=0 step=1>
 <select name={{attrname}}_scale>
 {%- for scale in scales %}
     <option value="{{scale[1].total_seconds()}}"

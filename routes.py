@@ -25,8 +25,7 @@ def touch_viewer(resp):
 @app.route('/')
 def index():
     if g.viewer:
-        posts = Post.query.filter_by(author_id = g.viewer.account_id).order_by(db.desc(Post.created_at)).limit(30)
-        return render_template('index.html', posts=posts)
+        return render_template('logged_in.html', scales=lib.interval_scales)
     else:
         return render_template('index.html')
 
@@ -66,27 +65,46 @@ def upload_tweet_archive():
 
     tasks.import_twitter_archive.s(ta.id).apply_async(routing_key='high')
 
-    return render_template('upload_tweet_archive.html')
+    return redirect(url_for('index'))
 
-@app.route('/settings', methods=('GET', 'POST'))
+@app.route('/settings', methods=('POST',))
 @require_auth
 def settings():
-    if request.method == 'POST':
-        for attr in ('policy_enabled',
-                'policy_keep_favourites',
-                'policy_keep_latest',
-                'policy_delete_every_significand',
-                'policy_delete_every_scale',
-                'policy_keep_younger_significand',
-                'policy_keep_younger_scale',
-                ):
-            if attr in request.form:
-                setattr(g.viewer.account, attr, request.form[attr])
+    for attr in (
+            'policy_keep_favourites',
+            'policy_keep_latest',
+            'policy_delete_every_significand',
+            'policy_delete_every_scale',
+            'policy_keep_younger_significand',
+            'policy_keep_younger_scale',
+            ):
+        if attr in request.form:
+            setattr(g.viewer.account, attr, request.form[attr])
 
-        db.session.commit()
+    db.session.commit()
 
-    return render_template('settings.html', scales=lib.interval_scales)
+    return redirect(url_for('index', settings_saved=''))
 
+@app.route('/disable', methods=('POST',))
+@require_auth
+def disable():
+    g.viewer.account.policy_enabled = False
+    db.session.commit()
+
+    return redirect(url_for('index'))
+
+@app.route('/enable', methods=('POST',))
+@require_auth
+def enable():
+
+    # TODO require confirmation when risky
+    # i.e. about to instantly delete a lot of posts,
+    # or when enabling for the first time (last_delete is >1 year in the past)
+
+    g.viewer.account.policy_enabled = True
+    db.session.commit()
+
+    return redirect(url_for('index'))
 
 
 @app.route('/logout')
