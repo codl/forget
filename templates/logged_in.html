@@ -45,7 +45,7 @@
     <input type=number name=policy_keep_latest min=0 step=1 style='max-width:8ch' value={{g.viewer.account.policy_keep_latest}}>
     posts are considered fresh
 </p>
-<p>Posts that you have given a like to stay fresh forever
+<p>Posts that you have given a like stay fresh forever
     <label><input type=radio name=policy_keep_favourites value=true {{ "checked" if g.viewer.account.policy_keep_favourites }}> Yes</label>
     <label><input type=radio name=policy_keep_favourites value=false {{ "checked" if not g.viewer.account.policy_keep_favourites }}> No</label>
 </p>
