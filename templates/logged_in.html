@@ -73,7 +73,7 @@
 </form>
 
 {% if g.viewer.account.twitter_archives %}
-    <h3 name="recent_archives">Recent archives</h3>
+    <h3 id="recent_archives">Recent archives</h3>
     <ul>
     {% for archive in g.viewer.account.twitter_archives %}
         <li>{{archive.created_at.strftime('%Y-%m-%d %H:%M')}}<br>
