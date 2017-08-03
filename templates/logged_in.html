@@ -23,6 +23,7 @@
 {% set post_count = g.viewer.account.post_count() %}
 <p>Currently keeping track of {{ post_count }} of your posts, roughly {{ g.viewer.account.estimate_eligible_for_delete() }} of which currently match your expiration rules.</p>
 {% if g.viewer.account.service == 'twitter'
+        and g.viewer.account.reported_post_count
         and post_count < g.viewer.account.reported_post_count * 3/4
         and g.viewer.account.reported_post_count > 3200 -%}
 <div class='banner warning'>Are we missing some of your posts? Try uploading a tweet archive below</div>
