@@ -123,7 +123,7 @@ def delete_from_account(account_id):
         filter(~Post.id.in_(latest_n_posts)).\
         order_by(db.func.random()).limit(100).all()
 
-    posts = refresh_account(account_id)
+    posts = refresh_posts(posts)
     if account.service == 'twitter':
         eligible = list((post for post in posts if not account.policy_keep_favourites or not post.favourite))
         if eligible:
