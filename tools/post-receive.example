@@ -6,6 +6,7 @@ while read old new refname; do
         systemctl --user stop forget
         GIT_WORK_TREE='/home/codl/forget' git checkout -f deploy
 
+        export GIT_DIR
         (
             cd /home/codl/forget
             source venv/bin/activate
