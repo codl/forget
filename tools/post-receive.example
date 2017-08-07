@@ -1,0 +1,19 @@
+#!/bin/sh
+
+while read old new refname; do
+    branch=$(git rev-parse --abbrev-ref=strict ${refname})
+    if [[ $branch == "deploy" ]]; then
+        systemctl --user stop forget
+        GIT_WORK_TREE='/home/codl/forget' git checkout -f deploy
+
+        (
+            cd /home/codl/forget
+            source venv/bin/activate
+            pip install -r requirements.txt
+            tools/write-version.sh
+            FLASK_APP='forget.py' flask db upgrade
+        )
+        systemctl --user start forget
+    fi
+done
+

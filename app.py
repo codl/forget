@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask_migrate import Migrate
+import version
 
 app = Flask(__name__)
 
@@ -31,4 +32,4 @@ migrate = Migrate(app, db)
 sentry = None
 if 'SENTRY_DSN' in app.config:
     from raven.contrib.flask import Sentry
-    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
+    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'], release=version.version)
