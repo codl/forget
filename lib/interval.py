@@ -4,6 +4,7 @@ SCALES = [
     ('minutes', timedelta(minutes=1)),
     ('hours', timedelta(hours=1)),
     ('days', timedelta(days=1)),
+    ('weeks', timedelta(days=7)),
     ('months', timedelta(days=30)),
     ('years', timedelta(days=365)),
 ]
@@ -40,7 +41,12 @@ def decompose_interval(attrname):
 
         @significand.setter
         def significand(self, value):
-            setattr(self, attrname, int(value) * getattr(self, scl_name))
+            try:
+                value = int(value)
+                assert value >= 0
+            except (ValueError, AssertionError):
+                raise ValueError("Incorrect time interval")
+            setattr(self, attrname, value * getattr(self, scl_name))
 
 
         setattr(cls, scl_name, scale)
