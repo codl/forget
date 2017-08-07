@@ -32,7 +32,7 @@ def touch_viewer(resp):
 def index():
     if g.viewer:
         return render_template('logged_in.html', scales=lib.interval_scales,
-                error=request.args.get('error', None))
+                tweet_archive_failed = 'tweet_archive_failed' in request.args)
     else:
         return render_template('index.html')
 
@@ -77,7 +77,7 @@ def upload_tweet_archive():
 
         return redirect(url_for('index', _anchor='recent_archives'))
     except (BadZipFile, AssertionError):
-        return redirect(url_for('index', error='The file you uploaded is not a valid tweet archive. No posts have been imported.'))
+        return redirect(url_for('index', tweet_archive_failed='', _anchor='tweet_archive_import'))
 
 @app.route('/settings', methods=('POST',))
 @require_auth

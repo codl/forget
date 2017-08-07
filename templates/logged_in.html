@@ -2,12 +2,6 @@
 {% extends 'lib/layout.html' %}
 {% block body -%}
 
-{% if error %}
-<section class=banners>
-    <div class="banner error">{{ error }}</div>
-</section>
-{% endif %}
-
 <section class=viewer>
 <p>Hello,
     <img class=avatar src="{{g.viewer.account.avatar_url}}"/>
@@ -68,15 +62,19 @@
 {% if g.viewer.account.service == 'twitter' %}
 <section>
 
-    <h2>Tweet archive import</h2>
+    <h2 id='tweet_archive_import'>Tweet archive import</h2>
     <p>
     Twitter's API only lets us access up to 3200 of your most recent tweets. If you have more tweets than that, you can request an archive of your tweets from
     <a href="https://twitter.com/settings/account">Twitter's settings page</a>,
     and upload it here.
     </p>
-<form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
-    <input type="file" name='file'><input type="submit" value="Upload">
-</form>
+    <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
+        <input type="file" name='file'><input type="submit" value="Upload">
+    </form>
+
+    {% if tweet_archive_failed %}
+    <div class="banner error">The file you uploaded is not a valid tweet archive. No posts have been imported.</div>
+    {% endif %}
 
 {% if g.viewer.account.twitter_archives %}
     <h3 id="recent_archives">Recent archives</h3>
