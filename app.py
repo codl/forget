@@ -35,3 +35,10 @@ if 'SENTRY_DSN' in app.config:
     from raven.contrib.flask import Sentry
     app.config['SENTRY_CONFIG']['release'] = version.version
     sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
+
+@app.context_processor
+def inject_static():
+    from flask import url_for
+    def static(filename, **kwargs):
+        return url_for('static', filename=filename, **kwargs)
+    return {'st': static}

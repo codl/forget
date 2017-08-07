@@ -18,11 +18,14 @@ body > section, body > header {
 
 header > h1 {
     margin: 0;
-    text-indent:-1000vw;
-    background: url('/static/logotype.png') no-repeat 2rem bottom, white;
-    background-size: contain;
-    padding: 2em;
+    padding: 0;
 }
+
+h1 img {
+    margin-left: 2.5rem;
+}
+
+
 
 
 body > section {
@@ -48,10 +51,6 @@ h3 {
     font-size: inherit;
     font-weight: bold;
     padding-left: 5rem;
-}
-
-header {
-    text-align: center;
 }
 
 input[type=number]{

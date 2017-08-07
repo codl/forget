@@ -2,12 +2,12 @@
 <html lang=en prefix='og: http://ogp.me/ns#'>
     <head>
         <title>Forget</title>
-        <link rel='stylesheet' href='{{ url_for("static", filename="style.css") }}' />
+        <link rel='stylesheet' href='{{ st("style.css") }}' />
         <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <link rel='icon' href='{{ url_for("static", filename="icon.png") }}' />
+        <link rel='icon' href='{{ st("icon.png") }}' />
         <meta name='og:title' content='Forget'/>
         <meta name='og:description' content='Let your old bad posts be forgotten'/>
-        <meta name='og:image' content='{{ url_for("static", filename="logotype.png", _external=True) }}'/>
+        <meta name='og:image' content='{{ st("logotype.png", _external=True) }}'/>
         <meta name='og:image:alt' content='Forget'/>
         <meta name='og:type' content='website' />
         <meta name='twitter:card' content='summary' />
@@ -15,7 +15,11 @@
     </head>
     <body>
         <header>
-            <h1>Forget</h1>
+            <h1>
+                <a href="{{url_for('index')}}">
+                    <img src="{{ st('logotype.png') }}" alt="Forget" width=200 />
+                </a>
+            </h1>
         </header>
         {% block body %}{% endblock %}
     </body>
