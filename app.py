@@ -33,5 +33,5 @@ migrate = Migrate(app, db)
 sentry = None
 if 'SENTRY_DSN' in app.config:
     from raven.contrib.flask import Sentry
+    app.config['SENTRY_CONFIG']['release'] = version.version
     sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
-    app.config['SENTRY_CONFIG']['release']= version.version
