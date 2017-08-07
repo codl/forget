@@ -23,6 +23,13 @@ app.conf.task_default_queue = 'default'
 app.conf.task_default_exchange = 'celery'
 app.conf.task_default_exchange_type = 'direct'
 
+if 'SENTRY_DSN' in flaskapp.config:
+    from raven import Client
+    from raven.contrib.celery import register_signal, register_logger_signal
+    sentry = Client(flaskapp.config['SENTRY_DSN'])
+    register_logger_signal(sentry)
+    register_signal(sentry)
+
 @app.task(autoretry_for=(TwitterError, URLError))
 def fetch_acc(id, cursor=None):
     acc = Account.query.get(id)
