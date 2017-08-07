@@ -76,6 +76,7 @@ class Account(TimestampMixin, RemoteIDMixin):
     # backref: tokens
     # backref: twitter_archives
     # backref: posts
+    # backref: sessions
 
     def __repr__(self):
         return f"<Account({self.id}, {self.screen_name}, {self.display_name})>"
@@ -97,6 +98,9 @@ class Account(TimestampMixin, RemoteIDMixin):
         return query.count()
 
 
+    def force_log_out(self):
+        Session.query.with_parent(self).delete()
+        db.session.commit()
 
 
 class Account(Account, db.Model):
@@ -120,7 +124,7 @@ class Session(db.Model, TimestampMixin):
     id = db.Column(db.String, primary_key=True, default=lambda: secrets.token_urlsafe())
 
     account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-    account = db.relationship(Account, lazy='joined')
+    account = db.relationship(Account, lazy='joined', backref='sessions')
 
 class Post(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'posts'

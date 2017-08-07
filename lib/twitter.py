@@ -1,4 +1,4 @@
-from twitter import Twitter, OAuth
+from twitter import Twitter, OAuth, TwitterHTTPError
 from werkzeug.urls import url_decode
 from model import OAuthToken, Account, Post
 from app import db, app
@@ -55,10 +55,23 @@ def get_twitter_for_acc(account):
     consumer_key = app.config['TWITTER_CONSUMER_KEY']
     consumer_secret = app.config['TWITTER_CONSUMER_SECRET']
 
-    token = OAuthToken.query.with_parent(account).order_by(db.desc(OAuthToken.created_at)).first()
-    t = Twitter(
-            auth=OAuth(token.token, token.token_secret, consumer_key, consumer_secret))
-    return t
+    tokens = OAuthToken.query.with_parent(account).order_by(db.desc(OAuthToken.created_at)).all()
+    for token in tokens:
+        t = Twitter(
+                auth=OAuth(token.token, token.token_secret, consumer_key, consumer_secret))
+        try:
+            t.account.verify_credentials()
+            return t
+        except TwitterHTTPError as e:
+            if e.e.code == 401:
+                # token revoked
+                db.session.delete(token)
+                db.session.commit()
+
+    # if no tokens are valid, we log out the user so we'll get a fresh
+    # token when they log in again
+    account.force_log_out()
+    return None
 
 locale.setlocale(locale.LC_TIME, 'C')
 
@@ -82,6 +95,9 @@ def post_from_api_tweet_object(tweet, post=None):
 
 def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
     t = get_twitter_for_acc(account)
+    if not t:
+        print("no twitter access, aborting")
+        return
 
     user = t.account.verify_credentials()
     db.session.merge(account_from_api_user_object(user))
