@@ -11,7 +11,8 @@ default_config = {
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2:///forget",
         "SECRET_KEY": "hunter2",
         "CELERY_BROKER": "amqp://",
-        "HTTPS": True
+        "HTTPS": True,
+        "SENTRY_CONFIG": {}
 }
 
 app.config.update(default_config)
@@ -33,4 +34,4 @@ sentry = None
 if 'SENTRY_DSN' in app.config:
     from raven.contrib.flask import Sentry
     sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
-    app.config['SENTRY_CONFIG_RELEASE'] = version.version
+    app.config['SENTRY_CONFIG']['release']= version.version
