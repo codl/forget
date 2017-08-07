@@ -31,7 +31,8 @@ def touch_viewer(resp):
 @app.route('/')
 def index():
     if g.viewer:
-        return render_template('logged_in.html', scales=lib.interval_scales)
+        return render_template('logged_in.html', scales=lib.interval_scales,
+                error=request.args.get('error', None))
     else:
         return render_template('index.html')
 
