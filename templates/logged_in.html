@@ -82,7 +82,7 @@
     <ul>
     {% for archive in g.viewer.account.twitter_archives %}
         <li class="tweet_archive" data-status="{{archive.status()}}">{{archive.created_at.strftime('%Y-%m-%d %H:%M')}}<br>
-            {% if archive.chunks is None %}
+            {% if archive.chunks is none %}
             {{archive.chunks_successful}}/{{archive.chunks}} months imported, {{archive.chunks_failed}} failed</li>
             {% else %}
             Archive could not be opened
