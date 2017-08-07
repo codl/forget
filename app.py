@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask_migrate import Migrate
 import version
+from lib import cachebust
 
 app = Flask(__name__)
 
@@ -36,9 +37,10 @@ if 'SENTRY_DSN' in app.config:
     app.config['SENTRY_CONFIG']['release'] = version.version
     sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
 
+url_for = cachebust(app)
+
 @app.context_processor
 def inject_static():
-    from flask import url_for
     def static(filename, **kwargs):
         return url_for('static', filename=filename, **kwargs)
     return {'st': static}
