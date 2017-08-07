@@ -6,6 +6,7 @@ from lib import require_auth
 from model import Account, Session, Post, TwitterArchive
 from app import app, db, sentry
 import tasks
+from zipfile import BadZipFile
 
 @app.before_request
 def load_viewer():
@@ -68,9 +69,14 @@ def upload_tweet_archive():
     db.session.add(ta)
     db.session.commit()
 
-    tasks.chunk_twitter_archive(ta.id)
+    try:
+        tasks.chunk_twitter_archive(ta.id)
 
-    return redirect(url_for('index', _anchor='recent_archives'))
+        assert ta.chunks > 0
+
+        return redirect(url_for('index', _anchor='recent_archives'))
+    except (BadZipFile, AssertionError):
+        return redirect(url_for('index', error='The file you uploaded is not a valid tweet archive. No posts have been imported.'))
 
 @app.route('/settings', methods=('POST',))
 @require_auth

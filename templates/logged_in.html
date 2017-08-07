@@ -2,6 +2,12 @@
 {% extends 'lib/layout.html' %}
 {% block body -%}
 
+{% if error %}
+<section class=banners>
+    <div class="banner error">{{ error|safe }}</div>
+</section>
+{% endif %}
+
 <section class=viewer>
 <p>Hello,
     <img class=avatar src="{{g.viewer.account.avatar_url}}"/>
