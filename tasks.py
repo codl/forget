@@ -12,6 +12,7 @@ from io import BytesIO, TextIOWrapper
 import json
 from kombu import Queue
 import random
+import version
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
 app.conf.task_queues = (
@@ -26,7 +27,7 @@ app.conf.task_default_exchange_type = 'direct'
 if 'SENTRY_DSN' in flaskapp.config:
     from raven import Client
     from raven.contrib.celery import register_signal, register_logger_signal
-    sentry = Client(flaskapp.config['SENTRY_DSN'])
+    sentry = Client(flaskapp.config['SENTRY_DSN'], release=version.version)
     register_logger_signal(sentry)
     register_signal(sentry)
 
