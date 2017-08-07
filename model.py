@@ -34,7 +34,6 @@ class RemoteIDMixin(object):
         self.id = "twitter:{}".format(id)
 
 
-
 @decompose_interval('policy_delete_every')
 @decompose_interval('policy_keep_younger')
 class Account(TimestampMixin, RemoteIDMixin):
@@ -66,6 +65,13 @@ class Account(TimestampMixin, RemoteIDMixin):
         if not (value == timedelta(0) or value >= timedelta(minutes=1)):
             value = timedelta(minutes=1)
         return value
+
+    @db.validates('policy_keep_latest')
+    def validate_empty_string_is_zero(self, key, value):
+        if type(value) == str and value.strip() == '':
+            return 0
+        return value
+
 
     # backref: tokens
     # backref: twitter_archives

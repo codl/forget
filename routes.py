@@ -32,7 +32,9 @@ def touch_viewer(resp):
 def index():
     if g.viewer:
         return render_template('logged_in.html', scales=lib.interval_scales,
-                tweet_archive_failed = 'tweet_archive_failed' in request.args)
+                tweet_archive_failed = 'tweet_archive_failed' in request.args,
+                settings_error = 'settings_error' in request.args
+                )
     else:
         return render_template('index.html')
 
@@ -90,8 +92,11 @@ def settings():
             'policy_keep_younger_significand',
             'policy_keep_younger_scale',
             ):
-        if attr in request.form:
-            setattr(g.viewer.account, attr, request.form[attr])
+        try:
+            if attr in request.form:
+                setattr(g.viewer.account, attr, request.form[attr])
+        except ValueError:
+            return redirect(url_for('index', settings_error=''))
 
     db.session.commit()
 

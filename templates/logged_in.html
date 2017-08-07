@@ -37,6 +37,10 @@
 <div class='banner success'>Settings saved successfully</div>
 {% endif %}
 
+{% if settings_error %}
+<div class='banner error'>Something went wrong trying to save your settings. Please try again later.</div>
+{% endif %}
+
 <form action='{{url_for("settings")}}' method='post' enctype='multipart/form-data'>
 <p>Posts that are less than
     {{interval_input(g.viewer.account, 'policy_keep_younger', scales)}}
