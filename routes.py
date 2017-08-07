@@ -1,11 +1,10 @@
-from app import app
 from flask import render_template, url_for, redirect, request, g, Response
 from datetime import datetime, timedelta
 import lib.twitter
 import lib
 from lib import require_auth
 from model import Account, Session, Post, TwitterArchive
-from app import db
+from app import app, db, sentry
 import tasks
 
 @app.before_request
@@ -14,6 +13,12 @@ def load_viewer():
     sid = request.cookies.get('forget_sid', None)
     if sid:
         g.viewer = Session.query.get(sid)
+        if g.viewer and sentry:
+            sentry.user_context({
+                 'id': g.viewer.account.id,
+                 'username': g.viewer.account.screen_name,
+                 'service': g.viewer.account.service
+                })
 
 @app.after_request
 def touch_viewer(resp):

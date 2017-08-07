@@ -31,6 +31,8 @@ CELERY_BROKER='amqp://'
 
 HTTPS=True
 
+# SENTRY_DSN='https://foo:bar@sentry.io/69420'
+
 """
 you can also use any config variable that flask expects here, such as
 """
