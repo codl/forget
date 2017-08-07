@@ -144,3 +144,10 @@ class TwitterArchive(db.Model, TimestampMixin):
     chunks = db.Column(db.Integer)
     chunks_successful = db.Column(db.Integer, server_default='0', nullable=False)
     chunks_failed = db.Column(db.Integer, server_default='0', nullable=False)
+
+    def status():
+        if self.chunks == None or self.chunks_failed > 0:
+            return 'failed'
+        if self.chunks_successful == self.chunks:
+            return 'successful'
+        return 'pending'
