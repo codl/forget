@@ -102,10 +102,6 @@ def disable():
 @require_auth
 def enable():
 
-    # TODO require confirmation when risky
-    # i.e. about to instantly delete a lot of posts,
-    # or when enabling for the first time (last_delete is >1 year in the past)
-
     risky = False
     if not 'confirm' in request.form and not g.viewer.account.policy_enabled:
         if g.viewer.account.policy_delete_every == timedelta(0):
