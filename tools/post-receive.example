@@ -1,12 +1,14 @@
 #!/bin/sh
 
+export GIT_DIR=$(git rev-parse --absolute-git-dir)
+
 while read old new refname; do
     branch=$(git rev-parse --abbrev-ref=strict ${refname})
     if [[ $branch == "deploy" ]]; then
+
         systemctl --user stop forget
         GIT_WORK_TREE='/home/codl/forget' git checkout -f deploy
 
-        export GIT_DIR
         (
             cd /home/codl/forget
             source venv/bin/activate
