@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang=en>
+<html lang=en prefix='og: http://ogp.me/ns#'>
     <head>
         <title>Forget</title>
         <link rel='stylesheet' href='{{ url_for("static", filename="style.css") }}' />
         <meta name='viewport' content='width=device-width, initial-scale=1'>
         <link rel='icon' href='{{ url_for("static", filename="icon.png") }}' />
+        <meta name='og:title' content='Forget'/>
+        <meta name='og:description' content='Let your old bad posts be forgotten'/>
+        <meta name='og:image' content='{{ url_for("static", filename="logotype.png", _external=True) }}'/>
+        <meta name='og:image:alt' content='Forget'/>
+        <meta name='og:type' content='website' />
+        <meta name='twitter:card' content='summary' />
+        <meta name='twitter:site:id' content='808418'/>
     </head>
     <body>
         <header>
