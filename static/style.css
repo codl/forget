@@ -103,6 +103,10 @@ body > section > .banner {
     background: #eec;
 }
 
+form {
+    margin: 1em auto;
+}
+
 .banner form {
     display: inline;
 }

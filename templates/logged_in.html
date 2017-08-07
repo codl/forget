@@ -68,13 +68,14 @@
     <a href="https://twitter.com/settings/account">Twitter's settings page</a>,
     and upload it here.
     </p>
-    <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
-        <input type="file" name='file'><input type="submit" value="Upload">
-    </form>
 
     {% if tweet_archive_failed %}
     <div class="banner error">The file you uploaded is not a valid tweet archive. No posts have been imported.</div>
     {% endif %}
+
+    <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
+        <input type="file" name='file'><input type="submit" value="Upload">
+    </form>
 
 {% if g.viewer.account.twitter_archives %}
     <h3 id="recent_archives">Recent archives</h3>
