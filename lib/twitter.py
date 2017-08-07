@@ -126,7 +126,7 @@ def refresh_posts(posts):
     for post in posts:
         tweet = next((tweet for tweet in tweets if tweet['id_str'] == post.twitter_id), None)
         if not tweet:
-            session.delete(post)
+            db.session.delete(post)
         else:
             post = db.session.merge(post_from_api_tweet_object(tweet))
             refreshed_posts.append(post)
