@@ -41,6 +41,9 @@ def decompose_interval(attrname):
 
         @significand.setter
         def significand(self, value):
+            if type(value) == str and value.strip() == '':
+                value = 0
+
             try:
                 value = int(value)
                 assert value >= 0
