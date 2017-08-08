@@ -36,33 +36,40 @@ def index():
                 settings_error = 'settings_error' in request.args
                 )
     else:
-        return render_template('index.html')
+        return render_template('index.html',
+                twitter_login_error = 'twitter_login_error' in request.args)
 
 @app.route('/login/twitter')
 def twitter_login_step1():
-    return redirect(lib.twitter.get_login_url(
-        callback = url_for('twitter_login_step2', _external=True),
-        **app.config.get_namespace("TWITTER_")
-        ))
+    try:
+        return redirect(lib.twitter.get_login_url(
+            callback = url_for('twitter_login_step2', _external=True),
+            **app.config.get_namespace("TWITTER_")
+            ))
+    except (TwitterError, URLError):
+        return redirect(url_for('index', twitter_login_error='', _anchor='log_in'))
 
 @app.route('/login/twitter/callback')
 def twitter_login_step2():
-    oauth_token = request.args['oauth_token']
-    oauth_verifier = request.args['oauth_verifier']
-    token = lib.twitter.receive_verifier(oauth_token, oauth_verifier, **app.config.get_namespace("TWITTER_"))
+    try:
+        oauth_token = request.args['oauth_token']
+        oauth_verifier = request.args['oauth_verifier']
+        token = lib.twitter.receive_verifier(oauth_token, oauth_verifier, **app.config.get_namespace("TWITTER_"))
 
-    session = Session(account_id = token.account_id)
-    db.session.add(session)
-    db.session.commit()
+        session = Session(account_id = token.account_id)
+        db.session.add(session)
+        db.session.commit()
 
-    tasks.fetch_acc.s(token.account_id).apply_async(routing_key='high')
+        tasks.fetch_acc.s(token.account_id).apply_async(routing_key='high')
 
-    resp = Response(status=302, headers={"location": url_for('index')})
-    resp.set_cookie('forget_sid', session.id,
-        max_age=60*60*48,
-        httponly=True,
-        secure=app.config.get("HTTPS"))
-    return resp
+        resp = Response(status=302, headers={"location": url_for('index')})
+        resp.set_cookie('forget_sid', session.id,
+            max_age=60*60*48,
+            httponly=True,
+            secure=app.config.get("HTTPS"))
+        return resp
+    except (TwitterError, URLError):
+        return redirect(url_for('index', twitter_login_error='', _anchor='log_in'))
 
 @app.route('/upload_tweet_archive', methods=('POST',))
 @require_auth

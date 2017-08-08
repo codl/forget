@@ -20,7 +20,13 @@
 </section>
 
 <section>
-<h2>Sign in</h2>
+<h2 id="sign_in">Sign in</h2>
+{% if twitter_login_error %}
+<div class="banner error">
+    Sorry, something went wrong when communicating with Twitter. Give it another shot, maybe?
+</div>
+{% endif %}
+
 <p>Sound good to you? <a href="/login/twitter">Log in with Twitter</a></p>
 </section>
 <section class='policy'>
