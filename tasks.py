@@ -2,7 +2,7 @@ from celery import Celery
 
 from app import app as flaskapp
 from app import db
-from model import Session, Account, TwitterArchive, Post
+from model import Session, Account, TwitterArchive, Post, OAuthToken
 import lib.twitter
 from twitter import TwitterError
 from urllib.error import URLError
@@ -108,12 +108,19 @@ def import_twitter_archive_month(archive_id, month_path):
 
 @app.task
 def periodic_cleanup():
+    # delete sessions after 48 hours
     Session.query.filter(Session.updated_at < (db.func.now() - timedelta(hours=48))).\
             delete(synchronize_session=False)
+
+    # delete twitter archives after 7 days
     TwitterArchive.query.filter(TwitterArchive.updated_at < (db.func.now() - timedelta(days=7))).\
             delete(synchronize_session=False)
-    db.session.commit()
 
+    # delete anonymous oauth tokens after 1 day
+    OAuthToken.query.filter(OAuthToken.updated_at < (db.func.now() - timedelta(days=1)))\
+            .filter(OAuthToken.account_id == None)\
+            .delete(synchronize_session=False)
+    db.session.commit()
 
 @app.task
 def queue_deletes():
@@ -176,10 +183,10 @@ def refresh_account_with_oldest_post():
     post = Post.query.options(db.joinedload(Post.author)).order_by(db.asc(Post.updated_at)).first()
     return refresh_account(post.author_id)
 
-app.add_periodic_task(6*60*60, periodic_cleanup)
+app.add_periodic_task(30*60, periodic_cleanup)
 app.add_periodic_task(45, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(45, queue_deletes)
-app.add_periodic_task(30*60, refresh_account_with_oldest_post)
+app.add_periodic_task(10*60, refresh_account_with_oldest_post)
 
 if __name__ == '__main__':
     app.worker_main()
