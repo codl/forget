@@ -20,6 +20,10 @@ $ pip install -r requirements.txt
 $ cp config.example.py config.py
 $ $EDITOR config.py
 
+$ # set up database schema
+$ createdb forget
+$ env FLASK_APP=forget.py flask db upgrade
+
 $ # start web server and background worker
 $ honcho start
 ```
