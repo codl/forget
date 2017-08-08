@@ -72,7 +72,7 @@ def chunk_twitter_archive(archive_id):
         import_twitter_archive_month.s(archive_id, filename).apply_async()
 
 
-@app.task
+@app.task(autoretry_for=(TwitterError, URLError))
 def import_twitter_archive_month(archive_id, month_path):
     ta = TwitterArchive.query.get(archive_id)
 
@@ -129,7 +129,7 @@ def queue_deletes():
     for account in eligible_accounts:
         delete_from_account.s(account.id).apply_async()
 
-@app.task
+@app.task(autoretry_for=(TwitterError, URLError))
 def delete_from_account(account_id):
     account = Account.query.get(account_id)
     latest_n_posts = db.session.query(Post.id).with_parent(account).order_by(db.desc(Post.created_at)).limit(account.policy_keep_latest)
@@ -140,7 +140,7 @@ def delete_from_account(account_id):
 
     posts = refresh_posts(posts)
     if account.service == 'twitter':
-        eligible = list((post for post in posts if 
+        eligible = list((post for post in posts if
             (not account.policy_keep_favourites or not post.favourite)
             and (not account.policy_keep_media or not post.has_media)
             ))
@@ -165,7 +165,7 @@ def refresh_posts(posts):
     if posts[0].service == 'twitter':
         return lib.twitter.refresh_posts(posts)
 
-@app.task
+@app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account(account_id):
     account = Account.query.get(account_id)
 
@@ -181,7 +181,7 @@ def refresh_account(account_id):
     db.session.commit()
     return posts
 
-@app.task
+@app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account_with_oldest_post():
     post = Post.query.options(db.joinedload(Post.author)).order_by(db.asc(Post.updated_at)).first()
     return refresh_account(post.author_id)
