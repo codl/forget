@@ -91,6 +91,8 @@ def post_from_api_tweet_object(tweet, post=None):
     post.author_id = 'twitter:{}'.format(tweet['user']['id_str'])
     if 'favorited' in tweet:
         post.favourite = tweet['favorited']
+    if 'entities' in tweet:
+        post.has_media = bool('media' in tweet['entities'] and tweet['entities']['media'])
     return post
 
 def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):

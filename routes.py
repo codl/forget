@@ -91,6 +91,7 @@ def settings():
             'policy_delete_every_scale',
             'policy_keep_younger_significand',
             'policy_keep_younger_scale',
+            'policy_keep_media',
             ):
         try:
             if attr in request.form:

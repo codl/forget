@@ -43,6 +43,7 @@ class Account(TimestampMixin, RemoteIDMixin):
     policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     policy_keep_latest = db.Column(db.Integer, server_default='100', nullable=False)
     policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE', nullable=False)
+    policy_keep_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     policy_delete_every = db.Column(db.Interval, server_default='30 minutes', nullable=False)
     policy_keep_younger = db.Column(db.Interval, server_default='365 days', nullable=False)
 
@@ -95,6 +96,8 @@ class Account(TimestampMixin, RemoteIDMixin):
             filter(~Post.id.in_(latest_n_posts))
         if(self.policy_keep_favourites):
             query = query.filter_by(favourite = False)
+        if(self.policy_keep_media):
+            query = query.filter_by(has_media = False)
         return query.count()
 
 
@@ -118,6 +121,8 @@ class OAuthToken(db.Model, TimestampMixin):
 
     # note: account_id is nullable here because we don't know what account a token is for
     # until we call /account/verify_credentials with it
+
+
 class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
 
@@ -125,6 +130,7 @@ class Session(db.Model, TimestampMixin):
 
     account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     account = db.relationship(Account, lazy='joined', backref='sessions')
+
 
 class Post(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'posts'
@@ -137,12 +143,15 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
             backref=db.backref('posts', order_by=lambda: db.desc(Post.created_at)))
 
     favourite = db.Column(db.Boolean, server_default='FALSE', nullable=False)
+    has_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
+
+    def snippet(self):
+        if len(self.body) > 20:
+            return self.body[:19] + "✂"
+        return self.body
 
     def __repr__(self):
-        snippet = self.body
-        if len(snippet) > 20:
-            snippet = snippet[:19] + "✂"
-        return '<Post ({}, "{}", Author: {})>'.format(self.id, snippet, self.author_id)
+        return '<Post ({}, "{}", Author: {})>'.format(self.id, self.snippet(), self.author_id)
 
 class TwitterArchive(db.Model, TimestampMixin):
     __tablename__ = 'twitter_archives'

@@ -140,7 +140,10 @@ def delete_from_account(account_id):
 
     posts = refresh_posts(posts)
     if account.service == 'twitter':
-        eligible = list((post for post in posts if not account.policy_keep_favourites or not post.favourite))
+        eligible = list((post for post in posts if 
+            (not account.policy_keep_favourites or not post.favourite)
+            and (not account.policy_keep_media or not post.has_media)
+            ))
         if eligible:
             if account.policy_delete_every == timedelta(0):
                 print("deleting all {} eligible posts for {}".format(len(eligible), account))
