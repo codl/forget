@@ -150,7 +150,7 @@ def delete_from_account(account_id):
                 for post in eligible:
                     lib.twitter.delete(post)
             else:
-                post = random.choice(list((post for post in posts if not account.policy_keep_favourites or not post.favourite)))
+                post = random.choice(eligible)
                 print("deleting {}".format(post))
                 lib.twitter.delete(post)
                 account.touch_delete()
