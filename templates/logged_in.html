@@ -31,10 +31,10 @@
 </section>
 
 <section>
-<h2>Settings</h2>
+<h2>Your expiration rules</h2>
 
 {% if request.args.get('settings_saved') != None %}
-<div class='banner success'>Settings saved successfully</div>
+<div class='banner success'>Rules saved successfully</div>
 {% endif %}
 
 {% if settings_error %}
@@ -42,28 +42,27 @@
 {% endif %}
 
 <form action='{{url_for("settings")}}' method='post' enctype='multipart/form-data'>
-<p>Posts that are less than
+<p>Posts that are over
     {{interval_input(g.viewer.account, 'policy_keep_younger', scales)}}
-    old are considered fresh
-</p>
-<p>Your latest
+    old and are not one of your
     <input type=number name=policy_keep_latest min=0 step=1 style='max-width:8ch' value={{g.viewer.account.policy_keep_latest}}>
-    posts are considered fresh
+    posts will expire
 </p>
-<p>Posts that you have liked / favourited will stay fresh forever
+<p>Posts that you have liked / favourited will never expire
     <span style='display:inline-block'>
         <label><input type=radio name=policy_keep_favourites value=true {{ "checked" if g.viewer.account.policy_keep_favourites }}> Yes</label>
         <label><input type=radio name=policy_keep_favourites value=false {{ "checked" if not g.viewer.account.policy_keep_favourites }}> No</label>
     </span>
 </p>
-<p>Posts that have media attached will stay fresh forever
+<p>Posts that have media attached will never expire
     <span style='display:inline-block'>
         <label><input type=radio name=policy_keep_media value=true {{ "checked" if g.viewer.account.policy_keep_media }}> Yes</label>
         <label><input type=radio name=policy_keep_media value=false {{ "checked" if not g.viewer.account.policy_keep_media }}> No</label>
     </span>
 </p>
-<p>Any post that is not kept fresh by any of these rules is considered expired. One random expired post will be deleted every
-    {{interval_input(g.viewer.account, 'policy_delete_every', scales)}}
+<p>Every
+    {{interval_input(g.viewer.account, 'policy_delete_every', scales)}},
+    one expired post will be picked at random and deleted.
 </p>
 <input type=submit value='Save settings'>
 </form>
