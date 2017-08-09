@@ -23,9 +23,6 @@ h1 img {
     margin-left: 2.5rem;
 }
 
-
-
-
 body > section {
     margin-bottom: 3rem;
 }
@@ -113,13 +110,19 @@ label {
 }
 
 footer {
-    text-align: center;
-    color: #555;
     font-size: 0.9rem;
     margin-top: 5rem;
-    margin-bottom: 5rem;
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+footer p {
+    margin: 0 0.7rem;
 }
 
 footer a {
     color: inherit;
 }
+
