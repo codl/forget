@@ -67,6 +67,9 @@ def get_twitter_for_acc(account):
                 # token revoked
                 db.session.delete(token)
                 db.session.commit()
+            else:
+                # temporary error, re-raise
+                raise e
 
     # if no tokens are valid, we log out the user so we'll get a fresh
     # token when they log in again
