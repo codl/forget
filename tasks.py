@@ -132,10 +132,10 @@ def queue_deletes():
 @app.task(autoretry_for=(TwitterError, URLError))
 def delete_from_account(account_id):
     account = Account.query.get(account_id)
-    latest_n_posts = db.session.query(Post.id).with_parent(account).order_by(db.desc(Post.created_at)).limit(account.policy_keep_latest)
+    latest_n_posts = Post.query.with_parent(account).order_by(db.desc(Post.created_at)).limit(account.policy_keep_latest)
     posts = Post.query.with_parent(account).\
         filter(Post.created_at + account.policy_keep_younger <= db.func.now()).\
-        filter(~Post.id.in_(latest_n_posts)).\
+        except_(latest_n_posts).\
         order_by(db.func.random()).limit(100).all()
 
     posts = refresh_posts(posts)
