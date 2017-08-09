@@ -112,8 +112,8 @@ def periodic_cleanup():
     Session.query.filter(Session.updated_at < (db.func.now() - timedelta(hours=48))).\
             delete(synchronize_session=False)
 
-    # delete twitter archives after 7 days
-    TwitterArchive.query.filter(TwitterArchive.updated_at < (db.func.now() - timedelta(days=7))).\
+    # delete twitter archives after 3 days
+    TwitterArchive.query.filter(TwitterArchive.updated_at < (db.func.now() - timedelta(days=3))).\
             delete(synchronize_session=False)
 
     # delete anonymous oauth tokens after 1 day
