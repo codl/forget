@@ -33,7 +33,7 @@ def decompose_interval(attrname):
         def scale(self, value):
             if(type(value) != timedelta):
                 value = timedelta(seconds=float(value))
-            setattr(self, attrname, getattr(self, sig_name) * value)
+            setattr(self, attrname, max(1, getattr(self, sig_name)) * value)
 
         @property
         def significand(self):
