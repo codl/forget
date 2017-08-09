@@ -8,6 +8,7 @@ from app import app, db, sentry
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
+from urllib.error import URLError
 import version
 
 @app.before_request
