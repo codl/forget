@@ -16,7 +16,14 @@ SCALES = [
                     for year in range(400)))
             ,31,30,31,30,31,31,30,31,30,31))
         )),
-    ('years', timedelta(days=365.25)),
+    ('years', timedelta(days=
+    # you, a fool: ok. a year is 365.25 days. happy?
+    # me, wise: absolutely not
+        mean((366 if year % 400 == 0
+                or year % 100 != 0 and year % 4 == 0
+            else 365
+            for year in range(400)))
+        )),
 ]
 
 def decompose_interval(attrname):
