@@ -8,6 +8,7 @@ from app import app, db, sentry
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
+import version
 
 @app.before_request
 def load_viewer():
@@ -21,6 +22,10 @@ def load_viewer():
                  'username': g.viewer.account.screen_name,
                  'service': g.viewer.account.service
                 })
+
+@app.context_processor
+def inject_version():
+    return dict(version=version.version)
 
 @app.after_request
 def touch_viewer(resp):

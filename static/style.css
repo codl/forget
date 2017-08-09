@@ -8,7 +8,7 @@ body {
     box-sizing: border-box;
 }
 
-body > section, body > header {
+body > section, body > header, body > footer {
     max-width: 45rem;
     margin-left: auto;
     margin-right: auto;
@@ -112,4 +112,16 @@ form {
 
 label {
     display: inline-block;
+}
+
+footer {
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
+
+footer a {
+    color: inherit;
 }
