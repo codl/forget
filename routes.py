@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import lib.twitter
 import lib
 from lib import require_auth
+from lib import set_session_cookie
 from model import Account, Session, Post, TwitterArchive
 from app import app, db, sentry
 import tasks
@@ -31,6 +32,7 @@ def inject_version():
 @app.after_request
 def touch_viewer(resp):
     if g.viewer:
+        set_session_cookie(g.viewer, resp, app.config.get('HTTPS'))
         g.viewer.touch()
         db.session.commit()
     return resp
@@ -70,10 +72,7 @@ def twitter_login_step2():
         tasks.fetch_acc.s(token.account_id).apply_async(routing_key='high')
 
         resp = Response(status=302, headers={"location": url_for('index')})
-        resp.set_cookie('forget_sid', session.id,
-            max_age=60*60*48,
-            httponly=True,
-            secure=app.config.get("HTTPS"))
+        set_session_cookie(session, resp, app.config.get('HTTPS'))
         return resp
     except (TwitterError, URLError):
         return redirect(url_for('index', twitter_login_error='', _anchor='log_in'))
