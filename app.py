@@ -16,7 +16,8 @@ default_config = {
         "SECRET_KEY": "hunter2",
         "CELERY_BROKER": "amqp://",
         "HTTPS": True,
-        "SENTRY_CONFIG": {}
+        "SENTRY_CONFIG": {},
+        "RATELIMIT_STORAGE_URL": "redis://",
 }
 
 app.config.update(default_config)
