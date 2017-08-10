@@ -33,6 +33,16 @@ HTTPS=True
 
 # SENTRY_DSN='https://foo:bar@sentry.io/69420'
 
+'''
+you can set this to memory:// if you only have one web process
+or if you don't care about people exhausting your twitter api
+key and your celery workers by making hundreds of login
+requests and uploading hundreds of bogus tweet archives
+
+docs here <https://flask-limiter.readthedocs.io/en/stable/#configuration>
+'''
+RATELIMIT_STORAGE_URL='redis://'
+
 """
 you can also use any config variable that flask expects here, such as
 """
