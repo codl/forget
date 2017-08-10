@@ -6,6 +6,7 @@ celery==4.1.0
 click==6.7
 contextlib2==0.5.5
 Flask==0.12.2
+Flask-Limiter==0.9.5
 Flask-Migrate==2.0.4
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.2
@@ -14,6 +15,7 @@ honcho==1.0.1
 itsdangerous==0.24
 Jinja2==2.9.6
 kombu==4.1.0
+limits==1.2.1
 Mako==1.0.6
 MarkupSafe==1.0
 psycopg2==2.7.1

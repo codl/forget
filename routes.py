@@ -4,8 +4,9 @@ import lib.twitter
 import lib
 from lib import require_auth
 from lib import set_session_cookie
+from lib import get_viewer_session
 from model import Account, Session, Post, TwitterArchive
-from app import app, db, sentry
+from app import app, db, sentry, limiter
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
@@ -14,16 +15,13 @@ import version
 
 @app.before_request
 def load_viewer():
-    g.viewer = None
-    sid = request.cookies.get('forget_sid', None)
-    if sid:
-        g.viewer = Session.query.get(sid)
-        if g.viewer and sentry:
-            sentry.user_context({
-                 'id': g.viewer.account.id,
-                 'username': g.viewer.account.screen_name,
-                 'service': g.viewer.account.service
-                })
+    g.viewer = get_viewer_session()
+    if g.viewer and sentry:
+        sentry.user_context({
+                'id': g.viewer.account.id,
+                'username': g.viewer.account.screen_name,
+                'service': g.viewer.account.service
+            })
 
 @app.context_processor
 def inject_version():
@@ -31,7 +29,7 @@ def inject_version():
 
 @app.after_request
 def touch_viewer(resp):
-    if g.viewer:
+    if 'viewer' in g and g.viewer:
         set_session_cookie(g.viewer, resp, app.config.get('HTTPS'))
         g.viewer.touch()
         db.session.commit()
@@ -49,6 +47,7 @@ def index():
                 twitter_login_error = 'twitter_login_error' in request.args)
 
 @app.route('/login/twitter')
+@limiter.limit('3/minute')
 def twitter_login_step1():
     try:
         return redirect(lib.twitter.get_login_url(
@@ -59,6 +58,7 @@ def twitter_login_step1():
         return redirect(url_for('index', twitter_login_error='', _anchor='log_in'))
 
 @app.route('/login/twitter/callback')
+@limiter.limit('3/minute')
 def twitter_login_step2():
     try:
         oauth_token = request.args['oauth_token']
@@ -78,6 +78,7 @@ def twitter_login_step2():
         return redirect(url_for('index', twitter_login_error='', _anchor='log_in'))
 
 @app.route('/upload_tweet_archive', methods=('POST',))
+@limiter.limit('10/10 minutes')
 @require_auth
 def upload_tweet_archive():
     ta = TwitterArchive(account = g.viewer.account,
