@@ -1,4 +1,4 @@
-from celery import Celery
+from celery import Celery, Task
 
 from app import app as flaskapp
 from app import db
@@ -30,6 +30,16 @@ if 'SENTRY_DSN' in flaskapp.config:
     sentry = Client(flaskapp.config['SENTRY_DSN'], release=version.version)
     register_logger_signal(sentry)
     register_signal(sentry)
+
+
+class DBTask(Task):
+    def __call__(self, *args, **kwargs):
+        try:
+            super().__call__(*args, **kwargs)
+        finally:
+            db.session.close()
+
+app.Task = DBTask
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def fetch_acc(id, cursor=None):
