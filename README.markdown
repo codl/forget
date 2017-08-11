@@ -29,6 +29,9 @@ $ doit
 
 $ # start web server and background worker
 $ honcho start
+
+$ # if you are doing development then you can try the dev procfile
+$ honcho -f Procfile.dev start
 ```
 
 the web server will listen on `127.0.0.1:42157`, you'll probably want to proxy with nginx or apache or what have you

@@ -1,0 +1,3 @@
+web: env FLASK_APP=forget.py FLASK_DEBUG=t flask run
+worker: python tasks.py -B -Ofair
+build: doit auto
