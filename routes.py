@@ -164,10 +164,6 @@ def logout():
         g.viewer = None
     return redirect(url_for('index'))
 
-@app.route('/api/about')
-def api_about():
-    return jsonify(service='Forget', version=version.version)
-
 @app.route('/api/settings', methods=('PUT',))
 @require_auth_api
 def api_settings_put():
