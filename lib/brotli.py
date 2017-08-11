@@ -1,6 +1,5 @@
 import brotli as brotli_
 from flask import request, make_response
-from functools import wraps
 from threading import Thread
 from hashlib import sha256
 import redis
