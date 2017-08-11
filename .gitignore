@@ -3,5 +3,6 @@
 __pycache__
 celerybeat-schedule
 .doit.db
-static/
+static/*
+!static/.keep
 
