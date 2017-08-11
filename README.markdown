@@ -27,6 +27,9 @@ $ # set up database schema
 $ createdb forget
 $ env FLASK_APP=forget.py flask db upgrade
 
+$ # build assets
+$ doit
+
 $ # start web server and background worker
 $ honcho start
 ```
