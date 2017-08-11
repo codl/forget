@@ -14,22 +14,22 @@ def task_gen_logo():
                 new.save('static/logotype-{}.png'.format(width), optimize=True)
             im.save('static/logotype.png', optimize=True)
 
-    return {
-            'actions': [gen_logo],
-            'targets': [f'static/logotype-{width}.png' for width in widths]\
+    return dict(
+            actions=[gen_logo],
+            targets=[f'static/logotype-{width}.png' for width in widths]
                 + ['static/logotype.png'],
-            'file_dep': ['assets/logotype.png'],
-            'clean': True,
-        }
+            file_dep=['assets/logotype.png'],
+            clean=True,
+        )
 
 def task_copy_icon():
     import shutil
-    return {
-            'actions': [lambda: shutil.copy('assets/icon.png', 'static/icon.png')],
-            'targets': ['static/icon.png'],
-            'file_dep': ['assets/icon.png'],
-            'clean': True,
-    }
+    return dict(
+            actions=[lambda: shutil.copy('assets/icon.png', 'static/icon.png')],
+            targets=['static/icon.png'],
+            file_dep=['assets/icon.png'],
+            clean=True,
+    )
 
 def task_minify_css():
     """minify css"""
@@ -41,12 +41,12 @@ def task_minify_css():
             with open('static/styles.css', 'w') as out:
                 out.write(compress(in_.read()))
 
-    return {
-            'actions': [minify],
-            'targets': ['static/styles.css'],
-            'file_dep': ['assets/styles.css'],
-            'clean': True,
-        }
+    return dict(
+            actions=[minify],
+            targets=['static/styles.css'],
+            file_dep=['assets/styles.css'],
+            clean=True,
+        )
 
 def task_compress_static():
     import brotli
