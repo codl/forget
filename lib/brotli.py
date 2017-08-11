@@ -1,4 +1,4 @@
-from brotli import compress
+import brotli as brotli_
 from flask import request, make_response
 from functools import wraps
 from threading import Thread
@@ -13,8 +13,8 @@ class BrotliCache(object):
         self.max_wait = max_wait
         self.expire = expire
 
-    def compress(self, cache_key, lock_key, body):
-        encbody = compress(body)
+    def compress(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
+        encbody = brotli_.compress(body, mode=mode)
         self.redis.set(cache_key, encbody, ex=self.expire)
         self.redis.delete(lock_key)
 
@@ -30,7 +30,8 @@ class BrotliCache(object):
         if not encbody:
             lock_key = 'brotlicache:lock:{}'.format(digest)
             if self.redis.set(lock_key, 1, nx=True, ex=10):
-                t = Thread(target=self.compress, args=(cache_key, lock_key, body))
+                mode = brotli_.MODE_TEXT if response.content_type.startswith('text/') else brotli_.MODE_GENERIC
+                t = Thread(target=self.compress, args=(cache_key, lock_key, body, mode))
                 t.start()
                 if self.max_wait > 0:
                     t.join(self.max_wait)
