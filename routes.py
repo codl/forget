@@ -28,6 +28,15 @@ def load_viewer():
 def inject_version():
     return dict(version=version.version)
 
+@app.context_processor
+def inject_sentry():
+    if sentry:
+        client_dsn = app.config.get('SENTRY_DSN').split('@')
+        client_dsn[:1] = client_dsn[0].split(':')
+        client_dsn = ':'.join(client_dsn[0:2]) + '@' + client_dsn[3]
+        return dict(sentry_dsn=client_dsn)
+    return dict()
+
 @app.after_request
 def touch_viewer(resp):
     if 'viewer' in g and g.viewer:

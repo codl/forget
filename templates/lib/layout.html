@@ -12,7 +12,12 @@
         <meta name='og:type' content='website' />
         <meta name='twitter:card' content='summary' />
         <meta name='twitter:site:id' content='808418'/>
-        <script async src="{{ st('version.js') }}"></script>
+
+        {% if sentry_dsn -%}
+        <script defer src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"
+            onload="Raven.config('{{sentry_dsn}}').install()"></script>
+        {% endif -%}
+        <script defer src="{{ st('version.js') }}"></script>
     </head>
     <body>
         <header>
