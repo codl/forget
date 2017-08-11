@@ -8,10 +8,7 @@ it works with twitter and maybe sometime in the future it will work with other s
 
 it lives at <https://forget.codl.fr>
 
-you can run your own if you want to, youll need postgresql and rabbitmq and python 3.6+
-
-youll also need redis probably unless you wanna set the rate limiter to use the in-memory store, which doesnt work if
-you have more than one web process
+you can run your own if you want to, youll need postgresql and redis and python 3.6+
 
 ```
 $ # set up virtualenv (recommended)
