@@ -54,7 +54,13 @@ def task_compress_static():
     import brotli
     import gzip
 
-    files = ('static/styles.css', 'static/icon.png', 'static/logotype.png') + tuple((f'static/logotype-{width}.png' for width in (200, 400, 600, 800)))
+    files = (
+        'static/styles.css',
+        'static/icon.png',
+        'static/logotype.png',
+        'static/version.js',
+        'static/settings_form.js',
+        ) + tuple((f'static/logotype-{width}.png' for width in (200, 400, 600, 800)))
 
     def compress_brotli(dependencies):
         for filename in dependencies:
