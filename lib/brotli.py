@@ -34,7 +34,7 @@ class BrotliCache(object):
             lock_key = 'brotlicache:lock:{}'.format(digest)
             if self.redis.set(lock_key, 1, nx=True, ex=10):
                 t = Thread(target=self.compress, args=(cache_key, lock_key, body))
-                t.run()
+                t.start()
 
         return response
 
