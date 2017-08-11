@@ -14,7 +14,7 @@ def task_gen_logo():
     for width in widths:
         yield dict(
                 name=str(width),
-                actions=[(gen_logo, (width,))],
+                actions=[(resize_logo, (width,))],
                 targets=[f'static/logotype-{width}.png'],
                 file_dep=['assets/logotype.png'],
                 clean=True,
@@ -27,7 +27,7 @@ def task_copy_asset():
     for asset in assets:
         yield dict(
                 name=asset,
-                actions=[lambda: shutil.copy(f'assets/{asset}', f'static/{asset}')],
+                actions=[(lambda asset: shutil.copy(f'assets/{asset}', f'static/{asset}'), (asset,))],
                 targets=[f'static/{asset}'],
                 file_dep=[f'assets/{asset}'],
                 clean=True,
