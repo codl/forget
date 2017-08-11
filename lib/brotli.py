@@ -8,12 +8,14 @@ import os.path
 import mimetypes
 
 class BrotliCache(object):
-    def __init__(self, redis_kwargs={}):
+    def __init__(self, redis_kwargs={}, max_wait=0.3, expire=60*60*12):
         self.redis = redis.StrictRedis(**redis_kwargs)
+        self.max_wait = max_wait
+        self.expire = expire
 
     def compress(self, cache_key, lock_key, body):
         encbody = compress(body)
-        self.redis.set(cache_key, encbody, ex=3600)
+        self.redis.set(cache_key, encbody, ex=self.expire)
         self.redis.delete(lock_key)
 
     def wrap_response(self, response):
@@ -25,16 +27,19 @@ class BrotliCache(object):
         cache_key = 'brotlicache:{}'.format(digest)
 
         encbody = self.redis.get(cache_key)
+        if not encbody:
+            lock_key = 'brotlicache:lock:{}'.format(digest)
+            if self.redis.set(lock_key, 1, nx=True, ex=10):
+                t = Thread(target=self.compress, args=(cache_key, lock_key, body))
+                t.start()
+                if self.max_wait > 0:
+                    t.join(self.max_wait)
+                    encbody = self.redis.get(cache_key)
         if encbody:
             response.headers.set('content-encoding', 'br')
             response.headers.set('vary', 'accept-encoding')
             response.set_data(encbody)
             return response
-        else:
-            lock_key = 'brotlicache:lock:{}'.format(digest)
-            if self.redis.set(lock_key, 1, nx=True, ex=10):
-                t = Thread(target=self.compress, args=(cache_key, lock_key, body))
-                t.start()
 
         return response
 
