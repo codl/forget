@@ -17,7 +17,9 @@
         <header>
             <h1>
                 <a href="{{url_for('index')}}">
-                    <img src="{{ st('logotype.png') }}" alt="Forget" width=200 />
+                    <img src="{{ st('logotype-200.png') }}" alt="Forget" width=200 srcset="{% for width in (200,400,600,800) -%}
+                    {{ st('logotype-{}.png'.format(width)) }} {{width}}w,
+                    {%- endfor %}"/>
                 </a>
             </h1>
         </header>
