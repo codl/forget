@@ -24,7 +24,7 @@
 {% endif %}
 </div>
 {% set post_count = g.viewer.account.post_count() %}
-<p>Currently keeping track of {{ post_count }} of your posts, roughly {{ g.viewer.account.estimate_eligible_for_delete() }} of which currently match your expiration rules.</p>
+<p>Currently keeping track of <span id="post-count">{{ post_count }}</span> of your posts, roughly <span id="eligible-estimate">{{ g.viewer.account.estimate_eligible_for_delete() }}</span> of which currently match your expiration rules.</p>
 {% if g.viewer.account.service == 'twitter'
         and g.viewer.account.reported_post_count
         and post_count < g.viewer.account.reported_post_count * 3/4

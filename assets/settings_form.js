@@ -41,14 +41,14 @@
         clearTimeout(status_timeout);
         status_timeout = setTimeout(show_saving, 70);
 
-        send_settings(get_all_inputs())
+        promise = send_settings(get_all_inputs())
             .then(data => {
                 show_success();
                 clearTimeout(status_timeout);
                 status_timeout = setTimeout(hide_status, 3000);
                 backoff_level = 0;
-            })
-            .catch(e => {
+            });
+        promise.catch(e => {
                 console.error('Fetch rejected:', e);
                 show_error();
                 clearTimeout(status_timeout);
@@ -56,6 +56,7 @@
                 backoff_level += 1;
                 backoff_level = Math.min(backoff_level, 5);
             });
+        promise.then(fetch_counters).then(update_counters);
 
         // remove server-rendered banner
         let settings_section = document.querySelector('#settings-section');
@@ -108,4 +109,19 @@
 
     // silently send_settings in case the user changed settings while the page was loading
     send_settings(get_all_inputs());
+
+    function fetch_counters(){
+        return fetch('/api/viewer', {
+            credentials: 'same-origin',
+        })
+            .then(resp => { if(!resp.ok){ return Promise.reject(resp) }; return resp; })
+            .then(resp => resp.json());
+    }
+
+    function update_counters(counters){
+        document.querySelector('#post-count').textContent = counters.post_count;
+        document.querySelector('#eligible-estimate').textContent = counters.eligible_for_delete_estimate;
+    }
+
+    setInterval(() => fetch_counters().then(update_counters), 1000 * 20)
 })();

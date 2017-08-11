@@ -180,3 +180,13 @@ def api_settings_put():
             updated[key] = data[key]
     db.session.commit()
     return jsonify(status='success', updated=updated)
+
+@app.route('/api/viewer')
+@require_auth_api
+def api_viewer_post_counts():
+    viewer = get_viewer()
+    return jsonify(
+            post_count=viewer.post_count(),
+            eligible_for_delete_estimate=viewer.estimate_eligible_for_delete(),
+            # more? maybe later
+        )
