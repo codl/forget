@@ -3,33 +3,35 @@ def task_gen_logo():
 
     from PIL import Image
 
-    widths = (200, 400, 600, 800)
-
-    def gen_logo():
+    def resize_logo(width):
         with Image.open('assets/logotype.png') as im:
             im = im.convert('L')
-            for width in widths:
-                height = im.height * width // im.width
-                new = im.resize((width,height), resample=Image.LANCZOS)
-                new.save('static/logotype-{}.png'.format(width), optimize=True)
-            im.save('static/logotype.png', optimize=True)
+            height = im.height * width // im.width
+            new = im.resize((width,height), resample=Image.LANCZOS)
+            new.save('static/logotype-{}.png'.format(width), optimize=True)
 
-    return dict(
-            actions=[gen_logo],
-            targets=[f'static/logotype-{width}.png' for width in widths]
-                + ['static/logotype.png'],
-            file_dep=['assets/logotype.png'],
-            clean=True,
-        )
+    widths = (200, 400, 600, 800)
+    for width in widths:
+        yield dict(
+                name=str(width),
+                actions=[(gen_logo, (width,))],
+                targets=[f'static/logotype-{width}.png'],
+                file_dep=['assets/logotype.png'],
+                clean=True,
+            )
 
-def task_copy_icon():
+
+def task_copy_asset():
     import shutil
-    return dict(
-            actions=[lambda: shutil.copy('assets/icon.png', 'static/icon.png')],
-            targets=['static/icon.png'],
-            file_dep=['assets/icon.png'],
-            clean=True,
-    )
+    assets = ('icon.png', 'logotype.png')
+    for asset in assets:
+        yield dict(
+                name=asset,
+                actions=[lambda: shutil.copy(f'assets/{asset}', f'static/{asset}')],
+                targets=[f'static/{asset}'],
+                file_dep=[f'assets/{asset}'],
+                clean=True,
+            )
 
 def task_minify_css():
     """minify css"""
