@@ -12,6 +12,7 @@ from zipfile import BadZipFile
 from twitter import TwitterError
 from urllib.error import URLError
 import version
+import lib.brotli
 
 @app.before_request
 def load_viewer():
@@ -34,6 +35,8 @@ def touch_viewer(resp):
         g.viewer.touch()
         db.session.commit()
     return resp
+
+app.after_request(lib.brotli.compress_response)
 
 @app.route('/')
 def index():
