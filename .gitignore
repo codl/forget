@@ -3,4 +3,5 @@
 __pycache__
 celerybeat-schedule
 .doit.db
-static/logotype*.png
+static/
+

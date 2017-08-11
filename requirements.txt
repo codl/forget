@@ -6,6 +6,7 @@ celery==4.1.0
 click==6.7
 cloudpickle==0.4.0
 contextlib2==0.5.5
+csscompressor==0.9.4
 doit==0.30.3
 Flask==0.12.2
 Flask-Limiter==0.9.5
