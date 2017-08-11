@@ -11,8 +11,8 @@ def task_gen_logo():
             for width in widths:
                 height = im.height * width // im.width
                 new = im.resize((width,height), resample=Image.LANCZOS)
-                new.save('static/logotype-{}.png'.format(width))
-            im.save('static/logotype.png')
+                new.save('static/logotype-{}.png'.format(width), optimize=True)
+            im.save('static/logotype.png', optimize=True)
 
     return {
             'actions': [gen_logo],
