@@ -19,6 +19,7 @@ def task_gen_logo():
             'targets': [f'static/logotype-{width}.png' for width in widths]\
                 + ['static/logotype.png'],
             'file_dep': ['assets/logotype.png'],
+            'clean': True,
         }
 
 def task_copy_icon():
@@ -27,6 +28,7 @@ def task_copy_icon():
             'actions': [lambda: shutil.copy('assets/icon.png', 'static/icon.png')],
             'targets': ['static/icon.png'],
             'file_dep': ['assets/icon.png'],
+            'clean': True,
     }
 
 def task_minify_css():
@@ -43,6 +45,7 @@ def task_minify_css():
             'actions': [minify],
             'targets': ['static/styles.css'],
             'file_dep': ['assets/styles.css'],
+            'clean': True,
         }
 
 if __name__ == '__main__':
