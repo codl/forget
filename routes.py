@@ -36,9 +36,8 @@ def touch_viewer(resp):
         db.session.commit()
     return resp
 
-brcache = lib.brotli.BrotliCache(app.config.get('REDIS', {}))
 
-app.after_request(brcache.wrap_response)
+lib.brotli.brotli(app)
 
 @app.route('/')
 def index():
