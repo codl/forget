@@ -48,6 +48,31 @@ def task_minify_css():
             'clean': True,
         }
 
+def task_compress_static():
+    import brotli
+    import gzip
+
+    deps = ('static/styles.css', 'static/icon.png', 'static/logotype.png') + tuple((f'static/logotype-{width}.png' for width in (200, 400, 600, 800)))
+    targets = tuple((f'{file}.br' for file in deps)) + tuple((f'{file}.gz' for file in deps))
+
+    def compress_brotli(dependencies):
+        for filename in dependencies:
+            with open(filename, 'rb') as in_:
+                with open(filename + '.br', 'wb') as out:
+                    out.write(brotli.compress(in_.read()))
+    def compress_gzip(dependencies):
+        for filename in dependencies:
+            with open(filename, 'rb') as in_:
+                with gzip.open(filename + '.gz', 'wb') as out:
+                    out.write(in_.read())
+
+    return dict(
+            file_dep=deps,
+            targets=targets,
+            actions=[compress_brotli, compress_gzip],
+            clean=True,
+        )
+
 if __name__ == '__main__':
     import doit
     doit.run(globals())
