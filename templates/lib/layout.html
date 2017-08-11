@@ -12,6 +12,7 @@
         <meta name='og:type' content='website' />
         <meta name='twitter:card' content='summary' />
         <meta name='twitter:site:id' content='808418'/>
+        <script async src="{{ st('version.js') }}"></script>
     </head>
     <body>
         <header>
@@ -27,7 +28,7 @@
         </header>
         {% block body %}{% endblock %}
         <footer>
-            <p>Forget {{version or "dev"}}</p>
+            <p id='ident'>Forget</p>
             <p>A <a href="https://twitter.com/codl">codl</a> joint</p>
             <p><a href="https://github.com/codl/forget">Code on Github</a></p>
         </footer>

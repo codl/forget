@@ -1,4 +1,4 @@
-from flask import render_template, url_for, redirect, request, g, Response
+from flask import render_template, url_for, redirect, request, g, Response, jsonify
 from datetime import datetime, timedelta
 import lib.twitter
 import lib
@@ -161,3 +161,7 @@ def logout():
         db.session.commit()
         g.viewer = None
     return redirect(url_for('index'))
+
+@app.route('/api/about')
+def api_about():
+    return jsonify(service='Forget', version=version.version)
