@@ -1,18 +1,20 @@
-from flask import g, redirect
+from flask import g, redirect, jsonify, make_response
+from functools import wraps
 
-def require_auth(fun, redir=True):
-
-    from functools import update_wrapper
+def require_auth(fun):
+    @wraps(fun)
     def wrapper(*args, **kwargs):
         if not g.viewer:
-            if redir:
-                return redirect('/')
-            else:
-                return 403
-        else:
-            return fun(*args, **kwargs)
+            return redirect('/')
+        return fun(*args, **kwargs)
+    return wrapper
 
-    update_wrapper(wrapper, fun)
+def require_auth_api(fun):
+    @wraps(fun)
+    def wrapper(*args, **kwargs):
+        if not g.viewer:
+            return make_response((jsonify(status='error', error='not logged in'), 403))
+        return fun(*args, **kwargs)
     return wrapper
 
 

@@ -18,6 +18,7 @@
             onload="Raven.config('{{sentry_dsn}}').install()"></script>
         {% endif -%}
         <script defer src="{{ st('version.js') }}"></script>
+        {% block scripts %}{% endblock %}
     </head>
     <body>
         <header>

@@ -23,7 +23,7 @@ def task_gen_logo():
 
 def task_copy_asset():
     import shutil
-    assets = ('icon.png', 'logotype.png', 'version.js')
+    assets = ('icon.png', 'logotype.png', 'version.js', 'settings_form.js')
     for asset in assets:
         yield dict(
                 name=asset,

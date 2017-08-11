@@ -1,5 +1,8 @@
 {% from 'lib/interval.html' import interval_input -%}
 {% extends 'lib/layout.html' %}
+{% block scripts %}
+<script async src="{{st('settings_form.js')}}"></script>
+{% endblock %}
 {% block body -%}
 
 <section class=viewer>
@@ -30,8 +33,8 @@
 {% endif %}
 </section>
 
-<section>
-<h2>Your expiration rules</h2>
+<section id='settings-section'>
+<h2 id="settings-title">Your expiration rules</h2>
 
 {% if request.args.get('settings_saved') != None %}
 <div class='banner success'>Rules saved successfully</div>
@@ -41,7 +44,7 @@
 <div class='banner error'>Something went wrong trying to save your settings. Please try again later.</div>
 {% endif %}
 
-<form action='{{url_for("settings")}}' method='post' enctype='multipart/form-data'>
+<form name='settings' action='{{url_for("settings")}}' method='post' enctype='multipart/form-data'>
 <p>Posts that are over
     {{interval_input(g.viewer.account, 'policy_keep_younger', scales)}}
     old and are not one of your

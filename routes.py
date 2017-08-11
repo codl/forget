@@ -2,9 +2,9 @@ from flask import render_template, url_for, redirect, request, g, Response, json
 from datetime import datetime, timedelta
 import lib.twitter
 import lib
-from lib import require_auth
+from lib.auth import require_auth, require_auth_api
 from lib import set_session_cookie
-from lib import get_viewer_session
+from lib import get_viewer_session, get_viewer
 from model import Account, Session, Post, TwitterArchive
 from app import app, db, sentry, limiter
 import tasks
@@ -13,6 +13,7 @@ from twitter import TwitterError
 from urllib.error import URLError
 import version
 import lib.brotli
+import lib.settings
 
 @app.before_request
 def load_viewer():
@@ -111,15 +112,7 @@ def upload_tweet_archive():
 @app.route('/settings', methods=('POST',))
 @require_auth
 def settings():
-    for attr in (
-            'policy_keep_favourites',
-            'policy_keep_latest',
-            'policy_delete_every_scale',
-            'policy_delete_every_significand',
-            'policy_keep_younger_scale',
-            'policy_keep_younger_significand',
-            'policy_keep_media',
-            ):
+    for attr in lib.settings.attrs:
         try:
             if attr in request.form:
                 setattr(g.viewer.account, attr, request.form[attr])
@@ -174,3 +167,16 @@ def logout():
 @app.route('/api/about')
 def api_about():
     return jsonify(service='Forget', version=version.version)
+
+@app.route('/api/settings', methods=('PUT',))
+@require_auth_api
+def api_settings_put():
+    viewer = get_viewer()
+    data = request.json
+    updated = dict()
+    for key in lib.settings.attrs:
+        if key in data:
+            setattr(viewer, key, data[key])
+            updated[key] = data[key]
+    db.session.commit()
+    return jsonify(status='success', updated=updated)

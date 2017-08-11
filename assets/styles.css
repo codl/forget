@@ -82,17 +82,17 @@ body > section > .banner {
     background: #eee;
 }
 
-.banner.success {
+.success {
+    border-color: #4a2;
     background: #dec;
-    border-left-color: #4a2;
 }
 
-.banner.error {
+.error {
     border-color: #a24;
     background: #ecd;
 }
 
-.banner.warning {
+.warning {
     border-color: #dc4;
     background: #eec;
 }
@@ -125,4 +125,58 @@ footer p {
 footer a {
     color: inherit;
 }
+
+.status-display {
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-left: 1ch;
+    padding: 0 0.4em;
+    vertical-align: top;
+}
+
+.status-display.hidden {
+    display: none;
+}
+
+.status-display.error {
+    background: #ecd;
+}
+
+.status-display.success {
+    display: inline-block;
+    background: #dec;
+    animation: fade-background 2s forwards;
+}
+
+@keyframes fade-background {
+    to {
+        background: transparent;
+    }
+}
+
+.status-display::before {
+    content: "";
+    display: inline-block;
+    border-radius: 50%;
+    width:  0.8em;
+    height: 0.8em;
+    border-color: inherit;
+    border-style: solid;
+    border-width: 0.4em;
+    margin-right: 0.3em;
+
+}
+.status-display.saving::before {
+    border-color: #666;
+    border-width: 2px;
+    animation: blink infinite 0.6s steps(1) normal;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+
 
