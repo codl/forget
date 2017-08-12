@@ -17,7 +17,6 @@
         <script defer src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"
             onload="Raven.config('{{sentry_dsn}}').install()"></script>
         {% endif -%}
-        <script defer src="{{ st('version.js') }}"></script>
         {% block scripts %}{% endblock %}
     </head>
     <body>
