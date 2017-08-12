@@ -112,14 +112,15 @@ def upload_tweet_archive():
 @app.route('/settings', methods=('POST',))
 @require_auth
 def settings():
-    for attr in lib.settings.attrs:
-        try:
+    viewer = get_viewer()
+    try:
+        for attr in lib.settings.attrs:
             if attr in request.form:
-                setattr(g.viewer.account, attr, request.form[attr])
-        except ValueError:
-            return redirect(url_for('index', settings_error=''))
+                setattr(viewer, attr, request.form[attr])
+        db.session.commit()
+    except ValueError:
+        return 400
 
-    db.session.commit()
 
     return redirect(url_for('index', settings_saved=''))
 
@@ -184,5 +185,9 @@ def api_viewer_post_counts():
     return jsonify(
             post_count=viewer.post_count(),
             eligible_for_delete_estimate=viewer.estimate_eligible_for_delete(),
-            # more? maybe later
+            display_name=viewer.display_name,
+            screen_name=viewer.screen_name,
+            avatar_url=viewer.avatar_url,
+            id=viewer.id,
+            service=viewer.service,
         )

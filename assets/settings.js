@@ -57,7 +57,7 @@
                 backoff_level += 1;
                 backoff_level = Math.min(backoff_level, 5);
             });
-        promise.then(fetch_counters).then(update_counters);
+        promise.then(fetch_viewer).then(update_viewer);
 
         // remove server-rendered banner
         let banner = settings_section.querySelector('.banner');
@@ -109,7 +109,7 @@
     // silently send_settings in case the user changed settings while the page was loading
     send_settings(get_all_inputs());
 
-    function fetch_counters(){
+    function fetch_viewer(){
         return fetch('/api/viewer', {
             credentials: 'same-origin',
         })
@@ -117,10 +117,12 @@
             .then(resp => resp.json());
     }
 
-    function update_counters(counters){
-        document.querySelector('#post-count').textContent = counters.post_count;
-        document.querySelector('#eligible-estimate').textContent = counters.eligible_for_delete_estimate;
+    function update_viewer(viewer){
+        document.querySelector('#post-count').textContent = viewer.post_count;
+        document.querySelector('#eligible-estimate').textContent = viewer.eligible_for_delete_estimate;
+        document.querySelector('#display-name').textContent = viewer.display_name;
+        document.querySelector('#avatar').src = viewer.avatar_url;
     }
 
-    setInterval(() => fetch_counters().then(update_counters), 1000 * 20)
+    setInterval(() => fetch_viewer().then(update_viewer), 1000 * 20)
 })();
