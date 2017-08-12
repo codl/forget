@@ -101,9 +101,16 @@ def upload_tweet_archive():
     db.session.commit()
 
     try:
-        tasks.chunk_twitter_archive(ta.id)
+        files = lib.twitter.chunk_twitter_archive(ta.id)
+
+        ta.chunks = len(files)
+        db.session.commit()
 
         assert ta.chunks > 0
+
+        for filename in files:
+            tasks.import_twitter_archive_month.s(archive_id, filename).apply_async()
+
 
         return redirect(url_for('index', _anchor='recent_archives'))
     except (BadZipFile, AssertionError):

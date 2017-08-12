@@ -66,21 +66,6 @@ def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limi
         acc.touch_fetch()
     db.session.commit()
 
-@app.task
-def chunk_twitter_archive(archive_id):
-    ta = TwitterArchive.query.get(archive_id)
-
-    with ZipFile(BytesIO(ta.body), 'r') as zipfile:
-        files = [filename for filename in zipfile.namelist() if filename.startswith('data/js/tweets/') and filename.endswith('.js')]
-
-    files.sort()
-
-    ta.chunks = len(files)
-    db.session.commit()
-
-    for filename in files:
-        import_twitter_archive_month.s(archive_id, filename).apply_async()
-
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def import_twitter_archive_month(archive_id, month_path):

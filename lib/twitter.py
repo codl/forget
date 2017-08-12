@@ -1,10 +1,12 @@
 from twitter import Twitter, OAuth, TwitterHTTPError
 from werkzeug.urls import url_decode
-from model import OAuthToken, Account, Post
+from model import OAuthToken, Account, Post, TwitterArchive
 from app import db, app
 from math import inf
 from datetime import datetime
 import locale
+from zipfile import ZipFile
+from io import BytesIO
 
 def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
     twitter = Twitter(
@@ -159,3 +161,14 @@ def delete(post):
     t = get_twitter_for_acc(post.author)
     t.statuses.destroy(id=post.twitter_id)
     db.session.delete(post)
+
+
+def chunk_twitter_archive(archive_id):
+    ta = TwitterArchive.query.get(archive_id)
+
+    with ZipFile(BytesIO(ta.body), 'r') as zipfile:
+        files = [filename for filename in zipfile.namelist() if filename.startswith('data/js/tweets/') and filename.endswith('.js')]
+
+    files.sort()
+
+    return files
