@@ -26,7 +26,9 @@ class BrotliCache(object):
         cache_key = 'brotlicache:{}'.format(digest)
 
         encbody = self.redis.get(cache_key)
+        response.headers.set('x-brotli-cache', 'HIT')
         if not encbody:
+            response.headers.set('x-brotli-cache', 'MISS')
             lock_key = 'brotlicache:lock:{}'.format(digest)
             if self.redis.set(lock_key, 1, nx=True, ex=10):
                 mode = brotli_.MODE_TEXT if response.content_type.startswith('text/') else brotli_.MODE_GENERIC
