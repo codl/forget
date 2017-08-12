@@ -5,6 +5,7 @@
 
     let status_timeout = null;
 
+    let settings_section = document.querySelector('#settings-section');
     let form = document.forms.settings;
     let backoff_level = 0
 
@@ -59,7 +60,6 @@
         promise.then(fetch_counters).then(update_counters);
 
         // remove server-rendered banner
-        let settings_section = document.querySelector('#settings-section');
         let banner = settings_section.querySelector('.banner');
         if(banner){
             settings_section.removeChild(banner);
@@ -104,8 +104,7 @@
 
     let status_display = document.createElement('span');
     status_display.classList.add('status-display', 'hidden');
-    let settings_title = document.querySelector('#settings-title');
-    settings_title.appendChild(status_display);
+    settings_section.insertBefore(status_display, settings_section.childNodes[0]);
 
     // silently send_settings in case the user changed settings while the page was loading
     send_settings(get_all_inputs());

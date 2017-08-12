@@ -134,6 +134,9 @@ footer a {
     margin-left: 1ch;
     padding: 0 0.4em;
     vertical-align: top;
+    position: sticky;
+    top: 0;
+    float: right;
 }
 
 .status-display.hidden {
@@ -145,7 +148,6 @@ footer a {
 }
 
 .status-display.success {
-    display: inline-block;
     background: #dec;
     animation: fade-background 2s forwards;
 }
