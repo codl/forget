@@ -173,18 +173,18 @@ def refresh_account(account_id):
     posts.append(oldest_post)
 
     posts = refresh_posts(posts)
+    account.touch_refresh()
     db.session.commit()
-    return posts
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account_with_oldest_post():
     post = Post.query.options(db.joinedload(Post.author)).order_by(db.asc(Post.updated_at)).first()
-    return refresh_account(post.author_id)
+    refresh_account(post.author_id)
 
 app.add_periodic_task(30*60, periodic_cleanup)
 app.add_periodic_task(45, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(45, queue_deletes)
-app.add_periodic_task(10*60, refresh_account_with_oldest_post)
+app.add_periodic_task(45, refresh_account_with_oldest_post)
 
 if __name__ == '__main__':
     app.worker_main()

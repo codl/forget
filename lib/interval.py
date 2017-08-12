@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from statistics import mean
 
 SCALES = [
@@ -75,3 +75,28 @@ def decompose_interval(attrname):
         return cls
 
     return decorator
+
+def relative(interval):
+    # special cases
+    if interval > timedelta(seconds=-15) and interval < timedelta(0):
+        return "just now"
+    elif interval > timedelta(0) and interval < timedelta(seconds=15):
+        return "in a few seconds"
+    else:
+        output = None
+        for name, scale in reversed(SCALES):
+            if abs(interval) > scale:
+                value = abs(interval) // scale
+                output = '{} {}'.format(value, name)
+                if value == 1:
+                    output = output[:-1]
+                break
+        if not output:
+            output = '{} seconds'.format(abs(interval).seconds)
+        if interval > timedelta(0):
+            return 'in {}'.format(output)
+        else:
+            return '{} ago'.format(output)
+
+def relnow(time):
+    return relative(time - datetime.now())

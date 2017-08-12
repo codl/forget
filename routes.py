@@ -14,6 +14,7 @@ from urllib.error import URLError
 import version
 import lib.brotli
 import lib.settings
+import lib.interval
 
 @app.before_request
 def load_viewer():
@@ -52,7 +53,7 @@ lib.brotli.brotli(app)
 @app.route('/')
 def index():
     if g.viewer:
-        return render_template('logged_in.html', scales=lib.interval_scales,
+        return render_template('logged_in.html', scales=lib.interval.SCALES,
                 tweet_archive_failed = 'tweet_archive_failed' in request.args,
                 settings_error = 'settings_error' in request.args
                 )
@@ -197,4 +198,10 @@ def api_viewer_post_counts():
             avatar_url=viewer.avatar_url,
             id=viewer.id,
             service=viewer.service,
+            last_refresh=viewer.last_refresh,
+            last_refresh_rel=lib.interval.relnow(viewer.last_refresh),
+            last_fetch=viewer.last_fetch,
+            last_fetch_rel=lib.interval.relnow(viewer.last_fetch),
+            last_delete=viewer.last_delete,
+            last_delete_rel=lib.interval.relnow(viewer.last_delete),
         )

@@ -54,12 +54,16 @@ class Account(TimestampMixin, RemoteIDMixin):
 
     last_fetch = db.Column(db.DateTime, server_default='epoch')
     last_delete = db.Column(db.DateTime, server_default='epoch')
+    last_refresh = db.Column(db.DateTime, server_default='epoch')
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
 
     def touch_delete(self):
         self.last_delete = db.func.now()
+
+    def touch_refresh(self):
+        self.last_refresh = db.func.now()
 
     @db.validates('policy_keep_younger', 'policy_delete_every')
     def validate_intervals(self, key, value):
