@@ -23,7 +23,7 @@ def task_gen_logo():
 
 def task_copy_asset():
     import shutil
-    assets = ('icon.png', 'logotype.png', 'settings_form.js')
+    assets = ('icon.png', 'logotype.png', 'settings.js')
     for asset in assets:
         yield dict(
                 name=asset,
@@ -59,7 +59,7 @@ def task_compress_static():
         'static/icon.png',
         'static/logotype.png',
         'static/version.js',
-        'static/settings_form.js',
+        'static/settings.js',
         ) + tuple((f'static/logotype-{width}.png' for width in (200, 400, 600, 800)))
 
     def compress_brotli(dependencies):
