@@ -178,7 +178,7 @@ def refresh_account(account_id):
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account_with_oldest_post():
-    post = Post.query.outerjoin(Post.author).join(Account.tokens).group_by(Account).order_by(db.asc(Post.updated_at)).first()
+    post = Post.query.outerjoin(Post.author).join(Account.tokens).group_by(Post).order_by(db.asc(Post.updated_at)).first()
     refresh_account(post.author_id)
 
 @app.task(autoretry_for=(TwitterError, URLError))
