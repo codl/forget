@@ -183,7 +183,7 @@ def refresh_account_with_oldest_post():
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account_with_longest_time_since_refresh():
-    acc = Account.query.order_by(db.asc(Account.last_refresh)).first()
+    acc = Account.query.join(Account.tokens).group_by(Account).having(db.func.count(OAuthToken.token) > 0).order_by(db.asc(Account.last_refresh)).first()
     refresh_account(acc.id)
 
 
