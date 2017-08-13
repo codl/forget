@@ -164,7 +164,7 @@ def refresh_posts(posts):
 def refresh_account(account_id):
     account = Account.query.get(account_id)
 
-    posts = Post.query.with_parent(account).filter(Post.id != oldest_post.id).order_by(db.asc(Post.updated_at)).limit(100).all()
+    posts = Post.query.with_parent(account).order_by(db.asc(Post.updated_at)).limit(100).all()
 
     posts = refresh_posts(posts)
     account.touch_refresh()
