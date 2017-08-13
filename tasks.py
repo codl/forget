@@ -115,6 +115,12 @@ def periodic_cleanup():
     OAuthToken.query.filter(OAuthToken.updated_at < (db.func.now() - timedelta(days=1)))\
             .filter(OAuthToken.account_id == None)\
             .delete(synchronize_session=False)
+
+    # disable users with no tokens
+    unreachable = Account.query.outerjoin(Account.tokens).group_by(Account).having(db.func.count(OAuthToken.token) == 0).filter(Account.policy_enabled == True)
+    for account in unreachable:
+        account.policy_enabled = False
+
     db.session.commit()
 
 @app.task
@@ -172,16 +178,16 @@ def refresh_account(account_id):
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account_with_oldest_post():
-    post = Post.query.options(db.joinedload(Post.author)).order_by(db.asc(Post.updated_at)).first()
+    post = Post.query.outerjoin(Post.author).join(Account.tokens).group_by(Account).order_by(db.asc(Post.updated_at)).first()
     refresh_account(post.author_id)
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account_with_longest_time_since_refresh():
-    acc = Account.query.join(Account.tokens).group_by(Account).having(db.func.count(OAuthToken.token) > 0).order_by(db.asc(Account.last_refresh)).first()
+    acc = Account.query.join(Account.tokens).group_by(Account).order_by(db.asc(Account.last_refresh)).first()
     refresh_account(acc.id)
 
 
-app.add_periodic_task(30*60, periodic_cleanup)
+app.add_periodic_task(6*60, periodic_cleanup)
 app.add_periodic_task(45, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(45, queue_deletes)
 app.add_periodic_task(90, refresh_account_with_oldest_post)
