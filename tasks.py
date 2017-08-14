@@ -150,13 +150,13 @@ def delete_from_account(account_id):
             if account.policy_delete_every == timedelta(0):
                 print("deleting all {} eligible posts for {}".format(len(eligible), account))
                 for post in eligible:
-                    lib.twitter.delete(post)
                     account.touch_delete()
+                    lib.twitter.delete(post)
             else:
                 post = random.choice(eligible)
                 print("deleting {}".format(post))
-                lib.twitter.delete(post)
                 account.touch_delete()
+                lib.twitter.delete(post)
 
     db.session.commit()
 
