@@ -151,12 +151,12 @@ def enable():
             return render_template('warn.html', message=f"""You've set the time between deleting posts to 0. Every post that matches your expiration rules will be deleted within minutes.
                     { ("That's about " + str(approx) + " posts.") if approx > 0 else "" }
                     Go ahead?""")
-        if g.viewer.account.last_delete < datetime.now() - timedelta(days=365):
+        if g.viewer.account.next_delete < datetime.now() - timedelta(days=365):
             return render_template('warn.html', message="""Once you enable Forget, posts that match your expiration rules will be deleted <b>permanently</b>. We can't bring them back. Make sure that you won't miss them.""")
 
 
     if not g.viewer.account.policy_enabled:
-        g.viewer.account.last_delete = db.func.now()
+        g.viewer.account.next_delete = datetime.now() + g.viewer.account.policy_delete_every
 
     g.viewer.account.policy_enabled = True
     db.session.commit()
@@ -202,6 +202,6 @@ def api_viewer_post_counts():
             last_refresh_rel=lib.interval.relnow(viewer.last_refresh),
             last_fetch=viewer.last_fetch,
             last_fetch_rel=lib.interval.relnow(viewer.last_fetch),
-            last_delete=viewer.last_delete,
-            last_delete_rel=lib.interval.relnow(viewer.last_delete),
+            next_delete=viewer.next_delete,
+            next_delete_rel=lib.interval.relnow(viewer.next_delete),
         )

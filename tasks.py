@@ -127,7 +127,7 @@ def periodic_cleanup():
 @app.task
 def queue_deletes():
     eligible_accounts = Account.query.filter(Account.policy_enabled == True).\
-            filter(Account.last_delete + Account.policy_delete_every < db.func.now())
+            filter(Account.next_delete < db.func.now())
     for account in eligible_accounts:
         delete_from_account.s(account.id).apply_async()
 
@@ -151,6 +151,7 @@ def delete_from_account(account_id):
                 print("deleting all {} eligible posts for {}".format(len(eligible), account))
                 for post in eligible:
                     lib.twitter.delete(post)
+                    account.touch_delete()
             else:
                 post = random.choice(eligible)
                 print("deleting {}".format(post))

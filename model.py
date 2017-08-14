@@ -5,7 +5,7 @@ from app import db
 from twitter import Twitter, OAuth
 import secrets
 from lib import decompose_interval
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 class TimestampMixin(object):
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
@@ -53,14 +53,17 @@ class Account(TimestampMixin, RemoteIDMixin):
     reported_post_count = db.Column(db.Integer)
 
     last_fetch = db.Column(db.DateTime, server_default='epoch', index=True)
-    last_delete = db.Column(db.DateTime, server_default='epoch', index=True)
     last_refresh = db.Column(db.DateTime, server_default='epoch', index=True)
+    next_delete = db.Column(db.DateTime, server_default='epoch', index=True)
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
 
     def touch_delete(self):
-        self.last_delete = db.func.now()
+        if(datetime.now() - self.next_delete > 3 * self.delete_every):
+            self.next_delete = db.func.now() + self.delete_every
+        else:
+            self.next_delete += self.delete_every
 
     def touch_refresh(self):
         self.last_refresh = db.func.now()
