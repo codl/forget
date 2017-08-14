@@ -60,7 +60,9 @@ class Account(TimestampMixin, RemoteIDMixin):
         self.last_fetch = db.func.now()
 
     def touch_delete(self):
-        if(datetime.now() - self.next_delete > 3 * self.delete_every):
+        # if it's been more than 1 delete cycle ago that we've deleted a post,
+        # reset next_delete to be 1 cycle away
+        if(datetime.now() - self.next_delete > self.delete_every):
             self.next_delete = db.func.now() + self.delete_every
         else:
             self.next_delete += self.delete_every
