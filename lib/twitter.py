@@ -144,6 +144,8 @@ def refresh_posts(posts):
         return posts
 
     t = get_twitter_for_acc(posts[0].author)
+    if not t:
+        raise Exception('shit idk. twitter says no')
     tweets = t.statuses.lookup(_id=",".join((post.twitter_id for post in posts)),
             trim_user = True, tweet_mode = 'extended')
     refreshed_posts = list()
