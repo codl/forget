@@ -52,9 +52,9 @@ class Account(TimestampMixin, RemoteIDMixin):
     avatar_url = db.Column(db.String)
     reported_post_count = db.Column(db.Integer)
 
-    last_fetch = db.Column(db.DateTime, server_default='epoch')
-    last_delete = db.Column(db.DateTime, server_default='epoch')
-    last_refresh = db.Column(db.DateTime, server_default='epoch')
+    last_fetch = db.Column(db.DateTime, server_default='epoch', index=True)
+    last_delete = db.Column(db.DateTime, server_default='epoch', index=True)
+    last_refresh = db.Column(db.DateTime, server_default='epoch', index=True)
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
@@ -120,7 +120,7 @@ class OAuthToken(db.Model, TimestampMixin):
     token = db.Column(db.String, primary_key=True)
     token_secret = db.Column(db.String, nullable=False)
 
-    account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=True)
+    account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=True, index=True)
     account = db.relationship(Account, backref=db.backref('tokens', order_by=lambda: db.desc(OAuthToken.created_at)))
 
     # note: account_id is nullable here because we don't know what account a token is for
@@ -132,7 +132,7 @@ class Session(db.Model, TimestampMixin):
 
     id = db.Column(db.String, primary_key=True, default=lambda: secrets.token_urlsafe())
 
-    account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     account = db.relationship(Account, lazy='joined', backref='sessions')
 
 
@@ -142,7 +142,7 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     id = db.Column(db.String, primary_key=True)
     body = db.Column(db.String)
 
-    author_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    author_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     author = db.relationship(Account,
             backref=db.backref('posts', order_by=lambda: db.desc(Post.created_at)))
 
