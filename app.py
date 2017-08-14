@@ -1,12 +1,14 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, event
+from sqlalchemy.engine import Engine
 from flask_migrate import Migrate
 import version
 from lib import cachebust
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from lib import get_viewer
+import os
 
 app = Flask(__name__)
 
@@ -34,6 +36,13 @@ metadata = MetaData(naming_convention = {
 
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
+
+if 'SQLALCHEMY_LOG_QUERIES_TO' in app.config:
+    @event.listens_for(Engine, 'after_cursor_execute', named=True)
+    def log_queries(statement='', **kwargs):
+        with open(app.config['SQLALCHEMY_LOG_QUERIES_TO'], 'a') as f:
+            f.write(statement.replace('\n', ' ') + ';\n')
+            os.sync()
 
 sentry = None
 if 'SENTRY_DSN' in app.config:
