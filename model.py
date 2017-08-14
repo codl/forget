@@ -62,10 +62,10 @@ class Account(TimestampMixin, RemoteIDMixin):
     def touch_delete(self):
         # if it's been more than 1 delete cycle ago that we've deleted a post,
         # reset next_delete to be 1 cycle away
-        if(datetime.now() - self.next_delete > self.delete_every):
-            self.next_delete = db.func.now() + self.delete_every
+        if(datetime.now() - self.next_delete > self.policy_delete_every):
+            self.next_delete = db.func.now() + self.policy_delete_every
         else:
-            self.next_delete += self.delete_every
+            self.next_delete += self.policy_delete_every
 
     def touch_refresh(self):
         self.last_refresh = db.func.now()
