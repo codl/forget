@@ -52,12 +52,13 @@ def fetch_acc(id, cursor=None):
                 fetch_acc.si(id, cursor).apply_async()
     finally:
         db.session.rollback()
-        acc.last_fetch = db.func.now()
+        acc.touch_fetch()
         db.session.commit()
 
 @app.task
 def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limit=20):
     accs = Account.query\
+            .join(Account.tokens).group_by(Account)\
             .filter(Account.last_fetch < db.func.now() - min_staleness)\
             .order_by(db.asc(Account.last_fetch))\
             .limit(limit)
