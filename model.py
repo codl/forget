@@ -101,7 +101,7 @@ class Account(TimestampMixin, RemoteIDMixin):
         """
         latest_n_posts = Post.query.with_parent(self).order_by(db.desc(Post.created_at)).limit(self.policy_keep_latest)
         query = Post.query.with_parent(self).\
-            filter(Post.created_at + self.policy_keep_younger <= db.func.now()).\
+            filter(Post.created_at <= db.func.now() - self.policy_keep_younger).\
             except_(latest_n_posts)
         if(self.policy_keep_favourites):
             query = query.filter_by(favourite = False)
@@ -147,7 +147,7 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     id = db.Column(db.String, primary_key=True)
     body = db.Column(db.String)
 
-    author_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    author_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     author = db.relationship(Account,
             backref=db.backref('posts', order_by=lambda: db.desc(Post.created_at)))
 
@@ -161,6 +161,8 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
 
     def __repr__(self):
         return '<Post ({}, "{}", Author: {})>'.format(self.id, self.snippet(), self.author_id)
+
+db.Index('ix_posts_author_id_created_at', Post.author_id, Post.created_at)
 
 class TwitterArchive(db.Model, TimestampMixin):
     __tablename__ = 'twitter_archives'
