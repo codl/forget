@@ -188,7 +188,7 @@ def api_settings_put():
 
 @app.route('/api/viewer')
 @require_auth_api
-def api_viewer_post_counts():
+def api_viewer():
     viewer = get_viewer()
     return jsonify(
             post_count=viewer.post_count(),
@@ -198,6 +198,13 @@ def api_viewer_post_counts():
             avatar_url=viewer.avatar_url,
             id=viewer.id,
             service=viewer.service,
+        )
+
+@app.route('/api/viewer/timers')
+@require_auth_api
+def api_viewer_timers():
+    viewer = get_viewer()
+    return jsonify(
             last_refresh=viewer.last_refresh,
             last_refresh_rel=lib.interval.relnow(viewer.last_refresh),
             last_fetch=viewer.last_fetch,
