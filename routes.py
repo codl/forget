@@ -110,7 +110,7 @@ def upload_tweet_archive():
         assert ta.chunks > 0
 
         for filename in files:
-            tasks.import_twitter_archive_month.s(archive.id, filename).apply_async()
+            tasks.import_twitter_archive_month.s(ta.id, filename).apply_async()
 
 
         return redirect(url_for('index', _anchor='recent_archives'))
