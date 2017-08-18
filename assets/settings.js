@@ -95,7 +95,6 @@
 
     for(input of form.elements){
         input.addEventListener('change', on_change);
-        input.addEventListener('change', e=>console.log(e.target));
     }
 
     // remove submit button since we're doing live updates
@@ -120,7 +119,7 @@
     function update_viewer(viewer){
         document.querySelector('#post-count').textContent = viewer.post_count;
         document.querySelector('#eligible-estimate').textContent = viewer.eligible_for_delete_estimate;
-        document.querySelector('#display-name').textContent = viewer.display_name;
+        document.querySelector('#display-name').textContent = viewer.display_name || viewer.screen_name;
         document.querySelector('#avatar').src = viewer.avatar_url;
     }
 

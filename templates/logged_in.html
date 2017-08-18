@@ -8,7 +8,7 @@
 <section class=viewer>
 <p>Hello,
     <img class=avatar id=avatar src="{{g.viewer.account.avatar_url}}"/>
-    <span id='display-name'>{{g.viewer.account.display_name}}</span>!
+    <span id='display-name'>{{g.viewer.account.display_name or g.viewer.account.screen_name}}</span>!
     <a href="{{url_for('logout')}}">Log out</a>
 </p>
 {% set enabled_disabled = "enabled" if g.viewer.account.policy_enabled else "disabled" %}
