@@ -1,11 +1,11 @@
 body {
     margin: 0;
     font-family: sans-serif;
-    line-height: 1.5em;
 }
 
 *, *::before, *::after {
     box-sizing: border-box;
+    line-height: 1.5em;
 }
 
 body > section, body > header, body > footer {
@@ -52,6 +52,10 @@ h3 {
 
 input[type=number]{
     max-width: 8ch;
+}
+
+input, select, button {
+    line-height: 1em;
 }
 
 .viewer img.avatar {
@@ -182,5 +186,7 @@ footer a {
     }
 }
 
-
-
+form aside {
+    font-style: italic;
+    font-size: 0.8em;
+}

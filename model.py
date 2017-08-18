@@ -1,11 +1,8 @@
-from datetime import datetime
+from datetime import timedelta, datetime
 
 from app import db
-
-from twitter import Twitter, OAuth
 import secrets
 from lib import decompose_interval
-from datetime import timedelta, datetime
 
 class TimestampMixin(object):
     created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
@@ -32,6 +29,30 @@ class RemoteIDMixin(object):
     @twitter_id.setter
     def twitter_id(self, id):
         self.id = "twitter:{}".format(id)
+
+    @property
+    def mastodon_instance(self):
+        if not self.id:
+            return None
+        if self.service != "mastodon":
+            raise Exception("tried to get mastodon instance for a {} {}".format(self.service, type(self)))
+        return self.id.split(":", 1)[1].split('@')[1]
+
+    @mastodon_instance.setter
+    def mastodon_instance(self, instance):
+        self.id = "mastodon:{}@{}".format(self.mastodon_id, instance)
+
+    @property
+    def mastodon_id(self):
+        if not self.id:
+            return None
+        if self.service != "mastodon":
+            raise Exception("tried to get mastodon id for a {} {}".format(self.service, type(self)))
+        return self.id.split(":", 1)[1].split('@')[0]
+
+    @mastodon_id.setter
+    def mastodon_id(self, id):
+        self.id = "mastodon:{}@{}".format(id, self.mastodon_instance)
 
 
 @decompose_interval('policy_delete_every')
@@ -123,7 +144,7 @@ class OAuthToken(db.Model, TimestampMixin):
     __tablename__ = 'oauth_tokens'
 
     token = db.Column(db.String, primary_key=True)
-    token_secret = db.Column(db.String, nullable=False)
+    token_secret = db.Column(db.String, nullable=True)
 
     account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=True, index=True)
     account = db.relationship(Account, backref=db.backref('tokens', order_by=lambda: db.desc(OAuthToken.created_at)))
@@ -181,3 +202,13 @@ class TwitterArchive(db.Model, TimestampMixin):
         if self.chunks_successful == self.chunks:
             return 'successful'
         return 'pending'
+
+ProtoEnum = db.Enum('http', 'https', name='enum_protocol')
+
+class MastodonApp(db.Model, TimestampMixin):
+    __tablename__ = 'mastodon_apps'
+
+    instance = db.Column(db.String, primary_key=True)
+    client_id = db.Column(db.String, nullable=False)
+    client_secret = db.Column(db.String, nullable=False)
+    protocol = db.Column(ProtoEnum, nullable=False)

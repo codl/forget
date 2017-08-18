@@ -1,20 +1,18 @@
 from flask import render_template, url_for, redirect, request, g, Response, jsonify
 from datetime import datetime, timedelta
 import lib.twitter
+import lib.mastodon
 import lib
 from lib.auth import require_auth, require_auth_api
 from lib import set_session_cookie
 from lib import get_viewer_session, get_viewer
-from model import Account, Session, Post, TwitterArchive
+from model import Account, Session, Post, TwitterArchive, MastodonApp
 from app import app, db, sentry, limiter
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
 from urllib.error import URLError
 import version
-import lib.brotli
-import lib.settings
-import lib.interval
 
 @app.before_request
 def load_viewer():
@@ -53,6 +51,19 @@ lib.brotli.brotli(app)
 @app.route('/')
 def index():
     if g.viewer:
+        if g.viewer.account.service == 'mastodon':
+            import lib.mastodon
+            api = lib.mastodon.get_api_for_acc(g.viewer.account)
+            me = api.account_verify_credentials()
+            #return str(me)
+            tl = api.timeline()
+            return str(tl)
+            if not api:
+                raise Exception('frick!!!!!')
+            else:
+                raise Exception(api)
+
+
         return render_template('logged_in.html', scales=lib.interval.SCALES,
                 tweet_archive_failed = 'tweet_archive_failed' in request.args,
                 settings_error = 'settings_error' in request.args
@@ -212,3 +223,52 @@ def api_viewer_timers():
             next_delete=viewer.next_delete,
             next_delete_rel=lib.interval.relnow(viewer.next_delete),
         )
+
+@app.route('/login/mastodon', methods=('GET', 'POST'))
+def mastodon_login_step1():
+    if request.method == 'GET':
+        return render_template('mastodon_login.html', generic_error = 'error' in request.args)
+
+    if not 'instance_url' in request.form or not request.form['instance_url']:
+        return render_template('mastodon_login.html', address_error=True)
+
+    instance_url = request.form['instance_url'].split("@")[-1].lower()
+
+    callback = url_for('mastodon_login_step2', instance=instance_url, _external=True)
+
+    app = lib.mastodon.get_or_create_app(instance_url,
+            callback,
+            url_for('index', _external=True))
+    db.session.merge(app)
+
+    db.session.commit()
+
+    return redirect(lib.mastodon.login_url(app, callback))
+
+@app.route('/login/mastodon/callback/<instance>')
+def mastodon_login_step2(instance):
+    code = request.args.get('code', None)
+    app = MastodonApp.query.get(instance)
+    if not code or not app:
+        return redirect('mastodon_login_step1', error=True)
+
+    callback = url_for('mastodon_login_step2', instance=instance, _external=True)
+
+    account = lib.mastodon.receive_code(code, app, callback)
+
+    account = db.session.merge(account)
+
+    sess = Session(account = account)
+    db.session.add(sess)
+    db.session.commit()
+
+    g.viewer = sess
+    return redirect(url_for('index'))
+
+
+@app.route('/debug')
+def debug():
+    sess = Session(account = Account.query.filter_by(display_name = 'codltest').first())
+    db.session.merge(sess)
+    db.session.commit()
+    return sess.id

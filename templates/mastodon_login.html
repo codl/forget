@@ -1,0 +1,26 @@
+{% extends 'lib/layout.html' %}
+{% block body %}
+<section>
+    <h2>Log in with Mastodon</h2>
+
+{% if generic_error %}
+    <div class='banner error'>Something went wrong while logging in. Try again?</div>
+{% endif %}
+
+{% if address_error %}
+    <div class='banner error'>This doesn't look like a mastodon instance url. Try again?</div>
+{% endif %}
+
+    <form method='post'>
+        <label>Your mastodon address:
+            <input type='text' name='instance_url' placeholder='example@glitch.social'/>
+        </label>
+        <input name='confirm' value='Log in' type='submit'/>
+        <aside>
+            Your mastodon address is your username, followed by an @ sign and the address of your mastodon instance.
+        </aside>
+    </form>
+
+</div>
+</section>
+{% endblock %}

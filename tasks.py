@@ -47,9 +47,12 @@ def fetch_acc(id, cursor=None):
     print(f'fetching {acc}')
     try:
         if(acc.service == 'twitter'):
-            cursor = lib.twitter.fetch_acc(acc, cursor, **flaskapp.config.get_namespace("TWITTER_"))
-            if cursor:
-                fetch_acc.si(id, cursor).apply_async()
+            action = lib.twitter.fetch_acc
+        elif(acc.service == 'mastodon'):
+            action = lib.mastodon.fetch_acc
+        cursor = action(acc, cursor, **flaskapp.config.get_namespace("TWITTER_"))
+        if cursor:
+            fetch_acc.si(id, cursor).apply_async()
     finally:
         db.session.rollback()
         acc.touch_fetch()
