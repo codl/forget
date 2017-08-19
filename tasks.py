@@ -160,7 +160,9 @@ def delete_from_account(account_id):
         action = lib.mastodon.delete
         for post in posts:
             refreshed = refresh_posts((post,))
-            if refreshed:
+            if refreshed and \
+            (not account.policy_keep_favourites or not post.favourite) \
+            and (not account.policy_keep_media or not post.has_media):
                 eligible = refreshed
                 break
 
