@@ -5,6 +5,7 @@ from app import db
 from model import Session, Account, TwitterArchive, Post, OAuthToken
 import lib.twitter
 import lib.mastodon
+from mastodon.Mastodon import MastodonRatelimitError
 from twitter import TwitterError
 from urllib.error import URLError
 from datetime import timedelta, datetime
@@ -42,7 +43,7 @@ class DBTask(Task):
 
 app.Task = DBTask
 
-@app.task(autoretry_for=(TwitterError, URLError))
+@app.task(autoretry_for=(TwitterError, URLError, MastodonRatelimitError))
 def fetch_acc(id, cursor=None):
     acc = Account.query.get(id)
     print(f'fetching {acc}')
@@ -136,7 +137,7 @@ def queue_deletes():
     for account in eligible_accounts:
         delete_from_account.s(account.id).apply_async()
 
-@app.task(autoretry_for=(TwitterError, URLError))
+@app.task(autoretry_for=(TwitterError, URLError, MastodonRatelimitError))
 def delete_from_account(account_id):
     account = Account.query.get(account_id)
     latest_n_posts = Post.query.with_parent(account).order_by(db.desc(Post.created_at)).limit(account.policy_keep_latest)
@@ -145,19 +146,26 @@ def delete_from_account(account_id):
         except_(latest_n_posts).\
         order_by(db.func.random()).limit(100).all()
 
+    eligible = None
+
     action = lambda post: None
     if account.service == 'twitter':
         action = lib.twitter.delete
+        posts = refresh_posts(posts)
+        eligible = list((post for post in posts if
+            (not account.policy_keep_favourites or not post.favourite)
+            and (not account.policy_keep_media or not post.has_media)
+            ))
     elif account.service == 'mastodon':
         action = lib.mastodon.delete
+        for post in posts:
+            refreshed = refresh_posts((post,))
+            if refreshed:
+                eligible = refreshed
+                break
 
-    posts = refresh_posts(posts)
-    eligible = list((post for post in posts if
-        (not account.policy_keep_favourites or not post.favourite)
-        and (not account.policy_keep_media or not post.has_media)
-        ))
     if eligible:
-        if account.policy_delete_every == timedelta(0):
+        if account.policy_delete_every == timedelta(0) and len(eligible) > 1:
             print("deleting all {} eligible posts for {}".format(len(eligible), account))
             for post in eligible:
                 account.touch_delete()
@@ -180,22 +188,25 @@ def refresh_posts(posts):
     elif posts[0].service == 'mastodon':
         return lib.mastodon.refresh_posts(posts)
 
-@app.task(autoretry_for=(TwitterError, URLError))
+@app.task(autoretry_for=(TwitterError, URLError), throws=(MastodonRatelimitError))
 def refresh_account(account_id):
     account = Account.query.get(account_id)
 
-    posts = Post.query.with_parent(account).order_by(db.asc(Post.updated_at)).limit(100).all()
+    limit = 100
+    if account.service == 'mastodon':
+        limit = 5
+    posts = Post.query.with_parent(account).order_by(db.asc(Post.updated_at)).limit(limit).all()
 
     posts = refresh_posts(posts)
     account.touch_refresh()
     db.session.commit()
 
-@app.task(autoretry_for=(TwitterError, URLError))
+@app.task(autoretry_for=(TwitterError, URLError), throws=(MastodonRatelimitError))
 def refresh_account_with_oldest_post():
     post = Post.query.outerjoin(Post.author).join(Account.tokens).group_by(Post).order_by(db.asc(Post.updated_at)).first()
     refresh_account(post.author_id)
 
-@app.task(autoretry_for=(TwitterError, URLError))
+@app.task(autoretry_for=(TwitterError, URLError), throws=(MastodonRatelimitError))
 def refresh_account_with_longest_time_since_refresh():
     acc = Account.query.join(Account.tokens).group_by(Account).order_by(db.asc(Account.last_refresh)).first()
     refresh_account(acc.id)
