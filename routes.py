@@ -51,19 +51,6 @@ lib.brotli.brotli(app)
 @app.route('/')
 def index():
     if g.viewer:
-        if g.viewer.account.service == 'mastodon':
-            import lib.mastodon
-            api = lib.mastodon.get_api_for_acc(g.viewer.account)
-            me = api.account_verify_credentials()
-            #return str(me)
-            tl = api.timeline()
-            return str(tl)
-            if not api:
-                raise Exception('frick!!!!!')
-            else:
-                raise Exception(api)
-
-
         return render_template('logged_in.html', scales=lib.interval.SCALES,
                 tweet_archive_failed = 'tweet_archive_failed' in request.args,
                 settings_error = 'settings_error' in request.args

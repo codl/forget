@@ -4,6 +4,7 @@ from app import app as flaskapp
 from app import db
 from model import Session, Account, TwitterArchive, Post, OAuthToken
 import lib.twitter
+import lib.mastodon
 from twitter import TwitterError
 from urllib.error import URLError
 from datetime import timedelta, datetime
@@ -46,11 +47,12 @@ def fetch_acc(id, cursor=None):
     acc = Account.query.get(id)
     print(f'fetching {acc}')
     try:
+        action = lambda acc, cursor: None
         if(acc.service == 'twitter'):
             action = lib.twitter.fetch_acc
         elif(acc.service == 'mastodon'):
             action = lib.mastodon.fetch_acc
-        cursor = action(acc, cursor, **flaskapp.config.get_namespace("TWITTER_"))
+        cursor = action(acc, cursor)
         if cursor:
             fetch_acc.si(id, cursor).apply_async()
     finally:
@@ -67,7 +69,7 @@ def queue_fetch_for_most_stale_accounts(min_staleness=timedelta(minutes=5), limi
             .limit(limit)
     for acc in accs:
         fetch_acc.s(acc.id).delay()
-        acc.touch_fetch()
+        #acc.touch_fetch()
     db.session.commit()
 
 
@@ -143,23 +145,28 @@ def delete_from_account(account_id):
         except_(latest_n_posts).\
         order_by(db.func.random()).limit(100).all()
 
-    posts = refresh_posts(posts)
+    action = lambda post: None
     if account.service == 'twitter':
-        eligible = list((post for post in posts if
-            (not account.policy_keep_favourites or not post.favourite)
-            and (not account.policy_keep_media or not post.has_media)
-            ))
-        if eligible:
-            if account.policy_delete_every == timedelta(0):
-                print("deleting all {} eligible posts for {}".format(len(eligible), account))
-                for post in eligible:
-                    account.touch_delete()
-                    lib.twitter.delete(post)
-            else:
-                post = random.choice(eligible)
-                print("deleting {}".format(post))
+        action = lib.twitter.delete
+    elif account.service == 'mastodon':
+        action = lib.mastodon.delete
+
+    posts = refresh_posts(posts)
+    eligible = list((post for post in posts if
+        (not account.policy_keep_favourites or not post.favourite)
+        and (not account.policy_keep_media or not post.has_media)
+        ))
+    if eligible:
+        if account.policy_delete_every == timedelta(0):
+            print("deleting all {} eligible posts for {}".format(len(eligible), account))
+            for post in eligible:
                 account.touch_delete()
-                lib.twitter.delete(post)
+                action(post)
+        else:
+            post = random.choice(eligible)
+            print("deleting {}".format(post))
+            account.touch_delete()
+            action(post)
 
     db.session.commit()
 
@@ -170,6 +177,8 @@ def refresh_posts(posts):
 
     if posts[0].service == 'twitter':
         return lib.twitter.refresh_posts(posts)
+    elif posts[0].service == 'mastodon':
+        return lib.mastodon.refresh_posts(posts)
 
 @app.task(autoretry_for=(TwitterError, URLError))
 def refresh_account(account_id):

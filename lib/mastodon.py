@@ -1,8 +1,11 @@
 import mastodon
 from mastodon import Mastodon
-from model import MastodonApp, Account, OAuthToken
+from mastodon.Mastodon import MastodonAPIError
+from model import MastodonApp, Account, OAuthToken, Post
 from requests import head
 from app import db
+from math import inf
+import iso8601
 
 def get_or_create_app(instance_url, callback, website):
     instance_url = instance_url
@@ -49,17 +52,10 @@ def receive_code(code, app, callback):
             )
 
     remote_acc = api.account_verify_credentials()
-    acc = Account(
-            #id = 'mastodon:{}:{}'.format(app.instance, remote_acc['username']),
-            mastodon_instance = app.instance,
-            mastodon_id = remote_acc['username'],
-            screen_name = remote_acc['username'],
-            display_name = remote_acc['display_name'],
-            avatar_url = remote_acc['avatar'],
-            reported_post_count = remote_acc['statuses_count'],
-        )
+    acc = account_from_api_object(remote_acc, app.instance)
+    acc = db.session.merge(acc)
     token = OAuthToken(account = acc, token = access_token)
-    db.session.merge(acc, token)
+    token = db.session.merge(token)
 
     return acc
 
@@ -71,18 +67,100 @@ def get_api_for_acc(account):
                 client_secret = app.client_secret,
                 api_base_url = '{}://{}'.format(app.protocol, app.instance),
                 access_token = token.token,
+                ratelimit_method = 'throw',
+                #debug_requests = True,
             )
-        try:
-            # api.verify_credentials()
-            # doesnt error even if the token is revoked lol sooooo
-            tl = api.timeline()
-            #if 'error' in tl and tl['error'] == 'The access token was revoked':
-            #ARRRRRGH
-        except mastodon.MastodonAPIError as e:
-            raise e
+
+        # api.verify_credentials()
+        # doesnt error even if the token is revoked lol
+        # https://github.com/tootsuite/mastodon/issues/4637
+        # so we have to do this:
+        tl = api.timeline()
+        if 'error' in tl:
+            db.session.delete(token)
+            continue
         return api
 
+    account.force_log_out()
 
-def fetch_acc(account, cursor=None):
-    pass
 
+def fetch_acc(acc, cursor=None):
+    api = get_api_for_acc(acc)
+    if not api:
+        print('no access, aborting')
+        return None
+
+    newacc = account_from_api_object(api.account_verify_credentials(), acc.mastodon_instance)
+    acc = db.session.merge(newacc)
+
+    kwargs = dict(limit = 40)
+    if cursor:
+        kwargs.update(cursor)
+
+    if 'max_id' not in kwargs:
+        most_recent_post = Post.query.with_parent(acc).order_by(db.desc(Post.created_at)).first()
+        if most_recent_post:
+            kwargs['since_id'] = most_recent_post.mastodon_id
+
+    statuses = api.account_statuses(acc.mastodon_id, **kwargs)
+
+    if statuses:
+        kwargs['max_id'] = +inf
+
+        for status in statuses:
+            post = post_from_api_object(status, acc.mastodon_instance)
+            db.session.merge(post)
+            kwargs['max_id'] = min(kwargs['max_id'], status['id'])
+
+    else:
+        kwargs = None
+
+    db.session.commit()
+
+    return kwargs
+
+def post_from_api_object(obj, instance):
+    return Post(
+            mastodon_instance = instance,
+            mastodon_id = obj['id'],
+            body = obj['content'],
+            favourite = obj['favourited'],
+            has_media = 'media_attachments' in obj and bool(obj['media_attachments']),
+            created_at = iso8601.parse_date(obj['created_at']),
+            author_id = account_from_api_object(obj['account'], instance).id,
+        )
+
+def account_from_api_object(obj, instance):
+    return Account(
+            mastodon_instance = instance,
+            mastodon_id = obj['id'],
+            screen_name = obj['username'],
+            display_name = obj['display_name'],
+            avatar_url = obj['avatar'],
+            reported_post_count = obj['statuses_count'],
+        )
+
+def refresh_posts(posts):
+    acc = posts[0].author
+    api = get_api_for_acc(acc)
+    if not api:
+        raise Exception('no access')
+
+    new_posts = list()
+    for post in posts:
+        try:
+            status = api.status(post.mastodon_id)
+            new_post = db.session.merge(post_from_api_object(status, post.mastodon_instance))
+            new_posts.append(new_post)
+        except MastodonAPIError as e:
+            if str(e) == 'Endpoint not found.':
+                db.session.delete(post)
+            else:
+                raise e
+
+    return new_posts
+
+def delete(post):
+    api = get_api_for_acc(post.author)
+    api.status_delete(post.mastodon_id)
+    db.session.delete(post)

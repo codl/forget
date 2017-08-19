@@ -37,7 +37,7 @@
         status_display.textContent='Still saving...';
     }
 
-    function on_change(e){
+    function save(){
         hide_status();
         clearTimeout(status_timeout);
         status_timeout = setTimeout(show_saving, 70);
@@ -94,7 +94,7 @@
     }
 
     for(input of form.elements){
-        input.addEventListener('change', on_change);
+        input.addEventListener('change', save);
     }
 
     // remove submit button since we're doing live updates

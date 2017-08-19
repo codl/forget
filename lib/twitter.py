@@ -101,7 +101,7 @@ def post_from_api_tweet_object(tweet, post=None):
         post.has_media = bool('media' in tweet['entities'] and tweet['entities']['media'])
     return post
 
-def fetch_acc(account, cursor, consumer_key=None, consumer_secret=None):
+def fetch_acc(account, cursor):
     t = get_twitter_for_acc(account)
     if not t:
         print("no twitter access, aborting")

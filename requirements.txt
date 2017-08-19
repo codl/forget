@@ -18,13 +18,13 @@ Flask-SQLAlchemy==2.2
 gunicorn==19.7.1
 honcho==1.0.1
 idna==2.6
+iso8601==0.1.12
 itsdangerous==0.24
 Jinja2==2.9.6
 kombu==4.1.0
 limits==1.2.1
 Mako==1.0.7
 MarkupSafe==1.0
-Mastodon.py==1.0.8
 olefile==0.44
 Pillow==4.2.1
 psycopg2==2.7.3
@@ -41,3 +41,4 @@ twitter==1.17.1
 urllib3==1.22
 vine==1.1.4
 Werkzeug==0.12.2
+git+https://github.com/codl/Mastodon.py.git@forget

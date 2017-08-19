@@ -95,6 +95,9 @@ class Account(TimestampMixin, RemoteIDMixin):
     def validate_intervals(self, key, value):
         if not (value == timedelta(0) or value >= timedelta(minutes=1)):
             value = timedelta(minutes=1)
+        if key == 'policy_delete_every' and datetime.now() + value < self.next_delete:
+            # make sure that next delete is not in the far future
+            self.next_delete = datetime.now() + value
         return value
 
     @db.validates('policy_keep_latest')
