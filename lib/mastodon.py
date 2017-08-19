@@ -54,10 +54,11 @@ def receive_code(code, app, callback):
     remote_acc = api.account_verify_credentials()
     acc = account_from_api_object(remote_acc, app.instance)
     acc = db.session.merge(acc)
-    token = OAuthToken(account = acc, token = access_token)
+    token = OAuthToken(token = access_token)
     token = db.session.merge(token)
+    token.account = acc
 
-    return acc
+    return token
 
 
 def get_api_for_acc(account):

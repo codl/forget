@@ -241,9 +241,8 @@ def mastodon_login_step2(instance):
 
     callback = url_for('mastodon_login_step2', instance=instance, _external=True)
 
-    account = lib.mastodon.receive_code(code, app, callback)
-
-    account = db.session.merge(account)
+    token = lib.mastodon.receive_code(code, app, callback)
+    account = token.account
 
     sess = Session(account = account)
     db.session.add(sess)
