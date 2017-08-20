@@ -23,11 +23,18 @@
         <header>
             <h1>
                 <a href="{{url_for('index')}}">
-                    <img src="{{ st('logotype-200.png') }}" alt="Forget" width='200px' height='144px' sizes='200px' srcset="
-                    {%- for width in (200,400,600,800) -%}
-                        {{ st('logotype-{}.png'.format(width)) }} {{width}}w,
-                    {%- endfor -%}
-                    "/>
+                    <picture>
+                        <source type='image/webp' sizes='200px' srcset="
+                        {%- for width in (200,400,600,800) -%}
+                            {{ st('logotype-{}.webp'.format(width)) }} {{width}}w,
+                        {%- endfor -%}
+                        "/>
+                        <img src="{{ st('logotype-200.jpeg') }}" alt="Forget" width='200px' height='144px' sizes='200px' srcset="
+                        {%- for width in (200,400,600,800) -%}
+                            {{ st('logotype-{}.jpeg'.format(width)) }} {{width}}w,
+                        {%- endfor -%}
+                        "/>
+                    </picture>
                 </a>
             </h1>
         </header>

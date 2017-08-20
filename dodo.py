@@ -3,22 +3,34 @@ def task_gen_logo():
 
     from PIL import Image
 
-    def resize_logo(width):
+    def resize_logo(width, format):
         with Image.open('assets/logotype.png') as im:
-            im = im.convert('L')
+            im = im.convert('RGB')
             height = im.height * width // im.width
             new = im.resize((width,height), resample=Image.LANCZOS)
-            new.save('static/logotype-{}.png'.format(width), optimize=True)
+            if format == 'jpeg':
+                kwargs = dict(
+                        optimize = True,
+                        progressive = True,
+                        quality = 80,
+                        )
+            elif format == 'webp':
+                kwargs = dict(
+                        quality = 79,
+                        )
+            new.save('static/logotype-{}.{}'.format(width, format), **kwargs)
 
     widths = (200, 400, 600, 800)
+    formats = ('jpeg', 'webp')
     for width in widths:
-        yield dict(
-                name=str(width),
-                actions=[(resize_logo, (width,))],
-                targets=[f'static/logotype-{width}.png'],
-                file_dep=['assets/logotype.png'],
-                clean=True,
-            )
+        for format in formats:
+            yield dict(
+                    name='{}.{}'.format(width, format),
+                    actions=[(resize_logo, (width, format))],
+                    targets=[f'static/logotype-{width}.{format}'],
+                    file_dep=['assets/logotype.png'],
+                    clean=True,
+                )
 
 
 def task_copy_asset():
@@ -50,6 +62,12 @@ def task_minify_css():
             clean=True,
         )
 
+
+def cross(a, b):
+    for A in a:
+        for B in b:
+            yield (A, B)
+
 def task_compress_static():
     import brotli
     import gzip
@@ -59,7 +77,7 @@ def task_compress_static():
         'static/icon.png',
         'static/logotype.png',
         'static/settings.js',
-        ) + tuple((f'static/logotype-{width}.png' for width in (200, 400, 600, 800)))
+        ) + tuple((f'static/logotype-{width}.{format}' for width, format in cross((200, 400, 600, 800), ('jpeg','webp'))))
 
     def compress_brotli(dependencies):
         for filename in dependencies:
