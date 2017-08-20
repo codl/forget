@@ -33,9 +33,8 @@
         </header>
         {% block body %}{% endblock %}
         <footer>
-            <p>Forget {{version or "dev"}}</p>
+            <p>Forget <a href='{{repo_url}}'>{{version or "dev"}}</a></p>
             <p>A <a href="https://twitter.com/codl">codl</a> joint</p>
-            <p><a href="https://github.com/codl/forget">Code on Github</a></p>
         </footer>
     </body>
 </html>

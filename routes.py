@@ -13,6 +13,7 @@ from zipfile import BadZipFile
 from twitter import TwitterError
 from urllib.error import URLError
 import version
+import lib.version
 
 @app.before_request
 def load_viewer():
@@ -26,7 +27,10 @@ def load_viewer():
 
 @app.context_processor
 def inject_version():
-    return dict(version=version.version)
+    return dict(
+            version=version.version,
+            repo_url=lib.version.url_for_version(version.version),
+        )
 
 @app.context_processor
 def inject_sentry():
