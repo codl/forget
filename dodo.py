@@ -58,7 +58,6 @@ def task_compress_static():
         'static/styles.css',
         'static/icon.png',
         'static/logotype.png',
-        'static/version.js',
         'static/settings.js',
         ) + tuple((f'static/logotype-{width}.png' for width in (200, 400, 600, 800)))
 
