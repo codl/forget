@@ -17,7 +17,8 @@ while read old new refname; do
             FLASK_APP='forget.py' flask db upgrade
             if [[ $(git diff --name-only ${old}..${new} dodo.py) == 'dodo.py' ]]
             then
-                doit forget
+                rm -rf static
+                mkdir static
             fi
             doit
         )
