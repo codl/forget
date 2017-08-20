@@ -4,7 +4,10 @@ def cachebust(app):
     @app.route('/static-<int:timestamp>/<path:filename>')
     def static_cachebust(timestamp, filename):
         path = os.path.join(app.static_folder, filename)
-        mtime = os.stat(path).st_mtime
+        try:
+            mtime = os.stat(path).st_mtime
+        except Exception:
+            return abort(404)
         if abs(mtime - timestamp) > 1:
             abort(404)
         else:
