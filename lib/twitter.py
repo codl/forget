@@ -90,10 +90,6 @@ def post_from_api_tweet_object(tweet, post=None):
     except ValueError:
         post.created_at = datetime.strptime(tweet['created_at'], '%Y-%m-%d %H:%M:%S %z')
         #whyyy
-    if 'full_text' in tweet:
-        post.body = tweet['full_text']
-    else:
-        post.body = tweet['text']
     post.author_id = 'twitter:{}'.format(tweet['user']['id_str'])
     if 'favorited' in tweet:
         post.favourite = tweet['favorited']

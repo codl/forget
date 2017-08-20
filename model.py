@@ -169,7 +169,6 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'posts'
 
     id = db.Column(db.String, primary_key=True)
-    body = db.Column(db.String)
 
     author_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     author = db.relationship(Account,
@@ -178,13 +177,8 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     favourite = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     has_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
 
-    def snippet(self):
-        if len(self.body) > 20:
-            return self.body[:19] + "✂"
-        return self.body
-
     def __repr__(self):
-        return '<Post ({}, "{}", Author: {})>'.format(self.id, self.snippet(), self.author_id)
+        return '<Post ({}, Author: {})>'.format(self.id, self.author_id)
 
 db.Index('ix_posts_author_id_created_at', Post.author_id, Post.created_at)
 
