@@ -67,6 +67,7 @@ class Account(TimestampMixin, RemoteIDMixin):
     policy_keep_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     policy_delete_every = db.Column(db.Interval, server_default='30 minutes', nullable=False)
     policy_keep_younger = db.Column(db.Interval, server_default='365 days', nullable=False)
+    policy_keep_direct = db.Column(db.Boolean, server_default='TRUE', nullable=False)
 
     display_name = db.Column(db.String)
     screen_name = db.Column(db.String)
@@ -176,6 +177,7 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
 
     favourite = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     has_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
+    direct = db.Column(db.Boolean, server_default='FALSE', nullable=False)
 
     def __repr__(self):
         return '<Post ({}, Author: {})>'.format(self.id, self.author_id)

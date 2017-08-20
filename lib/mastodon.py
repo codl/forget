@@ -128,6 +128,7 @@ def post_from_api_object(obj, instance):
             has_media = 'media_attachments' in obj and bool(obj['media_attachments']),
             created_at = iso8601.parse_date(obj['created_at']),
             author_id = account_from_api_object(obj['account'], instance).id,
+            direct = obj['visibility'] == 'direct',
         )
 
 def account_from_api_object(obj, instance):

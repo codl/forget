@@ -63,6 +63,14 @@
         <label><input type=radio name=policy_keep_media value=false {{ "checked" if not g.viewer.account.policy_keep_media }}> No</label>
     </span>
 </p>
+{% if g.viewer.account.service == 'mastodon' %}
+<p>Private posts (direct messages) will never expire
+    <span style='display:inline-block'>
+        <label><input type=radio name=policy_keep_private value=true {{ "checked" if g.viewer.account.policy_keep_private }}> Yes</label>
+        <label><input type=radio name=policy_keep_private value=false {{ "checked" if not g.viewer.account.policy_keep_private }}> No</label>
+    </span>
+</p>
+{% endif %}
 <p>Every
     {{interval_input(g.viewer.account, 'policy_delete_every', scales)}},
     one expired post will be picked at random and deleted.
