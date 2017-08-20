@@ -64,10 +64,10 @@
     </span>
 </p>
 {% if g.viewer.account.service == 'mastodon' %}
-<p>Private posts (direct messages) will never expire
+<p>Direct messages will never expire
     <span style='display:inline-block'>
-        <label><input type=radio name=policy_keep_private value=true {{ "checked" if g.viewer.account.policy_keep_private }}> Yes</label>
-        <label><input type=radio name=policy_keep_private value=false {{ "checked" if not g.viewer.account.policy_keep_private }}> No</label>
+        <label><input type=radio name=policy_keep_direct value=true {{ "checked" if g.viewer.account.policy_keep_direct }}> Yes</label>
+        <label><input type=radio name=policy_keep_direct value=false {{ "checked" if not g.viewer.account.policy_keep_direct }}> No</label>
     </span>
 </p>
 {% endif %}
