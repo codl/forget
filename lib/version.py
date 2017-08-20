@@ -7,5 +7,5 @@ def url_for_version(ver):
     match = version_re.match(ver)
     if not match:
         return app.config['REPO_URL']
-    return app.config['COMMIT_URL'].format(**match.groups())
+    return app.config['COMMIT_URL'].format(**match.groupdict())
 
