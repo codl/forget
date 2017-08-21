@@ -21,7 +21,7 @@ default_config = {
         "SENTRY_CONFIG": {},
         "RATELIMIT_STORAGE_URL": "redis://",
         "REPO_URL": "https://github.com/codl/forget",
-        "COMMIT_URL": "https://github.com/codl/forget/commit/{hash}",
+        "COMMIT_URL": "https://github.com/codl/forget/commits/{hash}",
 }
 
 app.config.update(default_config)
