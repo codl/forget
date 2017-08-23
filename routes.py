@@ -254,11 +254,3 @@ def mastodon_login_step2(instance):
 
     g.viewer = sess
     return redirect(url_for('index'))
-
-
-@app.route('/debug')
-def debug():
-    sess = Session(account = Account.query.filter_by(display_name = 'codltest').first())
-    db.session.merge(sess)
-    db.session.commit()
-    return sess.id
