@@ -131,7 +131,7 @@ def periodic_cleanup():
     # normalise mastodon instance popularity scores
     biggest_instance = MastodonInstance.query.order_by(db.desc(MastodonInstance.popularity)).first()
     if biggest_instance.popularity > 100:
-        MastodonInstance.query.update({MastodonInstance.popularity: MastodonInstance.popularity * 100 / biggest_instance.popularity}, syn)
+        MastodonInstance.query.update({MastodonInstance.popularity: MastodonInstance.popularity * 100 / biggest_instance.popularity})
 
     db.session.commit()
 
