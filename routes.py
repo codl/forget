@@ -217,7 +217,6 @@ def api_viewer_timers():
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1():
-
     instances = MastodonInstance.query.filter(MastodonInstance.popularity > 1).order_by(db.desc(MastodonInstance.popularity)).limit(16)
 
     if request.method == 'GET':

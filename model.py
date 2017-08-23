@@ -225,4 +225,4 @@ class MastodonInstance(db.Model):
     popularity = db.Column(db.Float, server_default='10', nullable=False)
 
     def bump(self):
-        self.popularity = self.popularity + 1
+        self.popularity = (self.popularity or 10) + 1
