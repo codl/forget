@@ -211,3 +211,18 @@ class MastodonApp(db.Model, TimestampMixin):
     client_id = db.Column(db.String, nullable=False)
     client_secret = db.Column(db.String, nullable=False)
     protocol = db.Column(ProtoEnum, nullable=False)
+
+class MastodonInstance(db.Model):
+    """
+    this is for the autocomplete in the mastodon login form
+
+    it isn't coupled with anything else so that we can seed it with
+    some popular instances ahead of time
+    """
+    __tablename__ = 'mastodon_instances'
+
+    instance = db.Column(db.String, primary_key=True)
+    popularity = db.Column(db.Float, server_default='10', nullable=False)
+
+    def bump(self):
+        self.popularity = self.popularity + 1

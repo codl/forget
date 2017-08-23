@@ -12,13 +12,16 @@
 {% endif %}
 
     <form method='post'>
-        <label>Your mastodon address:
-            <input type='text' name='instance_url' placeholder='example@glitch.social'/>
+        <label>Mastodon instance:
+            <input type='text' name='instance_url' list='instances' placeholder='social.example.net'/>
         </label>
+        <datalist id='instances'>
+            <option value=''>
+            {% for instance in instances %}
+            <option value='{{instance.instance}}'>
+            {% endfor %}
+        </datalist>
         <input name='confirm' value='Log in' type='submit'/>
-        <aside>
-            Your mastodon address is your username, followed by an @ sign and the address of your mastodon instance.
-        </aside>
     </form>
 
 </div>

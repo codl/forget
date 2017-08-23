@@ -2,7 +2,7 @@ from celery import Celery, Task
 
 from app import app as flaskapp
 from app import db
-from model import Session, Account, TwitterArchive, Post, OAuthToken
+from model import Session, Account, TwitterArchive, Post, OAuthToken, MastodonInstance
 import lib.twitter
 import lib.mastodon
 from mastodon.Mastodon import MastodonRatelimitError
@@ -127,6 +127,11 @@ def periodic_cleanup():
     unreachable = Account.query.outerjoin(Account.tokens).group_by(Account).having(db.func.count(OAuthToken.token) == 0).filter(Account.policy_enabled == True)
     for account in unreachable:
         account.policy_enabled = False
+
+    # normalise mastodon instance popularity scores
+    biggest_instance = MastodonInstance.query.order_by(db.desc(MastodonInstance.popularity)).first()
+    if biggest_instance.popularity > 100:
+        MastodonInstance.query.update({MastodonInstance.popularity: MastodonInstance.popularity * 100 / biggest_instance.popularity}, syn)
 
     db.session.commit()
 

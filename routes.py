@@ -6,7 +6,7 @@ import lib
 from lib.auth import require_auth, require_auth_api
 from lib import set_session_cookie
 from lib import get_viewer_session, get_viewer
-from model import Account, Session, Post, TwitterArchive, MastodonApp
+from model import Account, Session, Post, TwitterArchive, MastodonApp, MastodonInstance
 from app import app, db, sentry, limiter
 import tasks
 from zipfile import BadZipFile
@@ -217,11 +217,14 @@ def api_viewer_timers():
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1():
+
+    instances = MastodonInstance.query.filter(MastodonInstance.popularity > 1).order_by(db.desc(MastodonInstance.popularity)).limit(16)
+
     if request.method == 'GET':
-        return render_template('mastodon_login.html', generic_error = 'error' in request.args)
+        return render_template('mastodon_login.html', instances=instances, generic_error = 'error' in request.args)
 
     if not 'instance_url' in request.form or not request.form['instance_url']:
-        return render_template('mastodon_login.html', address_error=True)
+        return render_template('mastodon_login.html', instances=instances, address_error=True)
 
     instance_url = request.form['instance_url'].split("@")[-1].lower()
 
@@ -250,6 +253,11 @@ def mastodon_login_step2(instance):
 
     sess = Session(account = account)
     db.session.add(sess)
+
+    i=MastodonInstance(instance=instance)
+    i=db.session.merge(i)
+    i.bump()
+
     db.session.commit()
 
     g.viewer = sess
