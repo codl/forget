@@ -24,14 +24,14 @@ def upgrade():
     )
     op.execute("""
         INSERT INTO mastodon_instances (instance, popularity) VALUES
-            ('mastodon.social', 1000),
-            ('mastodon.cloud', 900),
-            ('social.tchncs.de', 800),
-            ('mastodon.xyz', 700),
-            ('mstdn.io', 600),
-            ('awoo.space', 500),
-            ('cybre.space', 400),
-            ('mastodon.art', 300)
+            ('mastodon.social', 100),
+            ('mastodon.cloud', 90),
+            ('social.tchncs.de', 80),
+            ('mastodon.xyz', 70),
+            ('mstdn.io', 60),
+            ('awoo.space', 50),
+            ('cybre.space', 40),
+            ('mastodon.art', 30)
             ;
     """)
 
