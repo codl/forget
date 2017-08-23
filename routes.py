@@ -263,5 +263,7 @@ def mastodon_login_step2(instance):
 
     db.session.commit()
 
+    tasks.fetch_acc.s(account.id).apply_async(routing_key='high')
+
     g.viewer = sess
     return redirect(url_for('index'))
