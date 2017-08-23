@@ -229,5 +229,6 @@ a.btn:hover {
 }
 
 .btn-content {
-    margin: 0 .5em 0 .1em;
+    margin: 0 .5em;
+    line-height: 2em;
 }
