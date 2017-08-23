@@ -7,10 +7,11 @@ import os.path
 import mimetypes
 
 class BrotliCache(object):
-    def __init__(self, redis_kwargs={}, max_wait=0.3, expire=60*60*12):
+    def __init__(self, redis_kwargs={}, max_wait=0.05, expire=60*60*12):
         self.redis = redis.StrictRedis(**redis_kwargs)
         self.max_wait = max_wait
         self.expire = expire
+        self.redis.client_setname('brotlicache')
 
     def compress(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
         encbody = brotli_.compress(body, mode=mode)
@@ -37,6 +38,10 @@ class BrotliCache(object):
                 if self.max_wait > 0:
                     t.join(self.max_wait)
                     encbody = self.redis.get(cache_key)
+                    if not encbody:
+                        response.headers.set('x-brotli-cache', 'TIMEOUT')
+            else:
+                response.headers.set('x-brotli-cache', 'LOCKED')
         if encbody:
             response.headers.set('content-encoding', 'br')
             response.headers.set('vary', 'accept-encoding')
