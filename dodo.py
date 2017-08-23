@@ -77,6 +77,8 @@ def task_compress_static():
         'static/icon.png',
         'static/logotype.png',
         'static/settings.js',
+        'static/twitter.png',
+        'static/mastodon.png',
         ) + tuple((f'static/logotype-{width}.{format}' for width, format in cross((200, 400, 600, 800), ('jpeg','webp'))))
 
     def compress_brotli(dependencies):
