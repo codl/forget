@@ -60,7 +60,9 @@ def index():
                 settings_error = 'settings_error' in request.args
                 )
     else:
+        instances = MastodonInstance.query.filter(MastodonInstance.popularity > 1).order_by(db.desc(MastodonInstance.popularity)).limit(3)
         return render_template('index.html',
+                mastodon_instances = instances,
                 twitter_login_error = 'twitter_login_error' in request.args)
 
 @app.route('/login/twitter')
@@ -216,16 +218,18 @@ def api_viewer_timers():
         )
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))
-def mastodon_login_step1():
+def mastodon_login_step1(instance=None):
     instances = MastodonInstance.query.filter(MastodonInstance.popularity > 1).order_by(db.desc(MastodonInstance.popularity)).limit(16)
 
-    if request.method == 'GET':
-        return render_template('mastodon_login.html', instances=instances, generic_error = 'error' in request.args)
+    instance_url = request.args.get('instance_url', None) or request.form.get('instance_url', None)
 
-    if not 'instance_url' in request.form or not request.form['instance_url']:
-        return render_template('mastodon_login.html', instances=instances, address_error=True)
+    if not instance_url:
+        return render_template('mastodon_login.html', instances=instances,
+                address_error = request.method == 'POST',
+                generic_error = 'error' in request.args
+                )
 
-    instance_url = request.form['instance_url'].split("@")[-1].lower()
+    instance_url = instance_url.split("@")[-1].lower()
 
     callback = url_for('mastodon_login_step2', instance=instance_url, _external=True)
 

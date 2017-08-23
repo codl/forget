@@ -27,8 +27,33 @@
 {% endif %}
 
 <p>Sound good to you?</p>
-<p><a href="/login/twitter">Log in with Twitter</a></p>
-<p><a href="{{ url_for('mastodon_login_step1') }}">Log in with Mastodon</a></p>
+<p>
+<a style='background-color:#1da1f2' class='btn' href="/login/twitter">
+    <span class='btn-header'>
+        <img src='{{ st('twitter.png') }}'></span>
+    <span class='btn-content'>Log in with Twitter</span>
+</a>
+</p>
+
+{% for instance in mastodon_instances %}
+
+<p>
+<a style='background-color:#282c37' class='btn' href="{{ url_for('mastodon_login_step1', instance_url=instance.instance) }}">
+    <span class='btn-header'>
+        <img src='{{ st('mastodon.png') }}'></span>
+    <span class='btn-content'>Log in with {{instance.instance}}</span>
+</a>
+</p>
+
+{% endfor %}
+
+<p>
+<a style='background-color:#282c37' class='btn' href="{{ url_for('mastodon_login_step1') }}">
+    <span class='btn-header'>
+        <img src='{{ st('mastodon.png') }}'></span>
+    <span class='btn-content'>Log in with another Mastodon instance</span>
+</a>
+</p>
 </section>
 <section class='policy'>
 <h2>Policy</h2>

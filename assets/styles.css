@@ -190,3 +190,44 @@ form aside {
     font-style: italic;
     font-size: 0.8em;
 }
+
+a.btn {
+    color: white;
+    text-decoration: none;
+    background-color: #555;
+    border-radius: .3em;
+    overflow: hidden;
+    height: 2em;
+
+    display: inline-block;
+}
+
+a.btn:hover {
+    opacity: 0.9;
+}
+
+.btn > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.btn-header {
+    flex: 0 0;
+    width: 2em;
+    height: 2em;
+    padding-left: 0.1em;
+    background-image: linear-gradient(0deg,
+            rgba(255,255,255,0),
+            rgba(255,255,255,0.2)
+        );
+    text-align: center;
+}
+
+.btn-header img {
+    margin-top: 0.4em;
+    height: 1.1em;
+}
+
+.btn-content {
+    margin: 0 .5em 0 .1em;
+}
