@@ -60,7 +60,7 @@ def index():
                 settings_error = 'settings_error' in request.args
                 )
     else:
-        instances = MastodonInstance.query.filter(MastodonInstance.popularity > 13).order_by(db.desc(MastodonInstance.popularity)).limit(5)
+        instances = MastodonInstance.query.filter(MastodonInstance.popularity > 13).order_by(db.desc(MastodonInstance.popularity), MastodonInstance.instance).limit(5)
         return render_template('index.html',
                 mastodon_instances = instances,
                 twitter_login_error = 'twitter_login_error' in request.args)
@@ -219,7 +219,7 @@ def api_viewer_timers():
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
-    instances = MastodonInstance.query.filter(MastodonInstance.popularity > 1).order_by(db.desc(MastodonInstance.popularity)).limit(30)
+    instances = MastodonInstance.query.filter(MastodonInstance.popularity > 1).order_by(db.desc(MastodonInstance.popularity), MastodonInstance.instance).limit(30)
 
     instance_url = request.args.get('instance_url', None) or request.form.get('instance_url', None)
 
