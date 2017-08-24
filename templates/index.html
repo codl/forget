@@ -1,3 +1,4 @@
+{% from 'lib/picture.html' import picture %}
 {% extends 'lib/layout.html' %}
 {% block body %}
 
@@ -30,7 +31,7 @@
 <p>
 <a style='background-color:#1da1f2' class='btn' href="/login/twitter">
     <span class='btn-header'>
-        <img src='{{ st('twitter.png') }}'>
+        {{picture(st, 'twitter', (20,40,80), ('webp', 'png'))}}
     </span><span class='btn-content'>Log in with Twitter</span>
 </a>
 </p>
@@ -42,7 +43,7 @@
 <a style='background-color:#282c37' class='btn' href="{{ url_for('mastodon_login_step1', instance_url=instance.instance) }}">
 {% if loop.first %}
     <span class='btn-header'>
-        <img src='{{ st('mastodon.png') }}'>
+        {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
     </span><span class='btn-content'>Log in with
 {% else %}
     <span class='btn-content'>

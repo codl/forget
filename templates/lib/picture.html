@@ -1,0 +1,18 @@
+{% macro picture(st, basename, widths, formats, sizes=None, alt='') -%}
+{% if not sizes %}
+{% set sizes = '{}px'.format(widths[0]) %}
+{% endif %}
+
+
+<picture>
+    {%- for format in formats %}
+    <source type='image/{{format}}' sizes='{{sizes}}' srcset="
+    {%- for width in widths -%}
+        {{ st('{}-{}.{}'.format(basename, width, format)) }} {{width}}w,
+    {%- endfor -%}
+    "/>
+    {% endfor %}
+    <img src="{{ st('{}-{}.{}'.format(basename, widths[0], formats[-1])) }}" alt="{{alt}}" />
+</picture>
+
+{%- endmacro %}

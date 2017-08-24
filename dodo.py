@@ -1,41 +1,59 @@
+def resize_image(basename, width, format):
+    from PIL import Image
+    with Image.open('assets/{}.png'.format(basename)) as im:
+        if 'A' in im.getbands() and format != 'jpeg':
+            im = im.convert('RGBA')
+        else:
+            im = im.convert('RGB')
+        height = im.height * width // im.width
+        new = im.resize((width,height), resample=Image.LANCZOS)
+        if format == 'jpeg':
+            kwargs = dict(
+                    optimize = True,
+                    progressive = True,
+                    quality = 80,
+                    )
+        elif format == 'webp':
+            kwargs = dict(
+                    quality = 79,
+                    )
+        elif format == 'png':
+            kwargs = dict(
+                    optimize = True,
+                    )
+        new.save('static/{}-{}.{}'.format(basename, width, format), **kwargs)
+
 def task_gen_logo():
     """generate versions of the logo in various sizes"""
-
-    from PIL import Image
-
-    def resize_logo(width, format):
-        with Image.open('assets/logotype.png') as im:
-            im = im.convert('RGB')
-            height = im.height * width // im.width
-            new = im.resize((width,height), resample=Image.LANCZOS)
-            if format == 'jpeg':
-                kwargs = dict(
-                        optimize = True,
-                        progressive = True,
-                        quality = 80,
-                        )
-            elif format == 'webp':
-                kwargs = dict(
-                        quality = 79,
-                        )
-            new.save('static/logotype-{}.{}'.format(width, format), **kwargs)
-
     widths = (200, 400, 600, 800)
     formats = ('jpeg', 'webp')
     for width in widths:
         for format in formats:
             yield dict(
                     name='{}.{}'.format(width, format),
-                    actions=[(resize_logo, (width, format))],
+                    actions=[(resize_image, ('logotype', width, format))],
                     targets=[f'static/logotype-{width}.{format}'],
                     file_dep=['assets/logotype.png'],
                     clean=True,
                 )
 
+def task_button_icons():
+    widths = (20,40,80)
+    formats = ('webp', 'png')
+    for width in widths:
+        for format in formats:
+            for basename in ('twitter', 'mastodon'):
+                yield dict(
+                    name='{}-{}.{}'.format(basename, width, format),
+                    actions=[(resize_image, (basename, width, format))],
+                    targets=['static/{}-{}.{}'.format(basename,width,format)],
+                    file_dep=['assets/{}.png'.format(basename)],
+                    clean=True,
+                )
 
 def task_copy_asset():
     import shutil
-    assets = ('icon.png', 'logotype.png', 'settings.js', 'twitter.png', 'mastodon.png')
+    assets = ('icon.png', 'logotype.png', 'settings.js')
     for asset in assets:
         yield dict(
                 name=asset,
@@ -77,9 +95,8 @@ def task_compress_static():
         'static/icon.png',
         'static/logotype.png',
         'static/settings.js',
-        'static/twitter.png',
-        'static/mastodon.png',
         ) + tuple((f'static/logotype-{width}.{format}' for width, format in cross((200, 400, 600, 800), ('jpeg','webp'))))
+
 
     def compress_brotli(dependencies):
         for filename in dependencies:
