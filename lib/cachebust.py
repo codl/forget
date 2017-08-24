@@ -1,7 +1,7 @@
 from flask import url_for, abort
 import os
 def cachebust(app):
-    @app.route('/static-<int:timestamp>/<path:filename>')
+    @app.route('/static-cb/<int:timestamp>/<path:filename>')
     def static_cachebust(timestamp, filename):
         path = os.path.join(app.static_folder, filename)
         try:
