@@ -76,8 +76,8 @@ def task_copy():
         yield dict(
                 name=asset,
                 actions=[(do_the_thing, (src, dst))],
-                targets=[src],
-                file_dep=[dst],
+                targets=[dst],
+                file_dep=[src],
                 clean=True,
             )
 
