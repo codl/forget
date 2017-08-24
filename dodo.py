@@ -1,3 +1,10 @@
+from doit import create_after
+
+def reltouch(source_filename, dest_filename):
+    from os import stat, utime
+    stat_res = stat(source_filename)
+    utime(dest_filename, ns=(stat_res.st_atime_ns, stat_res.st_mtime_ns))
+
 def resize_image(basename, width, format):
     from PIL import Image
     with Image.open('assets/{}.png'.format(basename)) as im:
@@ -22,9 +29,10 @@ def resize_image(basename, width, format):
                     optimize = True,
                     )
         new.save('static/{}-{}.{}'.format(basename, width, format), **kwargs)
+        reltouch('assets/{}.png'.format(basename), 'static/{}-{}.{}'.format(basename, width, format))
 
-def task_gen_logo():
-    """generate versions of the logo in various sizes"""
+def task_logotype():
+    """resize and convert logotype"""
     widths = (200, 400, 600, 800)
     formats = ('jpeg', 'webp')
     for width in widths:
@@ -37,7 +45,8 @@ def task_gen_logo():
                     clean=True,
                 )
 
-def task_button_icons():
+def task_service_icon():
+    """resize and convert service icons"""
     widths = (20,40,80)
     formats = ('webp', 'png')
     for width in widths:
@@ -51,20 +60,29 @@ def task_button_icons():
                     clean=True,
                 )
 
-def task_copy_asset():
-    import shutil
+def task_copy():
+    "copy assets verbatim"
+
     assets = ('icon.png', 'logotype.png', 'settings.js')
+
+    def do_the_thing(src, dst):
+        from shutil import copy
+        copy(src, dst)
+        reltouch(src, dst)
+
     for asset in assets:
+        src = 'assets/{}'.format(asset)
+        dst = 'static/{}'.format(asset)
         yield dict(
                 name=asset,
-                actions=[(lambda asset: shutil.copy(f'assets/{asset}', f'static/{asset}'), (asset,))],
-                targets=[f'static/{asset}'],
-                file_dep=[f'assets/{asset}'],
+                actions=[(do_the_thing, (src, dst))],
+                targets=[src],
+                file_dep=[dst],
                 clean=True,
             )
 
 def task_minify_css():
-    """minify css"""
+    """minify css file with csscompressor"""
 
     from csscompressor import compress
 
@@ -72,6 +90,7 @@ def task_minify_css():
         with open('assets/styles.css') as in_:
             with open('static/styles.css', 'w') as out:
                 out.write(compress(in_.read()))
+        reltouch('assets/styles.css', 'static/styles.css')
 
     return dict(
             actions=[minify],
@@ -80,48 +99,50 @@ def task_minify_css():
             clean=True,
         )
 
+@create_after('logotype')
+@create_after('service_icon')
+@create_after('copy')
+@create_after('minify_css')
+def task_compress():
+    "make gzip and brotli compressed versions of each static file for the server to lazily serve"
+    from glob import glob
+    from itertools import chain
 
-def cross(a, b):
-    for A in a:
-        for B in b:
-            yield (A, B)
+    files = chain(
+            glob('static/*.css'),
+            glob('static/*.js'),
+            glob('static/*.jpeg'),
+            glob('static/*.png'),
+            glob('static/*.webp'),
+            )
 
-def task_compress_static():
-    import brotli
-    import gzip
+    def compress_brotli(filename):
+        import brotli
+        with open(filename, 'rb') as in_:
+            with open(filename + '.br', 'wb') as out:
+                out.write(brotli.compress(in_.read()))
+        reltouch(filename, filename+'.br')
 
-    files = (
-        'static/styles.css',
-        'static/icon.png',
-        'static/logotype.png',
-        'static/settings.js',
-        ) + tuple((f'static/logotype-{width}.{format}' for width, format in cross((200, 400, 600, 800), ('jpeg','webp'))))
-
-
-    def compress_brotli(dependencies):
-        for filename in dependencies:
-            with open(filename, 'rb') as in_:
-                with open(filename + '.br', 'wb') as out:
-                    out.write(brotli.compress(in_.read()))
-    def compress_gzip(dependencies):
-        for filename in dependencies:
-            with open(filename, 'rb') as in_:
-                with gzip.open(filename + '.gz', 'wb') as out:
-                    out.write(in_.read())
+    def compress_gzip(filename):
+        import gzip
+        with open(filename, 'rb') as in_:
+            with gzip.open(filename + '.gz', 'wb') as out:
+                out.write(in_.read())
+        reltouch(filename, filename+'.gz')
 
     for filename in files:
         yield dict(
                 file_dep=(filename,),
                 targets=(filename+'.br',),
                 name=filename+'.br',
-                actions=[compress_brotli],
+                actions=[(compress_brotli, (filename,))],
                 clean=True,
             )
         yield dict(
                 file_dep=(filename,),
                 targets=(filename+'.gz',),
                 name=filename+'.gz',
-                actions=[compress_gzip],
+                actions=[(compress_gzip, (filename,))],
                 clean=True,
             )
 
