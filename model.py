@@ -165,6 +165,8 @@ class Session(db.Model, TimestampMixin):
     account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
     account = db.relationship(Account, lazy='joined', backref='sessions')
 
+    csrf_token = db.Column(db.String, default=lambda: secrets.token_urlsafe(), nullable=False)
+
 
 class Post(db.Model, TimestampMixin, RemoteIDMixin):
     __tablename__ = 'posts'

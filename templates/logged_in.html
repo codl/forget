@@ -16,12 +16,12 @@
 {% if g.viewer.account.policy_enabled -%}
     <form action='{{url_for("disable")}}' method='post' enctype='multipart/form-data'>
         <input type='submit' value='Disable'>
-    </form>
 {% else -%}
     <form action='{{url_for("enable")}}' method='post' enctype='multipart/form-data'>
         <input type='submit' value='Enable'>
-    </form>
 {% endif %}
+        <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
+    </form>
 </div>
 {% set post_count = g.viewer.account.post_count() %}
 <p>Currently keeping track of <span id="post-count">{{ post_count }}</span> of your posts, roughly <span id="eligible-estimate">{{ g.viewer.account.estimate_eligible_for_delete() }}</span> of which currently match your expiration rules.</p>
@@ -76,6 +76,7 @@
     one expired post will be picked at random and deleted.
 </p>
 <input type=submit value='Save settings'>
+<input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
 </form>
 
 </section>
@@ -95,6 +96,7 @@
 
     <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data'>
         <input type="file" name='file'><input type="submit" value="Upload">
+        <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
     </form>
 
 {% if g.viewer.account.twitter_archives %}

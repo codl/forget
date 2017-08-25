@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import lib.twitter
 import lib.mastodon
 import lib
-from lib.auth import require_auth, require_auth_api
+from lib.auth import require_auth, require_auth_api, csrf
 from lib import set_session_cookie
 from lib import get_viewer_session, get_viewer
 from model import Account, Session, Post, TwitterArchive, MastodonApp, MastodonInstance
@@ -122,6 +122,7 @@ def upload_tweet_archive():
         return redirect(url_for('index', tweet_archive_failed='', _anchor='tweet_archive_import'))
 
 @app.route('/settings', methods=('POST',))
+@csrf
 @require_auth
 def settings():
     viewer = get_viewer()
@@ -137,6 +138,7 @@ def settings():
     return redirect(url_for('index', settings_saved=''))
 
 @app.route('/disable', methods=('POST',))
+@csrf
 @require_auth
 def disable():
     g.viewer.account.policy_enabled = False
@@ -145,6 +147,7 @@ def disable():
     return redirect(url_for('index'))
 
 @app.route('/enable', methods=('POST',))
+@csrf
 @require_auth
 def enable():
 
