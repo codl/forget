@@ -9,6 +9,7 @@
     <div>
         <form method='post'>
             <input name='confirm' value='Do it' type='submit'/>
+            <input name='csrf-token' value='{{g.viewer.csrf_token}}' type='hidden'/>
         </form>
         <form action='{{url_for("index")}}'>
             <input name='confirm' value='Cancel' type='submit'/>
