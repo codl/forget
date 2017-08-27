@@ -85,7 +85,7 @@ def install_security_headers(resp):
     resp.headers.set('Content-Security-Policy', csp)
 
     if app.config.get('HTTPS'):
-        resp.headers.set('strict-transport-security', 'max-age: {}'.format(60*60*24*365))
+        resp.headers.set('strict-transport-security', 'max-age={}'.format(60*60*24*365))
 
     resp.headers.set('referrer-policy', 'no-referrer')
     resp.headers.set('x-content-type-options', 'nosniff')
