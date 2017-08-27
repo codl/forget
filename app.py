@@ -71,3 +71,20 @@ def rate_limit_key():
     return request.remote_addr
 
 limiter = Limiter(app, key_func=rate_limit_key)
+
+@app.after_request
+def install_security_headers(resp):
+    csp = "default-src 'none'; img-src 'self' https: http:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'"
+    if 'CSP_REPORT_URI' in app.config:
+        csp += "; report-uri " + app.config.get('CSP_REPORT_URI')
+    resp.headers.set('Content-Security-Policy', csp)
+
+    if app.config.get('HTTPS'):
+        resp.headers.set('strict-transport-security', 'max-age: {}'.format(60*60*24*365))
+
+    resp.headers.set('referrer-policy', 'no-referrer')
+    resp.headers.set('x-content-type-options', 'nosniff')
+    resp.headers.set('x-frame-options', 'DENY')
+    resp.headers.set('x-xss-protection', '0')
+
+    return resp
