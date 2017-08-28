@@ -108,7 +108,11 @@
     // silently send_settings in case the user changed settings while the page was loading
     send_settings(get_all_inputs());
 
+    let viewer_update_interval = 1000;
+
     function fetch_viewer(){
+        viewer_update_interval *= 2;
+        viewer_update_interval = Math.min(30000, viewer_update_interval);
         return fetch('/api/viewer', {
             credentials: 'same-origin',
         })
@@ -116,12 +120,23 @@
             .then(resp => resp.json());
     }
 
+    let last_viewer = {}
     function update_viewer(viewer){
+        if(JSON.stringify(last_viewer) == JSON.stringify(viewer)){
+            return
+        }
+
         document.querySelector('#post-count').textContent = viewer.post_count;
         document.querySelector('#eligible-estimate').textContent = viewer.eligible_for_delete_estimate;
         document.querySelector('#display-name').textContent = viewer.display_name || viewer.screen_name;
         document.querySelector('#avatar').src = viewer.avatar_url;
+        viewer_update_interval = 1000;
+        last_viewer = viewer;
     }
 
-    setInterval(() => fetch_viewer().then(update_viewer), 1000 * 20)
+    function set_viewer_timeout(){
+        setTimeout(() => fetch_viewer().then(update_viewer).then(set_viewer_timeout),
+            viewer_update_interval);
+    }
+    set_viewer_timeout();
 })();
