@@ -135,7 +135,7 @@
     }
 
     function set_viewer_timeout(){
-        setTimeout(() => fetch_viewer().then(update_viewer).then(set_viewer_timeout),
+        setTimeout(() => fetch_viewer().then(update_viewer).then(set_viewer_timeout, set_viewer_timeout),
             viewer_update_interval);
     }
     set_viewer_timeout();
