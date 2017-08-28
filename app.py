@@ -9,6 +9,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from lib import get_viewer
 import os
+import mimetypes
 
 app = Flask(__name__)
 
@@ -89,3 +90,5 @@ def install_security_headers(resp):
     resp.headers.set('x-xss-protection', '1')
 
     return resp
+
+mimetypes.add_type('image/webp', '.webp')
