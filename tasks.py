@@ -15,6 +15,7 @@ import json
 from kombu import Queue
 import random
 import version
+import celery_statsd
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'], task_serializer='pickle')
 app.conf.task_queues = (
