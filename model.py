@@ -93,12 +93,14 @@ class Account(TimestampMixin, RemoteIDMixin):
 
     last_fetch = db.Column(db.DateTime, server_default='epoch', index=True)
     last_refresh = db.Column(db.DateTime, server_default='epoch', index=True)
+    last_delete = db.Column(db.DateTime, index=True)
     next_delete = db.Column(db.DateTime, server_default='epoch', index=True)
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
 
     def touch_delete(self):
+        self.last_delete = db.func.now()
         # if it's been more than 1 delete cycle ago that we've deleted a post,
         # reset next_delete to be 1 cycle away
         if(datetime.now() - self.next_delete > self.policy_delete_every):
