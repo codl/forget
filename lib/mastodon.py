@@ -146,7 +146,7 @@ def account_from_api_object(obj, instance):
     return Account(
             mastodon_instance=instance,
             mastodon_id=obj['id'],
-            screen_name=obj['username'],
+            screen_name='{}@{}'.format(obj['username'], instance),
             display_name=obj['display_name'],
             avatar_url=obj['avatar'],
             reported_post_count=obj['statuses_count'],
