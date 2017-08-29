@@ -2,6 +2,8 @@ uhh frick i forgot to write a readme hang on uhh
 
 # forget
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1780ac6071c04cbd9ccf75de0891e798)](https://www.codacy.com/app/codl/forget?utm_source=github.com&utm_medium=referral&utm_content=codl/forget&utm_campaign=badger)
+
 its a thing that deletes your posts
 
 it works with twitter and mastodon and maybe sometime in the future it will work with other services
