@@ -189,7 +189,7 @@ class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
 
     id = db.Column(db.String, primary_key=True,
-                   default=lambda: secrets.token_urlsafe())
+                   default=secrets.token_urlsafe)
 
     account_id = db.Column(
             db.String,
@@ -199,7 +199,7 @@ class Session(db.Model, TimestampMixin):
     account = db.relationship(Account, lazy='joined', backref='sessions')
 
     csrf_token = db.Column(db.String,
-                           default=lambda: secrets.token_urlsafe(),
+                           default=secrets.token_urlsafe,
                            nullable=False)
 
 
