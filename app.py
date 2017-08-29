@@ -6,7 +6,6 @@ from flask_migrate import Migrate
 import version
 from lib import cachebust
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from lib import get_viewer
 import os
 import mimetypes
@@ -29,7 +28,7 @@ app.config.update(default_config)
 
 app.config.from_pyfile('config.py', True)
 
-metadata = MetaData(naming_convention = {
+metadata = MetaData(naming_convention={
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
     "ck": "ck_%(table_name)s_%(constraint_name)s",
@@ -55,11 +54,13 @@ if 'SENTRY_DSN' in app.config:
 
 url_for = cachebust(app)
 
+
 @app.context_processor
 def inject_static():
     def static(filename, **kwargs):
         return url_for('static', filename=filename, **kwargs)
     return {'st': static}
+
 
 def rate_limit_key():
     viewer = get_viewer()
@@ -71,16 +72,25 @@ def rate_limit_key():
             return address
     return request.remote_addr
 
+
 limiter = Limiter(app, key_func=rate_limit_key)
+
 
 @app.after_request
 def install_security_headers(resp):
-    csp = "default-src 'none'; img-src 'self' https:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'"
+    csp = ("default-src 'none';"
+           "img-src 'self' https:;"
+           "script-src 'self';"
+           "style-src 'self' 'unsafe-inline';"
+           "connect-src 'self';"
+           "frame-ancestors 'none';"
+           )
     if 'CSP_REPORT_URI' in app.config:
         csp += "; report-uri " + app.config.get('CSP_REPORT_URI')
 
     if app.config.get('HTTPS'):
-        resp.headers.set('strict-transport-security', 'max-age={}'.format(60*60*24*365))
+        resp.headers.set('strict-transport-security',
+                         'max-age={}'.format(60*60*24*365))
         csp += "; upgrade-insecure-requests"
 
     resp.headers.set('Content-Security-Policy', csp)
@@ -90,5 +100,6 @@ def install_security_headers(resp):
     resp.headers.set('x-xss-protection', '1')
 
     return resp
+
 
 mimetypes.add_type('image/webp', '.webp')

@@ -1,9 +1,11 @@
 from doit import create_after
 
+
 def reltouch(source_filename, dest_filename):
     from os import stat, utime
     stat_res = stat(source_filename)
     utime(dest_filename, ns=(stat_res.st_atime_ns, stat_res.st_mtime_ns))
+
 
 def resize_image(basename, width, format):
     from PIL import Image
@@ -13,23 +15,25 @@ def resize_image(basename, width, format):
         else:
             im = im.convert('RGB')
         height = im.height * width // im.width
-        new = im.resize((width,height), resample=Image.LANCZOS)
+        new = im.resize((width, height), resample=Image.LANCZOS)
         if format == 'jpeg':
             kwargs = dict(
-                    optimize = True,
-                    progressive = True,
-                    quality = 80,
+                    optimize=True,
+                    progressive=True,
+                    quality=80,
                     )
         elif format == 'webp':
             kwargs = dict(
-                    quality = 79,
+                    quality=79,
                     )
         elif format == 'png':
             kwargs = dict(
-                    optimize = True,
+                    optimize=True,
                     )
         new.save('static/{}-{}.{}'.format(basename, width, format), **kwargs)
-        reltouch('assets/{}.png'.format(basename), 'static/{}-{}.{}'.format(basename, width, format))
+        reltouch('assets/{}.png'.format(basename),
+                 'static/{}-{}.{}'.format(basename, width, format))
+
 
 def task_logotype():
     """resize and convert logotype"""
@@ -45,9 +49,10 @@ def task_logotype():
                     clean=True,
                 )
 
+
 def task_service_icon():
     """resize and convert service icons"""
-    widths = (20,40,80)
+    widths = (20, 40, 80)
     formats = ('webp', 'png')
     for width in widths:
         for format in formats:
@@ -55,10 +60,12 @@ def task_service_icon():
                 yield dict(
                     name='{}-{}.{}'.format(basename, width, format),
                     actions=[(resize_image, (basename, width, format))],
-                    targets=['static/{}-{}.{}'.format(basename,width,format)],
+                    targets=[
+                        'static/{}-{}.{}'.format(basename, width, format)],
                     file_dep=['assets/{}.png'.format(basename)],
                     clean=True,
                 )
+
 
 def task_copy():
     "copy assets verbatim"
@@ -81,6 +88,7 @@ def task_copy():
                 clean=True,
             )
 
+
 def task_minify_css():
     """minify css file with csscompressor"""
 
@@ -99,12 +107,16 @@ def task_minify_css():
             clean=True,
         )
 
+
 @create_after('logotype')
 @create_after('service_icon')
 @create_after('copy')
 @create_after('minify_css')
 def task_compress():
-    "make gzip and brotli compressed versions of each static file for the server to lazily serve"
+    """
+    make gzip and brotli compressed versions of each
+    static file for the server to lazily serve
+    """
     from glob import glob
     from itertools import chain
 
@@ -145,6 +157,7 @@ def task_compress():
                 actions=[(compress_gzip, (filename,))],
                 clean=True,
             )
+
 
 if __name__ == '__main__':
     import doit

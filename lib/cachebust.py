@@ -1,5 +1,7 @@
 from flask import url_for, abort
 import os
+
+
 def cachebust(app):
     @app.route('/static-cb/<int:timestamp>/<path:filename>')
     def static_cachebust(timestamp, filename):
@@ -12,14 +14,16 @@ def cachebust(app):
             abort(404)
         else:
             resp = app.view_functions['static'](filename=filename)
-            resp.headers.set('cache-control', 'public, immutable, max-age=%s' % (60*60*24*365,))
+            resp.headers.set(
+                'cache-control',
+                'public, immutable, max-age={}'.format(60*60*24*365))
             if 'expires' in resp.headers:
                 resp.headers.remove('expires')
             return resp
 
     @app.context_processor
     def replace_url_for():
-        return dict(url_for = cachebust_url_for)
+        return dict(url_for=cachebust_url_for)
 
     def cachebust_url_for(endpoint, **kwargs):
         if endpoint == 'static':

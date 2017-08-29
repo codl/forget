@@ -4,12 +4,16 @@ from app import db
 import secrets
 from lib import decompose_interval
 
+
 class TimestampMixin(object):
-    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now(), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now(),
+                           nullable=False)
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(),
+                           onupdate=db.func.now(), nullable=False)
 
     def touch(self):
-        self.updated_at=db.func.now()
+        self.updated_at = db.func.now()
+
 
 class RemoteIDMixin(object):
     @property
@@ -23,7 +27,9 @@ class RemoteIDMixin(object):
         if not self.id:
             return None
         if self.service != "twitter":
-            raise Exception("tried to get twitter id for a {} {}".format(self.service, type(self)))
+            raise Exception(
+                    "tried to get twitter id for a {} {}"
+                    .format(self.service, type(self)))
         return self.id.split(":")[1]
 
     @twitter_id.setter
@@ -35,7 +41,9 @@ class RemoteIDMixin(object):
         if not self.id:
             return None
         if self.service != "mastodon":
-            raise Exception("tried to get mastodon instance for a {} {}".format(self.service, type(self)))
+            raise Exception(
+                    "tried to get mastodon instance for a {} {}"
+                    .format(self.service, type(self)))
         return self.id.split(":", 1)[1].split('@')[1]
 
     @mastodon_instance.setter
@@ -47,7 +55,9 @@ class RemoteIDMixin(object):
         if not self.id:
             return None
         if self.service != "mastodon":
-            raise Exception("tried to get mastodon id for a {} {}".format(self.service, type(self)))
+            raise Exception(
+                    "tried to get mastodon id for a {} {}"
+                    .format(self.service, type(self)))
         return self.id.split(":", 1)[1].split('@')[0]
 
     @mastodon_id.setter
@@ -61,13 +71,20 @@ class Account(TimestampMixin, RemoteIDMixin):
     __tablename__ = 'accounts'
     id = db.Column(db.String, primary_key=True)
 
-    policy_enabled = db.Column(db.Boolean, server_default='FALSE', nullable=False)
-    policy_keep_latest = db.Column(db.Integer, server_default='100', nullable=False)
-    policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE', nullable=False)
-    policy_keep_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
-    policy_delete_every = db.Column(db.Interval, server_default='30 minutes', nullable=False)
-    policy_keep_younger = db.Column(db.Interval, server_default='365 days', nullable=False)
-    policy_keep_direct = db.Column(db.Boolean, server_default='TRUE', nullable=False)
+    policy_enabled = db.Column(db.Boolean, server_default='FALSE',
+                               nullable=False)
+    policy_keep_latest = db.Column(db.Integer, server_default='100',
+                                   nullable=False)
+    policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE',
+                                       nullable=False)
+    policy_keep_media = db.Column(db.Boolean, server_default='FALSE',
+                                  nullable=False)
+    policy_delete_every = db.Column(db.Interval, server_default='30 minutes',
+                                    nullable=False)
+    policy_keep_younger = db.Column(db.Interval, server_default='365 days',
+                                    nullable=False)
+    policy_keep_direct = db.Column(db.Boolean, server_default='TRUE',
+                                   nullable=False)
 
     display_name = db.Column(db.String)
     screen_name = db.Column(db.String)
@@ -96,7 +113,8 @@ class Account(TimestampMixin, RemoteIDMixin):
     def validate_intervals(self, key, value):
         if not (value == timedelta(0) or value >= timedelta(minutes=1)):
             value = timedelta(minutes=1)
-        if key == 'policy_delete_every' and datetime.now() + value < self.next_delete:
+        if key == 'policy_delete_every' and \
+           datetime.now() + value < self.next_delete:
             # make sure that next delete is not in the far future
             self.next_delete = datetime.now() + value
         return value
@@ -106,7 +124,6 @@ class Account(TimestampMixin, RemoteIDMixin):
         if type(value) == str and value.strip() == '':
             return 0
         return value
-
 
     # backref: tokens
     # backref: twitter_archives
@@ -121,19 +138,23 @@ class Account(TimestampMixin, RemoteIDMixin):
 
     def estimate_eligible_for_delete(self):
         """
-        this is an estimation because we do not know if favourite status has changed since last time a post was refreshed
-        and it is unfeasible to refresh every single post every time we need to know how many posts are eligible to delete
+        this is an estimation because we do not know if favourite status has
+        changed since last time a post was refreshed and it is unfeasible to
+        refresh every single post every time we need to know how many posts are
+        eligible to delete
         """
-        latest_n_posts = Post.query.with_parent(self).order_by(db.desc(Post.created_at)).limit(self.policy_keep_latest)
-        query = Post.query.with_parent(self).\
-            filter(Post.created_at <= db.func.now() - self.policy_keep_younger).\
-            except_(latest_n_posts)
+        latest_n_posts = (Post.query.with_parent(self)
+                          .order_by(db.desc(Post.created_at))
+                          .limit(self.policy_keep_latest))
+        query = (Post.query.with_parent(self)
+                 .filter(Post.created_at <=
+                         db.func.now() - self.policy_keep_younger)
+                 .except_(latest_n_posts))
         if(self.policy_keep_favourites):
-            query = query.filter_by(favourite = False)
+            query = query.filter_by(favourite=False)
         if(self.policy_keep_media):
-            query = query.filter_by(has_media = False)
+            query = query.filter_by(has_media=False)
         return query.count()
-
 
     def force_log_out(self):
         Session.query.with_parent(self).delete()
@@ -150,22 +171,36 @@ class OAuthToken(db.Model, TimestampMixin):
     token = db.Column(db.String, primary_key=True)
     token_secret = db.Column(db.String, nullable=True)
 
-    account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=True, index=True)
-    account = db.relationship(Account, backref=db.backref('tokens', order_by=lambda: db.desc(OAuthToken.created_at)))
+    account_id = db.Column(db.String,
+                           db.ForeignKey('accounts.id', ondelete='CASCADE',
+                                         onupdate='CASCADE'),
+                           nullable=True, index=True)
+    account = db.relationship(
+            Account,
+            backref=db.backref('tokens',
+                               order_by=lambda: db.desc(OAuthToken.created_at))
+            )
 
-    # note: account_id is nullable here because we don't know what account a token is for
-    # until we call /account/verify_credentials with it
+    # note: account_id is nullable here because we don't know what account a
+    # token is for until we call /account/verify_credentials with it
 
 
 class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
 
-    id = db.Column(db.String, primary_key=True, default=lambda: secrets.token_urlsafe())
+    id = db.Column(db.String, primary_key=True,
+                   default=lambda: secrets.token_urlsafe())
 
-    account_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False, index=True)
+    account_id = db.Column(
+            db.String,
+            db.ForeignKey('accounts.id',
+                          ondelete='CASCADE', onupdate='CASCADE'),
+            nullable=False, index=True)
     account = db.relationship(Account, lazy='joined', backref='sessions')
 
-    csrf_token = db.Column(db.String, default=lambda: secrets.token_urlsafe(), nullable=False)
+    csrf_token = db.Column(db.String,
+                           default=lambda: secrets.token_urlsafe(),
+                           nullable=False)
 
 
 class Post(db.Model, TimestampMixin, RemoteIDMixin):
@@ -173,9 +208,15 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
 
     id = db.Column(db.String, primary_key=True)
 
-    author_id = db.Column(db.String, db.ForeignKey('accounts.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-    author = db.relationship(Account,
-            backref=db.backref('posts', order_by=lambda: db.desc(Post.created_at)))
+    author_id = db.Column(
+            db.String,
+            db.ForeignKey('accounts.id',
+                          ondelete='CASCADE', onupdate='CASCADE'),
+            nullable=False)
+    author = db.relationship(
+            Account,
+            backref=db.backref('posts',
+                               order_by=lambda: db.desc(Post.created_at)))
 
     favourite = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     has_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
@@ -184,17 +225,27 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     def __repr__(self):
         return '<Post ({}, Author: {})>'.format(self.id, self.author_id)
 
+
 db.Index('ix_posts_author_id_created_at', Post.author_id, Post.created_at)
+
 
 class TwitterArchive(db.Model, TimestampMixin):
     __tablename__ = 'twitter_archives'
 
     id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.String, db.ForeignKey('accounts.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
-    account = db.relationship(Account, backref=db.backref('twitter_archives', order_by=lambda: db.desc(TwitterArchive.id)))
+    account_id = db.Column(
+            db.String,
+            db.ForeignKey('accounts.id',
+                          onupdate='CASCADE', ondelete='CASCADE'),
+            nullable=False)
+    account = db.relationship(
+            Account,
+            backref=db.backref('twitter_archives',
+                               order_by=lambda: db.desc(TwitterArchive.id)))
     body = db.deferred(db.Column(db.LargeBinary, nullable=False))
     chunks = db.Column(db.Integer)
-    chunks_successful = db.Column(db.Integer, server_default='0', nullable=False)
+    chunks_successful = db.Column(db.Integer,
+                                  server_default='0', nullable=False)
     chunks_failed = db.Column(db.Integer, server_default='0', nullable=False)
 
     def status(self):
@@ -204,7 +255,9 @@ class TwitterArchive(db.Model, TimestampMixin):
             return 'successful'
         return 'pending'
 
+
 ProtoEnum = db.Enum('http', 'https', name='enum_protocol')
+
 
 class MastodonApp(db.Model, TimestampMixin):
     __tablename__ = 'mastodon_apps'
@@ -213,6 +266,7 @@ class MastodonApp(db.Model, TimestampMixin):
     client_id = db.Column(db.String, nullable=False)
     client_secret = db.Column(db.String, nullable=False)
     protocol = db.Column(ProtoEnum, nullable=False)
+
 
 class MastodonInstance(db.Model):
     """

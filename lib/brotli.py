@@ -6,6 +6,7 @@ import redis
 import os.path
 import mimetypes
 
+
 class BrotliCache(object):
     def __init__(self, redis_kwargs={}, max_wait=0.020, expire=60*60*6):
         self.redis = redis.StrictRedis(**redis_kwargs)
@@ -32,8 +33,13 @@ class BrotliCache(object):
             response.headers.set('x-brotli-cache', 'MISS')
             lock_key = 'brotlicache:lock:{}'.format(digest)
             if self.redis.set(lock_key, 1, nx=True, ex=10):
-                mode = brotli_.MODE_TEXT if response.content_type.startswith('text/') else brotli_.MODE_GENERIC
-                t = Thread(target=self.compress, args=(cache_key, lock_key, body, mode))
+                mode = (
+                    brotli_.MODE_TEXT
+                    if response.content_type.startswith('text/')
+                    else brotli_.MODE_GENERIC)
+                t = Thread(
+                    target=self.compress,
+                    args=(cache_key, lock_key, body, mode))
                 t.start()
                 if self.max_wait > 0:
                     t.join(self.max_wait)
@@ -50,8 +56,10 @@ class BrotliCache(object):
 
         return response
 
-def brotli(app, static = True, dynamic = True):
+
+def brotli(app, static=True, dynamic=True):
     original_static = app.view_functions['static']
+
     def static_maybe_gzip_brotli(filename=None):
         path = os.path.join(app.static_folder, filename)
         for encoding, extension in (('br', '.br'), ('gzip', '.gz')):
@@ -59,10 +67,12 @@ def brotli(app, static = True, dynamic = True):
                 continue
             encpath = path + extension
             if os.path.isfile(encpath):
-                resp = make_response(original_static(filename=filename + extension))
+                resp = make_response(
+                    original_static(filename=filename + extension))
                 resp.headers.set('content-encoding', encoding)
                 resp.headers.set('vary', 'accept-encoding')
-                mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+                mimetype = (mimetypes.guess_type(filename)[0]
+                            or 'application/octet-stream')
                 resp.headers.set('content-type', mimetype)
                 return resp
         return original_static(filename=filename)
