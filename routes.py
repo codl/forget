@@ -88,6 +88,8 @@ def twitter_login_step1():
             **app.config.get_namespace("TWITTER_")
             ))
     except (TwitterError, URLError):
+        if sentry:
+            sentry.captureException()
         return redirect(
                 url_for('index', twitter_login_error='', _anchor='log_in'))
 
@@ -112,6 +114,8 @@ def twitter_login_step2():
         set_session_cookie(session, resp, app.config.get('HTTPS'))
         return resp
     except (TwitterError, URLError):
+        if sentry:
+            sentry.captureException()
         return redirect(
                 url_for('index', twitter_login_error='', _anchor='log_in'))
 
@@ -144,6 +148,8 @@ def upload_tweet_archive():
 
         return redirect(url_for('index', _anchor='recent_archives'))
     except (BadZipFile, TweetArchiveEmptyException):
+        if sentry:
+            sentry.captureException()
         return redirect(
                 url_for('index', tweet_archive_failed='',
                         _anchor='tweet_archive_import'))
@@ -160,6 +166,8 @@ def settings():
                 setattr(viewer, attr, request.form[attr])
         db.session.commit()
     except ValueError:
+        if sentry:
+            sentry.captureException()
         return 400
 
     return redirect(url_for('index', settings_saved=''))
@@ -267,17 +275,17 @@ def api_viewer_timers():
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
-    instances = (
-            MastodonInstance
-            .query.filter(MastodonInstance.popularity > 1)
-            .order_by(db.desc(MastodonInstance.popularity),
-                      MastodonInstance.instance)
-            .limit(30))
 
     instance_url = (request.args.get('instance_url', None)
                     or request.form.get('instance_url', None))
 
     if not instance_url:
+        instances = (
+            MastodonInstance
+            .query.filter(MastodonInstance.popularity > 1)
+            .order_by(db.desc(MastodonInstance.popularity),
+                      MastodonInstance.instance)
+            .limit(30))
         return render_template(
                 'mastodon_login.html', instances=instances,
                 address_error=request.method == 'POST',
@@ -289,15 +297,21 @@ def mastodon_login_step1(instance=None):
     callback = url_for('mastodon_login_step2',
                        instance=instance_url, _external=True)
 
-    app = lib.mastodon.get_or_create_app(
-            instance_url,
-            callback,
-            url_for('index', _external=True))
-    db.session.merge(app)
+    try:
+        app = lib.mastodon.get_or_create_app(
+                instance_url,
+                callback,
+                url_for('index', _external=True))
+        db.session.merge(app)
 
-    db.session.commit()
+        db.session.commit()
 
-    return redirect(lib.mastodon.login_url(app, callback))
+        return redirect(lib.mastodon.login_url(app, callback))
+
+    except Exception:
+        if sentry:
+            sentry.captureException()
+        return redirect(url_for('mastodon_login_step1', error=True))
 
 
 @app.route('/login/mastodon/callback/<instance>')
