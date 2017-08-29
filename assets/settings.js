@@ -129,7 +129,7 @@
         document.querySelector('#post-count').textContent = viewer.post_count;
         document.querySelector('#eligible-estimate').textContent = viewer.eligible_for_delete_estimate;
         document.querySelector('#display-name').textContent = viewer.display_name || viewer.screen_name;
-        document.querySelector('#display-name').title = '@' + viewer.display_name;
+        document.querySelector('#display-name').title = '@' + viewer.screen_name;
         document.querySelector('#avatar').src = viewer.avatar_url;
         viewer_update_interval = 1000;
         last_viewer = viewer;
