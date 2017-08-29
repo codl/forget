@@ -14,6 +14,7 @@ from urllib.error import URLError
 import version
 import lib.version
 import lib.brotli
+import lib.settings
 
 
 @app.before_request
