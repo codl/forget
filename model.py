@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 
 from app import db
 import secrets
-from lib import decompose_interval
+from lib.interval import decompose_interval
 
 
 class TimestampMixin(object):
@@ -33,8 +33,8 @@ class RemoteIDMixin(object):
         return self.id.split(":")[1]
 
     @twitter_id.setter
-    def twitter_id(self, id):
-        self.id = "twitter:{}".format(id)
+    def twitter_id(self, id_):
+        self.id = "twitter:{}".format(id_)
 
     @property
     def mastodon_instance(self):
@@ -61,8 +61,8 @@ class RemoteIDMixin(object):
         return self.id.split(":", 1)[1].split('@')[0]
 
     @mastodon_id.setter
-    def mastodon_id(self, id):
-        self.id = "mastodon:{}@{}".format(id, self.mastodon_instance)
+    def mastodon_id(self, id_):
+        self.id = "mastodon:{}@{}".format(id_, self.mastodon_instance)
 
 
 @decompose_interval('policy_delete_every')
@@ -121,9 +121,10 @@ class Account(TimestampMixin, RemoteIDMixin):
             self.next_delete = datetime.now() + value
         return value
 
+    # pylint: disable=R0201
     @db.validates('policy_keep_latest')
     def validate_empty_string_is_zero(self, key, value):
-        if type(value) == str and value.strip() == '':
+        if isinstance(value, str) and value.strip() == '':
             return 0
         return value
 

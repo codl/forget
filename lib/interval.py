@@ -24,7 +24,7 @@ def decompose_interval(attrname):
 
         @scale.setter
         def scale(self, value):
-            if(type(value) != timedelta):
+            if not isinstance(value, timedelta):
                 value = timedelta(seconds=float(value))
             setattr(self, attrname, max(1, getattr(self, sig_name)) * value)
 
@@ -34,7 +34,7 @@ def decompose_interval(attrname):
 
         @significand.setter
         def significand(self, value):
-            if type(value) == str and value.strip() == '':
+            if isinstance(value, str) and value.strip() == '':
                 value = 0
 
             try:

@@ -52,8 +52,8 @@ def noop(*args, **kwargs):
 
 
 @app.task(autoretry_for=(TwitterError, URLError, MastodonRatelimitError))
-def fetch_acc(id, cursor=None):
-    acc = Account.query.get(id)
+def fetch_acc(id_, cursor=None):
+    acc = Account.query.get(id_)
     print(f'fetching {acc}')
     try:
         action = noop
@@ -63,7 +63,7 @@ def fetch_acc(id, cursor=None):
             action = lib.mastodon.fetch_acc
         cursor = action(acc, cursor)
         if cursor:
-            fetch_acc.si(id, cursor).apply_async()
+            fetch_acc.si(id_, cursor).apply_async()
     finally:
         db.session.rollback()
         acc.touch_fetch()
@@ -188,8 +188,8 @@ def delete_from_account(account_id):
         action = lib.twitter.delete
         posts = refresh_posts(posts)
         if posts:
-            eligible = list(  # nosec
-                (post for post in posts if
+            eligible = list((  # nosec
+                post for post in posts if
                 (not account.policy_keep_favourites or not post.favourite)
                 and (not account.policy_keep_media or not post.has_media)
                 ))

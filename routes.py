@@ -3,10 +3,8 @@ from flask import render_template, url_for, redirect, request, g, Response,\
 from datetime import datetime, timedelta
 import lib.twitter
 import lib.mastodon
-import lib
 from lib.auth import require_auth, require_auth_api, csrf
-from lib import set_session_cookie
-from lib import get_viewer_session, get_viewer
+from lib.session import set_session_cookie, get_viewer_session, get_viewer
 from model import Session, TwitterArchive, MastodonApp, MastodonInstance
 from app import app, db, sentry, limiter
 import tasks
@@ -15,6 +13,7 @@ from twitter import TwitterError
 from urllib.error import URLError
 import version
 import lib.version
+import lib.brotli
 
 
 @app.before_request

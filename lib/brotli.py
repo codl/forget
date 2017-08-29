@@ -8,7 +8,9 @@ import mimetypes
 
 
 class BrotliCache(object):
-    def __init__(self, redis_kwargs={}, max_wait=0.020, expire=60*60*6):
+    def __init__(self, redis_kwargs=None, max_wait=0.020, expire=60*60*6):
+        if not redis_kwargs:
+            redis_kwargs = {}
         self.redis = redis.StrictRedis(**redis_kwargs)
         self.max_wait = max_wait
         self.expire = expire

@@ -3,6 +3,8 @@ import os
 
 
 def cachebust(app):
+    # pylint: disable=unused-variable
+
     @app.route('/static-cb/<int:timestamp>/<path:filename>')
     def static_cachebust(timestamp, filename):
         path = os.path.join(app.static_folder, filename)

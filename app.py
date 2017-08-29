@@ -4,9 +4,9 @@ from sqlalchemy import MetaData, event
 from sqlalchemy.engine import Engine
 from flask_migrate import Migrate
 import version
-from lib import cachebust
+from lib.cachebust import cachebust
 from flask_limiter import Limiter
-from lib import get_viewer
+from lib.session import get_viewer
 import os
 import mimetypes
 

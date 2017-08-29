@@ -7,44 +7,46 @@ def reltouch(source_filename, dest_filename):
     utime(dest_filename, ns=(stat_res.st_atime_ns, stat_res.st_mtime_ns))
 
 
-def resize_image(basename, width, format):
+def resize_image(basename, width, image_format):
     from PIL import Image
     with Image.open('assets/{}.png'.format(basename)) as im:
-        if 'A' in im.getbands() and format != 'jpeg':
+        if 'A' in im.getbands() and image_format != 'jpeg':
             im = im.convert('RGBA')
         else:
             im = im.convert('RGB')
         height = im.height * width // im.width
         new = im.resize((width, height), resample=Image.LANCZOS)
-        if format == 'jpeg':
+        if image_format == 'jpeg':
             kwargs = dict(
                     optimize=True,
                     progressive=True,
                     quality=80,
                     )
-        elif format == 'webp':
+        elif image_format == 'webp':
             kwargs = dict(
                     quality=79,
                     )
-        elif format == 'png':
+        elif image_format == 'png':
             kwargs = dict(
                     optimize=True,
                     )
-        new.save('static/{}-{}.{}'.format(basename, width, format), **kwargs)
+        new.save('static/{}-{}.{}'.format(basename, width, image_format),
+                 **kwargs)
         reltouch('assets/{}.png'.format(basename),
-                 'static/{}-{}.{}'.format(basename, width, format))
+                 'static/{}-{}.{}'.format(basename, width, image_format))
 
 
 def task_logotype():
     """resize and convert logotype"""
     widths = (200, 400, 600, 800)
-    formats = ('jpeg', 'webp')
+    image_formats = ('jpeg', 'webp')
     for width in widths:
-        for format in formats:
+        for image_format in image_formats:
             yield dict(
-                    name='{}.{}'.format(width, format),
-                    actions=[(resize_image, ('logotype', width, format))],
-                    targets=[f'static/logotype-{width}.{format}'],
+                    name='{}.{}'.format(width, image_format),
+                    actions=[(resize_image,
+                              ('logotype', width, image_format))],
+                    targets=[f'static/logotype-{width}.{image_format}'],
                     file_dep=['assets/logotype.png'],
                     clean=True,
                 )
@@ -55,13 +57,14 @@ def task_service_icon():
     widths = (20, 40, 80)
     formats = ('webp', 'png')
     for width in widths:
-        for format in formats:
+        for image_format in formats:
             for basename in ('twitter', 'mastodon'):
                 yield dict(
-                    name='{}-{}.{}'.format(basename, width, format),
-                    actions=[(resize_image, (basename, width, format))],
+                    name='{}-{}.{}'.format(basename, width, image_format),
+                    actions=[(resize_image, (basename, width, image_format))],
                     targets=[
-                        'static/{}-{}.{}'.format(basename, width, format)],
+                        'static/{}-{}.{}'.format(basename, width,
+                                                 image_format)],
                     file_dep=['assets/{}.png'.format(basename)],
                     clean=True,
                 )
