@@ -186,11 +186,11 @@ def delete_from_account(account_id):
     if account.service == 'twitter':
         action = lib.twitter.delete
         posts = refresh_posts(posts)
-        eligible = list(
+        eligible = random.choice(list(  # nosec
             (post for post in posts if
              (not account.policy_keep_favourites or not post.favourite)
              and (not account.policy_keep_media or not post.has_media)
-             ))
+             )))
     elif account.service == 'mastodon':
         action = lib.mastodon.delete
         for post in posts:
@@ -199,21 +199,14 @@ def delete_from_account(account_id):
                (not account.policy_keep_favourites or not post.favourite) \
                and (not account.policy_keep_media or not post.has_media)\
                and (not account.policy_keep_direct or not post.direct):
-                eligible = refreshed
+                eligible = refreshed[0]
                 break
 
     if eligible:
-        if account.policy_delete_every == timedelta(0) and len(eligible) > 1:
-            print("deleting all {} eligible posts for {}"
-                  .format(len(eligible), account))
-            for post in eligible:
-                account.touch_delete()
-                action(post)
-        else:
-            post = random.choice(eligible)  # nosec
-            print("deleting {}".format(post))
-            account.touch_delete()
-            action(post)
+        post = eligible
+        print("deleting {}".format(post))
+        account.touch_delete()
+        action(post)
 
     db.session.commit()
 
