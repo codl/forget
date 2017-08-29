@@ -295,7 +295,7 @@ def mastodon_login_step1(instance=None):
     instance_url = instance_url.split("@")[-1].lower()
 
     callback = url_for('mastodon_login_step2',
-                       instance=instance_url, _external=True)
+                       instance_url=instance_url, _external=True)
 
     try:
         app = lib.mastodon.get_or_create_app(
@@ -314,7 +314,7 @@ def mastodon_login_step1(instance=None):
         return redirect(url_for('mastodon_login_step1', error=True))
 
 
-@app.route('/login/mastodon/callback/<instance>')
+@app.route('/login/mastodon/callback/<instance_url>')
 def mastodon_login_step2(instance_url):
     code = request.args.get('code', None)
     app = MastodonApp.query.get(instance_url)
@@ -322,7 +322,7 @@ def mastodon_login_step2(instance_url):
         return redirect(url_for('mastodon_login_step1', error=True))
 
     callback = url_for('mastodon_login_step2',
-                       instance=instance_url, _external=True)
+                       instance_url=instance_url, _external=True)
 
     token = lib.mastodon.receive_code(code, app, callback)
     account = token.account
