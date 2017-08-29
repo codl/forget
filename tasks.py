@@ -171,14 +171,15 @@ def delete_from_account(account_id):
     account = Account.query.get(account_id)
     latest_n_posts = (Post.query.with_parent(account)
                       .order_by(db.desc(Post.created_at))
-                      .limit(account.policy_keep_latest))
+                      .limit(account.policy_keep_latest)
+                      .cte(name='latest'))
     posts = (
         Post.query.with_parent(account)
         .filter(
             Post.created_at + account.policy_keep_younger <= db.func.now())
-        .except_(latest_n_posts)
+        .filter(~Post.id.in_(db.select((latest_n_posts.c.id,))))
         .order_by(db.func.random())
-        .limit(100).all())
+        .limit(100).with_for_update().all())
 
     eligible = None
 
