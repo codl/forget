@@ -63,8 +63,9 @@ def decompose_interval(attrname):
 
             try:
                 value = int(value)
-                assert value >= 0
-            except (ValueError, AssertionError) as e:
+                if not value >= 0:
+                    raise ValueError(value)
+            except ValueError as e:
                 raise ValueError("Incorrect time interval", e)
             setattr(self, attrname, value * getattr(self, scl_name))
 

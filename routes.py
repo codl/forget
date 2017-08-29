@@ -96,6 +96,9 @@ def twitter_login_step2():
     except (TwitterError, URLError):
         return redirect(url_for('index', twitter_login_error='', _anchor='log_in'))
 
+class TweetArchiveEmptyException(Exception):
+    pass
+
 @app.route('/upload_tweet_archive', methods=('POST',))
 @limiter.limit('10/10 minutes')
 @require_auth
@@ -111,14 +114,15 @@ def upload_tweet_archive():
         ta.chunks = len(files)
         db.session.commit()
 
-        assert ta.chunks > 0
+        if not ta.chunks > 0:
+            raise TweetArchiveEmptyException()
 
         for filename in files:
             tasks.import_twitter_archive_month.s(ta.id, filename).apply_async()
 
 
         return redirect(url_for('index', _anchor='recent_archives'))
-    except (BadZipFile, AssertionError):
+    except (BadZipFile, TweetArchiveEmptyException):
         return redirect(url_for('index', tweet_archive_failed='', _anchor='tweet_archive_import'))
 
 @app.route('/settings', methods=('POST',))

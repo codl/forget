@@ -179,7 +179,7 @@ def delete_from_account(account_id):
                 account.touch_delete()
                 action(post)
         else:
-            post = random.choice(eligible)
+            post = random.choice(eligible) # nosec
             print("deleting {}".format(post))
             account.touch_delete()
             action(post)
