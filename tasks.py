@@ -181,18 +181,20 @@ def delete_from_account(account_id):
         .order_by(db.func.random())
         .limit(100).with_for_update().all())
 
-    eligible = None
+    to_delete = None
 
     action = noop
     if account.service == 'twitter':
         action = lib.twitter.delete
         posts = refresh_posts(posts)
         if posts:
-            eligible = random.choice(list(  # nosec
+            eligible = list(  # nosec
                 (post for post in posts if
                 (not account.policy_keep_favourites or not post.favourite)
                 and (not account.policy_keep_media or not post.has_media)
-                )))
+                ))
+            if eligible:
+                to_delete = random.choice(eligible)
     elif account.service == 'mastodon':
         action = lib.mastodon.delete
         for post in posts:
@@ -201,14 +203,13 @@ def delete_from_account(account_id):
                (not account.policy_keep_favourites or not post.favourite) \
                and (not account.policy_keep_media or not post.has_media)\
                and (not account.policy_keep_direct or not post.direct):
-                eligible = refreshed[0]
+                to_delete = refreshed[0]
                 break
 
-    if eligible:
-        post = eligible
-        print("deleting {}".format(post))
+    if to_delete:
+        print("deleting {}".format(to_delete))
         account.touch_delete()
-        action(post)
+        action(to_delete)
 
     db.session.commit()
 
