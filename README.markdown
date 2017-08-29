@@ -4,7 +4,7 @@ uhh frick i forgot to write a readme hang on uhh
 
 its a thing that deletes your posts
 
-it works with twitter and maybe sometime in the future it will work with other services
+it works with twitter and mastodon and maybe sometime in the future it will work with other services
 
 it lives at <https://forget.codl.fr>
 
