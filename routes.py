@@ -305,7 +305,7 @@ def mastodon_login_step2(instance_url):
     code = request.args.get('code', None)
     app = MastodonApp.query.get(instance_url)
     if not code or not app:
-        return redirect('mastodon_login_step1', error=True)
+        return redirect(url_for('mastodon_login_step1', error=True))
 
     callback = url_for('mastodon_login_step2',
                        instance=instance_url, _external=True)
