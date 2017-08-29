@@ -186,11 +186,12 @@ def delete_from_account(account_id):
     if account.service == 'twitter':
         action = lib.twitter.delete
         posts = refresh_posts(posts)
-        eligible = random.choice(list(  # nosec
-            (post for post in posts if
-             (not account.policy_keep_favourites or not post.favourite)
-             and (not account.policy_keep_media or not post.has_media)
-             )))
+        if posts:
+            eligible = random.choice(list(  # nosec
+                (post for post in posts if
+                (not account.policy_keep_favourites or not post.favourite)
+                and (not account.policy_keep_media or not post.has_media)
+                )))
     elif account.service == 'mastodon':
         action = lib.mastodon.delete
         for post in posts:
