@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from scales import SCALES
+from .timescales import SCALES
 
 
 def decompose_interval(attrname):
