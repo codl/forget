@@ -115,7 +115,7 @@ import Banner from '../components/Banner.html';
     // silently send_settings in case the user changed settings while the page was loading
     send_settings(get_all_inputs());
 
-    let viewer_update_interval = 500;
+    let viewer_update_interval = 1500;
 
     function fetch_viewer(){
         viewer_update_interval *= 2;
@@ -139,7 +139,7 @@ import Banner from '../components/Banner.html';
         document.querySelector('#display-name').textContent = viewer.display_name || viewer.screen_name;
         document.querySelector('#display-name').title = '@' + viewer.screen_name;
         document.querySelector('#avatar').src = viewer.avatar_url;
-        viewer_update_interval = 500;
+        viewer_update_interval = 1500;
 
         if(viewer.next_delete){
             viewer.next_delete = new Date(viewer.next_delete);
