@@ -13,9 +13,9 @@
         <meta name='twitter:card' content='summary' />
         <meta name='twitter:site:id' content='808418'/>
 
-        {% if sentry_dsn -%}
-        <script defer src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"
-            onload="Raven.config('{{sentry_dsn}}').install()"></script>
+        {% if sentry -%}
+        <script defer src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
+        <script defer src="{{ url_for('sentry_setup') }}"></script>
         {% endif -%}
         {% block scripts %}{% endblock %}
     </head>

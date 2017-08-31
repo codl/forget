@@ -40,10 +40,7 @@ def inject_version():
 @app.context_processor
 def inject_sentry():
     if sentry:
-        client_dsn = app.config.get('SENTRY_DSN').split('@')
-        client_dsn[:1] = client_dsn[0].split(':')
-        client_dsn = ':'.join(client_dsn[0:2]) + '@' + client_dsn[3]
-        return dict(sentry_dsn=client_dsn)
+        return dict(sentry=True)
     return dict()
 
 
@@ -338,3 +335,13 @@ def mastodon_login_step2(instance_url):
 
     g.viewer = sess
     return redirect(url_for('index'))
+
+@app.route('/sentry/setup.js')
+def sentry_setup():
+    client_dsn = app.config.get('SENTRY_DSN').split('@')
+    client_dsn[:1] = client_dsn[0].split(':')
+    client_dsn = ':'.join(client_dsn[0:2]) + '@' + client_dsn[3]
+    resp = make_response(render_template(
+        'sentry.js', sentry_dsn = client_dsn))
+    resp.headers.set('content-type', 'text/javascript')
+    return resp

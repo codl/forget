@@ -81,13 +81,14 @@ def install_security_headers(resp):
     csp = ("default-src 'none';"
            "img-src 'self' https:;"
            "style-src 'self' 'unsafe-inline';"
-           "connect-src 'self';"
            "frame-ancestors 'none';"
            )
     if 'SENTRY_DSN' in app.config:
         csp += "script-src 'self' https://cdn.ravenjs.com/;"
+        csp += "connect-src 'self' https://sentry.io/;"
     else:
         csp += "script-src 'self';"
+        csp += "connect-src 'self';"
 
     if 'CSP_REPORT_URI' in app.config:
         csp += "report-uri " + app.config.get('CSP_REPORT_URI')
