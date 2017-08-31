@@ -211,11 +211,6 @@ def enable():
                         miss them.
                         """)
 
-    if not g.viewer.account.policy_enabled:
-        g.viewer.account.next_delete = (
-            datetime.now(timezone.utc)
-            + g.viewer.account.policy_delete_every)
-
     g.viewer.account.policy_enabled = True
     db.session.commit()
 

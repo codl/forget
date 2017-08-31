@@ -130,7 +130,11 @@ export default {
     methods: {
         toggle(policy_enabled){
             policy_enabled = !policy_enabled;
-            this.set({policy_enabled});
+            let obj = {policy_enabled}
+            if(policy_enabled){
+                obj.next_delete = null;
+            }
+            this.set(obj);
             this.fire('toggle', policy_enabled);
         }
     },

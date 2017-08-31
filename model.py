@@ -135,6 +135,14 @@ class Account(TimestampMixin, RemoteIDMixin):
             return 0
         return value
 
+    @db.validates('policy_enabled')
+    def reset_next_delete(self, key, enable):
+        if not self.policy_enabled and enable:
+            self.next_delete = (
+                datetime.now(timezone.utc) + self.policy_delete_every)
+        return enable
+
+
     # backref: tokens
     # backref: twitter_archives
     # backref: posts
