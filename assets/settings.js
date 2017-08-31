@@ -141,8 +141,12 @@ import Banner from '../components/Banner.html';
         document.querySelector('#avatar').src = viewer.avatar_url;
         viewer_update_interval = 500;
 
-        viewer.next_delete = new Date(viewer.next_delete);
-        viewer.last_delete = new Date(viewer.last_delete);
+        if(viewer.next_delete){
+            viewer.next_delete = new Date(viewer.next_delete);
+        }
+        if(viewer.last_delete){
+            viewer.last_delete = new Date(viewer.last_delete);
+        }
         banner.set(viewer);
     }
 
