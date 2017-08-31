@@ -1,3 +1,5 @@
+import Banner from '../components/Banner.html';
+
 (function(){
     if(!('fetch' in window)){
         return;
@@ -8,6 +10,12 @@
     let settings_section = document.querySelector('#settings-section');
     let form = document.forms.settings;
     let backoff_level = 0;
+
+    let banner_el = document.querySelector('.main-banner');
+    banner_el.innerHTML = '';
+    let banner = new Banner({
+        target: banner_el,
+    });
 
     function hide_status(){
         status_display.classList.remove('error', 'success', 'saving');
@@ -107,7 +115,7 @@
     // silently send_settings in case the user changed settings while the page was loading
     send_settings(get_all_inputs());
 
-    let viewer_update_interval = 1000;
+    let viewer_update_interval = 500;
 
     function fetch_viewer(){
         viewer_update_interval *= 2;
@@ -121,22 +129,37 @@
 
     let last_viewer = {};
     function update_viewer(viewer){
-        if(JSON.stringify(last_viewer) == JSON.stringify(viewer)){
+        if(last_viewer == JSON.stringify(viewer)){
             return;
         }
+        last_viewer = JSON.stringify(viewer);
 
         document.querySelector('#post-count').textContent = viewer.post_count;
         document.querySelector('#eligible-estimate').textContent = viewer.eligible_for_delete_estimate;
         document.querySelector('#display-name').textContent = viewer.display_name || viewer.screen_name;
         document.querySelector('#display-name').title = '@' + viewer.screen_name;
         document.querySelector('#avatar').src = viewer.avatar_url;
-        viewer_update_interval = 1000;
-        last_viewer = viewer;
+        viewer_update_interval = 500;
+
+        viewer.next_delete = new Date(viewer.next_delete);
+        viewer.last_delete = new Date(viewer.last_delete);
+        banner.set(viewer);
     }
+
+    update_viewer(JSON.parse(document.querySelector('script[data-viewer]').textContent))
 
     function set_viewer_timeout(){
         setTimeout(() => fetch_viewer().then(update_viewer).then(set_viewer_timeout, set_viewer_timeout),
             viewer_update_interval);
     }
     set_viewer_timeout();
+
+
+    banner.on('toggle', enabled => {
+        send_settings({policy_enabled: enabled});
+        // TODO show error or spinner if it takes over a second
+    })
+
+
+
 })();

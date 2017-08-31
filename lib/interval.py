@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from .timescales import SCALES
 
 
@@ -77,4 +77,4 @@ def relative(interval):
 
 
 def relnow(time):
-    return relative(time - datetime.now())
+    return relative(time - datetime.now(timezone.utc))

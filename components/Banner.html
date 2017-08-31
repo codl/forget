@@ -1,0 +1,149 @@
+<div class='banner {{policy_enabled?'enabled':'disabled'}}'>
+    <div class='btn-group right'>
+        <button class='primary' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
+    </div>
+    <div>
+        Forget is currently {{policy_enabled?'enabled':'disabled'}} on your account.
+    </div>
+    <div class='timers'>
+        {{#if last_delete }}
+        <span class='last-delete {{(!last_delete)?'hidden':''}}'>
+            Last delete {{rel_past(now - last_delete)}}.
+        </span>
+        {{/if }}
+        <span class='next-delete {{(!policy_enabled || !next_delete || !eligible_for_delete_estimate)?'hidden':''}}'>
+            Next delete {{rel_future(next_delete - now)}}.
+        </span>
+    </div>
+</div>
+
+<style>
+.timers {
+    font-size: 0.8em;
+}
+
+.timers > * {
+    transition-property: opacity, transform;
+    transition-duration: 0.4s;
+}
+
+.timers > .hidden {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+}
+
+.btn-group {
+    margin-right: 5rem;
+}
+
+.right {
+    float: right;
+}
+
+button.primary {
+    border: none;
+    padding: 0.5rem 1rem;
+}
+
+.enabled button.primary {
+    background-color: transparent;
+    border: 1px solid currentColor;
+}
+.disabled button.primary {
+    background-color: #37d;
+    color: white;
+    font-weight: bold;
+}
+.banner {
+    transition: background-color 0.6s;
+}
+</style>
+
+<script>
+function absmod(n, x){
+    n = n % x;
+    if(n < 0){
+        n += x
+    }
+    return n
+}
+function s(n){
+    // utility for plurals
+    if(n > 1){
+        return 's';
+    }
+    return '';
+}
+function rel(millis){
+    let secs = Math.floor(millis/1000)
+    if(secs < 120){
+        return `${secs} seconds`;
+    }
+    let mins = Math.floor(secs/60);
+    if(mins < 60){
+        return `${mins} minute${s(mins)}`;
+    }
+    let hours = Math.floor(mins/60);
+    mins = mins % 60;
+    if(hours < 6){
+        return `${hours}h ${mins}m`;
+    }
+    if(hours < 48){
+        return `${hours} hour${s(hours)}`;
+    }
+    let days = Math.floor(hours/24);
+    return `${days} days`;
+}
+
+export default {
+    data(){
+        return {
+            policy_enabled: false,
+            next_delete: null,
+            last_delete: null,
+            now: +(new Date()),
+        }
+    },
+
+    helpers: {
+        rel_future(millis){
+            if(millis < 2000){
+                let secs = Math.floor(millis/1000)
+                let ndots = absmod(-secs, 3);
+                let out = 'anytime now';
+                for(; ndots > 0; ndots--){
+                    out += '.';
+                }
+                return out;
+            }
+            return `in ${rel(millis)}`;
+        },
+        rel_past(millis){
+            if(millis < 2000){
+                return 'just now';
+            }
+            return `${rel(millis)} ago`;
+        },
+    },
+
+    methods: {
+        toggle(policy_enabled){
+            policy_enabled = !policy_enabled;
+            this.set({policy_enabled});
+            this.fire('toggle', policy_enabled);
+        }
+    },
+
+    oncreate () {
+      this.interval = setInterval( () => {
+        this.set({ now: +(new Date()) });
+      }, 1000 );
+    },
+
+    ondestroy () {
+      clearInterval( this.interval );
+    },
+
+};
+</script>

@@ -11,17 +11,19 @@
     <span id='display-name' title='@{{g.viewer.account.screen_name}}'>{{g.viewer.account.display_name or g.viewer.account.screen_name}}</span>!
     <a href="{{url_for('logout')}}">Log out</a>
 </p>
-{% set enabled_disabled = "enabled" if g.viewer.account.policy_enabled else "disabled" %}
-<div class="banner {{enabled_disabled}}">Forget is currently {{ enabled_disabled }} on your account.
-{% if g.viewer.account.policy_enabled -%}
-    <form action='{{url_for("disable")}}' method='post' enctype='multipart/form-data'>
-        <input type='submit' value='Disable'>
-{% else -%}
-    <form action='{{url_for("enable")}}' method='post' enctype='multipart/form-data'>
-        <input type='submit' value='Enable'>
-{% endif %}
-        <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
-    </form>
+<div class='main-banner container'>
+    {% set enabled_disabled = "enabled" if g.viewer.account.policy_enabled else "disabled" %}
+    <div class="banner {{enabled_disabled}}">Forget is currently {{ enabled_disabled }} on your account.
+    {% if g.viewer.account.policy_enabled -%}
+        <form action='{{url_for("disable")}}' method='post' enctype='multipart/form-data'>
+            <input type='submit' value='Disable'>
+    {% else -%}
+        <form action='{{url_for("enable")}}' method='post' enctype='multipart/form-data'>
+            <input type='submit' value='Enable'>
+    {% endif %}
+            <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
+        </form>
+    </div>
 </div>
 {% set post_count = g.viewer.account.post_count() %}
 <p>Currently keeping track of <span id="post-count">{{ post_count }}</span> of your posts, roughly <span id="eligible-estimate">{{ g.viewer.account.estimate_eligible_for_delete() }}</span> of which currently match your expiration rules.</p>
@@ -114,5 +116,9 @@
 {% endif %}
 </section>
 {% endif %}
+
+<script type='text/json' data-viewer>
+    {{ viewer_json|safe }}
+</script>
 
 {% endblock %}

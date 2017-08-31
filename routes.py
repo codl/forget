@@ -1,6 +1,6 @@
 from flask import render_template, url_for, redirect, request, g, Response,\
-                  jsonify
-from datetime import datetime, timedelta
+                  jsonify, make_response
+from datetime import datetime, timedelta, timezone
 import lib.twitter
 import lib.mastodon
 from lib.auth import require_auth, require_auth_api, csrf
@@ -15,6 +15,7 @@ import version
 import lib.version
 import lib.brotli
 import lib.settings
+import lib.json
 
 
 @app.before_request
@@ -65,7 +66,9 @@ def index():
                 'logged_in.html',
                 scales=lib.interval.SCALES,
                 tweet_archive_failed='tweet_archive_failed' in request.args,
-                settings_error='settings_error' in request.args)
+                settings_error='settings_error' in request.args,
+                viewer_json=lib.json.account(get_viewer()),
+                )
     else:
         instances = (
                 MastodonInstance.query
@@ -200,7 +203,8 @@ def enable():
                         else "" }
                     Go ahead?
                     """)
-        if g.viewer.account.next_delete < datetime.now() - timedelta(days=365):
+        if (g.viewer.account.next_delete <
+           datetime.now(timezone.utc) - timedelta(days=365)):
             return render_template(
                     'warn.html',
                     message="""
@@ -212,7 +216,8 @@ def enable():
 
     if not g.viewer.account.policy_enabled:
         g.viewer.account.next_delete = (
-            datetime.now() + g.viewer.account.policy_delete_every)
+            datetime.now(timezone.utc)
+            + g.viewer.account.policy_delete_every)
 
     g.viewer.account.policy_enabled = True
     db.session.commit()
@@ -243,20 +248,13 @@ def api_settings_put():
     db.session.commit()
     return jsonify(status='success', updated=updated)
 
-
 @app.route('/api/viewer')
 @require_auth_api
 def api_viewer():
     viewer = get_viewer()
-    return jsonify(
-            post_count=viewer.post_count(),
-            eligible_for_delete_estimate=viewer.estimate_eligible_for_delete(),
-            display_name=viewer.display_name,
-            screen_name=viewer.screen_name,
-            avatar_url=viewer.avatar_url,
-            id=viewer.id,
-            service=viewer.service,
-        )
+    resp = make_response(lib.json.account(viewer))
+    resp.headers.set('content-type', 'application/json')
+    return resp
 
 
 @app.route('/api/viewer/timers')

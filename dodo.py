@@ -1,4 +1,6 @@
 from doit import create_after
+from glob import glob
+from itertools import chain
 
 
 def reltouch(source_filename, dest_filename):
@@ -73,7 +75,7 @@ def task_service_icon():
 def task_copy():
     "copy assets verbatim"
 
-    assets = ('icon.png', 'logotype.png', 'settings.js')
+    assets = ('icon.png', 'logotype.png')
 
     def do_the_thing(src, dst):
         from shutil import copy
@@ -111,17 +113,38 @@ def task_minify_css():
         )
 
 
+def task_rollup():
+    """rollup javascript bundle"""
+
+    filenames = ['settings.js']
+    for filename in filenames:
+        src = 'assets/{}'.format(filename)
+        dst = 'static/{}'.format(filename)
+        yield dict(
+                name=filename,
+                file_dep=list(chain(
+                    # fuck it
+                    glob('assets/*.js'),
+                    glob('components/*.html'))),
+                targets=[dst],
+                clean=True,
+                actions=[
+                    ['node_modules/.bin/rollup', '-c',
+                     '-i', src, '-o', dst, '-f', 'iife'],
+                ],
+            )
+
+
 @create_after('logotype')
 @create_after('service_icon')
 @create_after('copy')
 @create_after('minify_css')
+@create_after('rollup')
 def task_compress():
     """
     make gzip and brotli compressed versions of each
     static file for the server to lazily serve
     """
-    from glob import glob
-    from itertools import chain
 
     files = chain(
             glob('static/*.css'),

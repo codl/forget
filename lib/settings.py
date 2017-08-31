@@ -7,4 +7,5 @@ attrs = (
     'policy_keep_younger_significand',
     'policy_keep_media',
     'policy_keep_direct',
+    'policy_enabled',
     )

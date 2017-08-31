@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
 from app import db
 import secrets
@@ -6,10 +6,12 @@ from lib.interval import decompose_interval
 
 
 class TimestampMixin(object):
-    created_at = db.Column(db.DateTime, server_default=db.func.now(),
-                           nullable=False)
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(),
-                           onupdate=db.func.now(), nullable=False)
+    created_at = db.Column(
+            db.DateTime(timezone=True), server_default=db.func.now(),
+            nullable=False)
+    updated_at = db.Column(
+            db.DateTime(timezone=True), server_default=db.func.now(),
+            onupdate=db.func.now(), nullable=False)
 
     def touch(self):
         self.updated_at = db.func.now()
@@ -91,10 +93,14 @@ class Account(TimestampMixin, RemoteIDMixin):
     avatar_url = db.Column(db.String)
     reported_post_count = db.Column(db.Integer)
 
-    last_fetch = db.Column(db.DateTime, server_default='epoch', index=True)
-    last_refresh = db.Column(db.DateTime, server_default='epoch', index=True)
-    last_delete = db.Column(db.DateTime, index=True)
-    next_delete = db.Column(db.DateTime, server_default='epoch', index=True)
+    last_fetch = db.Column(db.DateTime(timezone=True),
+                           server_default='epoch', index=True)
+    last_refresh = db.Column(db.DateTime(timezone=True),
+                             server_default='epoch', index=True)
+    last_delete = db.Column(db.DateTime(timezone=True),
+                            index=True)
+    next_delete = db.Column(db.DateTime(timezone=True),
+                            server_default='epoch', index=True)
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
@@ -103,7 +109,8 @@ class Account(TimestampMixin, RemoteIDMixin):
         self.last_delete = db.func.now()
         # if it's been more than 1 delete cycle ago that we've deleted a post,
         # reset next_delete to be 1 cycle away
-        if(datetime.now() - self.next_delete > self.policy_delete_every):
+        if (datetime.now(timezone.utc) - self.next_delete
+           > self.policy_delete_every):
             self.next_delete = db.func.now() + self.policy_delete_every
         else:
             self.next_delete += self.policy_delete_every
@@ -116,9 +123,9 @@ class Account(TimestampMixin, RemoteIDMixin):
         if not (value == timedelta(0) or value >= timedelta(minutes=1)):
             value = timedelta(minutes=1)
         if key == 'policy_delete_every' and \
-           datetime.now() + value < self.next_delete:
+           datetime.now(timezone.utc) + value < self.next_delete:
             # make sure that next delete is not in the far future
-            self.next_delete = datetime.now() + value
+            self.next_delete = datetime.now(timezone.utc) + value
         return value
 
     # pylint: disable=R0201

@@ -32,6 +32,10 @@ section > * {
     padding-right: 5rem;
 }
 
+section > .container {
+    padding: 0;
+}
+
 section > ul {
     padding-left: 7rem;
 }
@@ -74,7 +78,8 @@ input, select, button {
     margin-bottom: 1rem;
 }
 
-body > section > .banner {
+body > section > .banner,
+body > section > .container > .banner {
     padding-left: 4.3rem;
 }
 
