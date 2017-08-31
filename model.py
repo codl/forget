@@ -97,10 +97,8 @@ class Account(TimestampMixin, RemoteIDMixin):
                            server_default='epoch', index=True)
     last_refresh = db.Column(db.DateTime(timezone=True),
                              server_default='epoch', index=True)
-    last_delete = db.Column(db.DateTime(timezone=True),
-                            index=True)
-    next_delete = db.Column(db.DateTime(timezone=True),
-                            server_default='epoch', index=True)
+    last_delete = db.Column(db.DateTime(timezone=True), index=True)
+    next_delete = db.Column(db.DateTime(timezone=True), index=True)
 
     def touch_fetch(self):
         self.last_fetch = db.func.now()
@@ -141,7 +139,6 @@ class Account(TimestampMixin, RemoteIDMixin):
             self.next_delete = (
                 datetime.now(timezone.utc) + self.policy_delete_every)
         return enable
-
 
     # backref: tokens
     # backref: twitter_archives
