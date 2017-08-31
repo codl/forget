@@ -76,12 +76,12 @@ function s(n){
     return '';
 }
 function rel(millis){
-    let secs = Math.floor(millis/1000)
-    if(secs < 120){
+    let secs = Math.round(millis/1000)
+    if(secs <= 120){
         return `${secs} seconds`;
     }
-    let mins = Math.floor(secs/60);
-    if(mins < 60){
+    let mins = Math.round(secs/60);
+    if(mins <= 60){
         return `${mins} minute${s(mins)}`;
     }
     let hours = Math.floor(mins/60);
@@ -89,10 +89,10 @@ function rel(millis){
     if(hours < 6){
         return `${hours}h ${mins}m`;
     }
-    if(hours < 48){
+    if(hours <= 48){
         return `${hours} hour${s(hours)}`;
     }
-    let days = Math.floor(hours/24);
+    let days = Math.round(hours/24);
     return `${days} days`;
 }
 
