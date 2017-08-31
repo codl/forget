@@ -121,6 +121,7 @@ class Account(TimestampMixin, RemoteIDMixin):
         if not (value == timedelta(0) or value >= timedelta(minutes=1)):
             value = timedelta(minutes=1)
         if key == 'policy_delete_every' and \
+           self.next_delete and\
            datetime.now(timezone.utc) + value < self.next_delete:
             # make sure that next delete is not in the far future
             self.next_delete = datetime.now(timezone.utc) + value
