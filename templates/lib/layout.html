@@ -30,7 +30,13 @@
         </header>
         {% block body %}{% endblock %}
         <footer>
-            <p>Forget <a href='{{repo_url}}'>{{version or "dev"}}</a></p>
+            <p>Forget <a href='{{repo_url}}'>{{version or "dev"}}</a> is free and open-source software.</p>
+            <p>Report issues <a href='https://github.com/codl/forget/issues'>on Github</a>
+               or directly to codl on
+                    <a href="https://twitter.com/codl">Twitter</a>,
+                    <a href="https://chitter.xyz/@codl">Mastodon</a>,
+                    or by <a href="mailto:codl@codl.fr">Email</a>.
+               </p>
         </footer>
     </body>
 </html>

@@ -121,13 +121,7 @@ footer {
     font-size: 0.9rem;
     margin-top: 5rem;
     margin-bottom: 3rem;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}
-
-footer p {
-    margin: 0 0.7rem;
+    text-align: center;
 }
 
 footer a {
