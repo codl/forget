@@ -1,6 +1,13 @@
 from json import dumps
 
+
 def account(acc):
+    last_delete = None
+    next_delete = None
+    if acc.last_delete:
+        last_delete = acc.last_delete.isoformat()
+    if acc.next_delete:
+        next_delete = acc.next_delete.isoformat()
     return dumps(dict(
             post_count=acc.post_count(),
             eligible_for_delete_estimate=acc.estimate_eligible_for_delete(),
@@ -10,6 +17,6 @@ def account(acc):
             id=acc.id,
             service=acc.service,
             policy_enabled=acc.policy_enabled,
-            next_delete=acc.next_delete.isoformat(),
-            last_delete=acc.last_delete.isoformat(),
+            next_delete=next_delete,
+            last_delete=last_delete,
         ))
