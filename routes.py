@@ -249,20 +249,6 @@ def api_viewer():
     return resp
 
 
-@app.route('/api/viewer/timers')
-@require_auth_api
-def api_viewer_timers():
-    viewer = get_viewer()
-    return jsonify(
-            last_refresh=viewer.last_refresh,
-            last_refresh_rel=lib.interval.relnow(viewer.last_refresh),
-            last_fetch=viewer.last_fetch,
-            last_fetch_rel=lib.interval.relnow(viewer.last_fetch),
-            next_delete=viewer.next_delete,
-            next_delete_rel=lib.interval.relnow(viewer.next_delete),
-        )
-
-
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
 
