@@ -4,18 +4,17 @@
 
 <section>
     <p>Hello, stranger! </p>
-    <p>Forget is a service that automatically deletes your old posts once everyone has forgotten about them. After all, why shouldn't computers forget too?</p>
+    <p>Forget is a service that automatically deletes your old posts that everyone has forgotten about. Shouldn't databases forget too?</p>
 </section>
 
 <section>
 <h2>Features</h2>
 <ul>
-    <li>Delete your stale bad posts without even having to look at them again. Old posts are deleted periodically at a rhythm that you define</li>
-    <li>Pick between deleting posts when they are older than a date, posts past a post count, or both</li>
-    <li>Optionally mark posts that you want to preserve forever, by giving them a like / favourite / florp</li>
-    <li>Optionally keep posts with media forever</li>
-    <li>Upload a tweet archive if your twitter account has more tweets than the twitter api will return</li>
-    <li><a href="https://github.com/codl/forget">Free and Open Source software</a></li>
+    <li>Delete your stale bad posts without even having to look at them again!</li>
+    <li>Set it and <em>forget</em> it. Once you set up an post age limit and/or a post count limit, posts will be considered for deletion as soon as they age past these limits.</li>
+    <li>Choose your pace: delete one post every minute, one post a day, etc...</li>
+    <li>Optionally mark posts that you want to keep, by giving them a like / favourite / florp.</li>
+    <li>Optionally keep posts with media.</li>
 </ul>
 </section>
 
@@ -27,7 +26,6 @@
 </div>
 {% endif %}
 
-<p>Sound good to you?</p>
 <p>
 <a style='background-color:#1da1f2' class='btn' href="/login/twitter">
     <span class='btn-header'>
@@ -59,8 +57,16 @@
 </p>
 </section>
 <section class='policy'>
-<h2>Policy</h2>
-<p>Forget will only start deleting posts if and when you explicitly enable it on this page. Forget will not post as you, follow any account or do anything else than delete posts.</p>
+<h2>Pledge & Privacy Policy</h2>
+<p>Forget does not post, follow, or do anything with your account other than its job: deleting posts. For it to function, Forget needs to retrieve and store some metadata about each of your posts:</p>
+<ul>
+    <li>A unique post identifier</li>
+    <li>The post's time and date of publishing</li>
+    <li>Whether the post has any media attached</li>
+    <li>Whether the post has been favourited by you</li>
+    <li>(Mastodon only) Whether the post is a direct message</li>
+</ul>
+<p>No other post metadata and no post contents are stored by Forget.</p>
 </section>
 
 {% endblock %}
