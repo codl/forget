@@ -258,10 +258,10 @@ def refresh_account_with_longest_time_since_refresh():
 
 
 app.add_periodic_task(6*60, periodic_cleanup)
-app.add_periodic_task(45, queue_fetch_for_most_stale_accounts)
-app.add_periodic_task(45, queue_deletes)
-app.add_periodic_task(90, refresh_account_with_oldest_post)
-app.add_periodic_task(90, refresh_account_with_longest_time_since_refresh)
+app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
+app.add_periodic_task(15, queue_deletes)
+app.add_periodic_task(60, refresh_account_with_oldest_post)
+app.add_periodic_task(180, refresh_account_with_longest_time_since_refresh)
 
 if __name__ == '__main__':
     app.worker_main()
