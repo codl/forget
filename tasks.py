@@ -72,7 +72,7 @@ def fetch_acc(id_, cursor=None):
 
 @app.task
 def queue_fetch_for_most_stale_accounts(
-        min_staleness=timedelta(minutes=5), limit=20):
+        min_staleness=timedelta(minutes=2), limit=20):
     accs = Account.query\
             .join(Account.tokens).group_by(Account)\
             .filter(Account.last_fetch < db.func.now() - min_staleness)\
