@@ -156,7 +156,7 @@ import Banner from '../components/Banner.html';
 
 
     banner.on('toggle', enabled => {
-        send_settings({policy_enabled: enabled});
+        send_settings({policy_enabled: enabled}).then(fetch_viewer).then(update_viewer);
         // TODO show error or spinner if it takes over a second
     })
 
