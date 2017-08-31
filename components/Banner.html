@@ -3,15 +3,21 @@
         <button class='primary' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
     </div>
     <div>
-        Forget is currently {{policy_enabled?'enabled':'disabled'}} on your account.
+        Forget is currently
+        {{#if policy_enabled }}
+        <b>enabled</b>
+        {{else}}
+        disabled
+        {{/if}}
+        on your account.
     </div>
     <div class='timers'>
+        <span class='last-delete {{(!last_delete)?'hidden':''}}' title={{last_delete}}>
         {{#if last_delete }}
-        <span class='last-delete {{(!last_delete)?'hidden':''}}'>
             Last delete {{rel_past(now - last_delete)}}.
-        </span>
         {{/if }}
-        <span class='next-delete {{(!policy_enabled || !next_delete || !eligible_for_delete_estimate)?'hidden':''}}'>
+        </span>
+        <span class='next-delete {{(!policy_enabled || !next_delete || !eligible_for_delete_estimate)?'hidden':''}}' title={{next_delete}}>
             Next delete {{rel_future(next_delete - now)}}.
         </span>
     </div>
@@ -25,20 +31,18 @@
 .timers > * {
     transition-property: opacity, transform;
     transition-duration: 0.4s;
+    display: inline-block;
 }
 
 .timers > .hidden {
     opacity: 0;
-    transform: translateY(-100%);
+    transform: translateY(-0.3em);
     pointer-events: none;
-}
-
-.btn-group {
-    margin-right: 5rem;
 }
 
 .right {
     float: right;
+    margin-left: 1em;
 }
 
 button.primary {

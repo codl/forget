@@ -13,7 +13,13 @@
 </p>
 <div class='main-banner container'>
     {% set enabled_disabled = "enabled" if g.viewer.account.policy_enabled else "disabled" %}
-    <div class="banner {{enabled_disabled}}">Forget is currently {{ enabled_disabled }} on your account.
+    <div class="banner {{enabled_disabled}}">Forget is currently
+    {% if g.viewer.account.policy_enabled -%}
+        <b>enabled</b>
+    {% else -%}
+        disabled
+    {% endif %}
+        on your account.
     {% if g.viewer.account.policy_enabled -%}
         <form action='{{url_for("disable")}}' method='post' enctype='multipart/form-data'>
             <input type='submit' value='Disable'>

@@ -77,11 +77,12 @@ input[type=number]{
 body > section > .banner,
 body > section > .container > .banner {
     padding-left: 4.3rem;
+    padding-right: 4.3rem;
 }
 
 .banner.enabled {
     border-left-color: transparent;
-    background: #bbfbff;
+    background: #cde;
 }
 
 .banner.disabled {
