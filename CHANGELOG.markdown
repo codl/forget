@@ -1,3 +1,10 @@
+## v0.0.9
+
+* logged in page now shows time of last delete and next delete
+* enabling/disabling doesnt require a refresh anymore
+* security enhancements (A+ on moz observatory binchhhhh)
+* bug fixes etc
+
 ## v0.0.8
 
 * quick log-in buttons for popular mastodon instances
