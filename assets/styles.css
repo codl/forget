@@ -58,10 +58,6 @@ input[type=number]{
     max-width: 8ch;
 }
 
-input, select, button {
-    line-height: 1em;
-}
-
 .viewer img.avatar {
     height: 1.5em;
     width: 1.5em;
