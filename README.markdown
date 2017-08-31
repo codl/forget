@@ -1,44 +1,95 @@
-uhh frick i forgot to write a readme hang on uhh
-
-# forget
+# Forget
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1780ac6071c04cbd9ccf75de0891e798)](https://www.codacy.com/app/codl/forget?utm_source=github.com&utm_medium=referral&utm_content=codl/forget&utm_campaign=badger)
 
-its a thing that deletes your posts
+Forget is a post deleting service for Twitter and Mastodon. It lives at <https://forget.codl.fr>.
 
-it works with twitter and mastodon and maybe sometime in the future it will work with other services
+[![](assets/screenshot.png)](https://forget.codl.fr)
 
-it lives at <https://forget.codl.fr>
+## Running your own
 
-you can run your own if you want to, youll need postgresql and redis and python 3.6+ and yarn (recommended) or npm
+### Requirements
+
+* Postgresql
+* Redis
+* Python 3.6+
+* Yarn or NPM
+
+
+### Set up venv
+
+Setting up a venv will isolate Forget from your system's libraries and allow you to install
+dependencies locally as a normal user. It's not necessary but it is recommended!
 
 ```
-$ # set up virtualenv (recommended)
-$ virtualenv venv
+$ python -m venv venv
 $ source venv/bin/activate
+```
 
-$ # install requirements and set up config file
+If you're using `zsh` or `fish` as a shell, substitute `venv/bin/activate` with `venv/bin/activate.zsh` or `venv/bin/activate.fish`, respectively.
+
+You will need to "activate" the venv in every new terminal before you can use pip or any python tools included in dependencies (honcho, flask...)
+
+### Download and install dependencies
+
+```
 $ pip install -r requirements.txt
 $ yarn || npm install
+```
+
+Wow!! Exciting
+
+### Create and complete config file
+
+Gotta set up those, paths, and stuff.
+
+```
 $ cp config.example.py config.py
 $ $EDITOR config.py
+```
 
-$ # set up database schema
-$ createdb forget
+### Set up database schema
+
+If you haven't started postgresql yet now would be a great time to do that.
+
+```
+$ createdb forget # if you havent created the DB yet
 $ env FLASK_APP=forget.py flask db upgrade
+```
 
-$ # build assets
+### Build static assets
+
+Gonna do it...!
+
+```
 $ doit
+```
 
-$ # start web server and background worker
+Done did it.
+
+### Running
+
+The included `Procfile` will run the app server and the background worker.
+`honcho`, a `Procfile` runner, is included as a dependency:
+
+```
 $ honcho start
+```
 
-$ # if you are doing development then you can try the dev procfile
+The application server will listen on `http://127.0.0.1:42157`.
+You'll want to use your favourite web server to proxy traffic to it.
+<small>This author suggests Caddy.</small>
+
+### Development
+
+For development, you may want to use `Procfile.dev`, which starts flask in debug mode and rebuilds the static assets automatically when they change
+
+```
 $ honcho -f Procfile.dev start
 ```
 
-the web server will listen on `127.0.0.1:42157`, you'll probably want to proxy with nginx or apache or what have you
+Or you could just look at `Procfile.dev` and run those things manually. It's up to you.
 
-sorry this readme sucks i forgot to write one before release
+---
 
-send me a tweet [@codl](https://twitter.com/codl) if you're having trouble or, to tell me you like it
+If you're having trouble with Forget, or if you're not having trouble but you just want to tell me you like it, you can drop me a note at [@codl](https://twitter.com/codl) or [codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
