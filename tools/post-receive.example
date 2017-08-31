@@ -13,6 +13,7 @@ while read old new refname; do
             cd /home/codl/forget
             source venv/bin/activate
             env -u GIT_DIR -u GIT_WORK_TREE pip install -r requirements.txt
+            yarn
             tools/write-version.sh
             FLASK_APP='forget.py' flask db upgrade
             if [[ $(git diff --name-only ${old}..${new} dodo.py) == 'dodo.py' ]]
