@@ -10,7 +10,7 @@ it works with twitter and mastodon and maybe sometime in the future it will work
 
 it lives at <https://forget.codl.fr>
 
-you can run your own if you want to, youll need postgresql and redis and python 3.6+
+you can run your own if you want to, youll need postgresql and redis and python 3.6+ and yarn (recommended) or npm
 
 ```
 $ # set up virtualenv (recommended)
@@ -19,6 +19,7 @@ $ source venv/bin/activate
 
 $ # install requirements and set up config file
 $ pip install -r requirements.txt
+$ yarn || npm install
 $ cp config.example.py config.py
 $ $EDITOR config.py
 
