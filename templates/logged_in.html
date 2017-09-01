@@ -1,8 +1,9 @@
 {% from 'lib/interval.html' import interval_input -%}
 {% extends 'lib/layout.html' %}
+
 {% block scripts %}
-<script async src="{{st('settings.js')}}"></script>
 {% endblock %}
+
 {% block body -%}
 
 <section class=viewer>
@@ -86,8 +87,13 @@
 <input type=submit value='Save settings'>
 <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
 </form>
-
 </section>
+
+<script type='text/json' data-viewer>
+    {{ viewer_json|safe }}
+</script>
+<script async src="{{st('settings.js')}}"></script>
+
 {% if g.viewer.account.service == 'twitter' %}
 <section>
 
@@ -122,9 +128,5 @@
 {% endif %}
 </section>
 {% endif %}
-
-<script type='text/json' data-viewer>
-    {{ viewer_json|safe }}
-</script>
 
 {% endblock %}

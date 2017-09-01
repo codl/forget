@@ -1,6 +1,6 @@
 import Banner from '../components/Banner.html';
 
-function settings_init(){
+(function settings_init(){
     if(!('fetch' in window)){
         return;
     }
@@ -163,14 +163,4 @@ function settings_init(){
         send_settings({policy_enabled: enabled}).then(fetch_viewer).then(update_viewer);
         // TODO show error or spinner if it takes over a second
     })
-
-
-
-}
-
-if(document.readyState == 'interactive'){
-    settings_init()
-}
-else {
-    document.addEventListener('DOMContentLoaded', settings_init);
-}
+})();
