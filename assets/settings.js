@@ -1,6 +1,6 @@
 import Banner from '../components/Banner.html';
 
-(function(){
+function settings_init(){
     if(!('fetch' in window)){
         return;
     }
@@ -166,4 +166,11 @@ import Banner from '../components/Banner.html';
 
 
 
-})();
+}
+
+if(document.readyState == 'interactive'){
+    settings_init()
+}
+else {
+    document.addEventListener('DOMContentLoaded', settings_init);
+}
