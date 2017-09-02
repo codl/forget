@@ -90,8 +90,6 @@ def get_api_for_acc(account):
             continue
         return api
 
-    account.force_log_out()
-
 
 def fetch_acc(acc, cursor=None):
     api = get_api_for_acc(acc)

@@ -89,10 +89,6 @@ def get_twitter_for_acc(account):
                 # temporary error, re-raise
                 raise e
 
-    # if no tokens are valid, we log out the user so we'll get a fresh
-    # token when they log in again
-    account.policy_enabled = False
-    account.force_log_out()
     return None
 
 

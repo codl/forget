@@ -135,13 +135,14 @@ def periodic_cleanup():
      .filter(OAuthToken.account_id == None)  # noqa: E711
      .delete(synchronize_session=False))
 
-    # disable users with no tokens
+    # disable and log out users with no tokens
     unreachable = (
             Account.query
             .outerjoin(Account.tokens)
             .group_by(Account).having(db.func.count(OAuthToken.token) == 0)
             .filter(Account.policy_enabled == True))  # noqa: E712
     for account in unreachable:
+        account.force_log_out()
         account.policy_enabled = False
         account.reason = """
         Your account was disabled because Forget no longer had access to
@@ -262,7 +263,7 @@ def refresh_account_with_longest_time_since_refresh():
     refresh_account(acc.id)
 
 
-app.add_periodic_task(6*60, periodic_cleanup)
+app.add_periodic_task(120, periodic_cleanup)
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(15, queue_deletes)
 app.add_periodic_task(60, refresh_account_with_oldest_post)
