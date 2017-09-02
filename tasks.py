@@ -143,6 +143,11 @@ def periodic_cleanup():
             .filter(Account.policy_enabled == True))  # noqa: E712
     for account in unreachable:
         account.policy_enabled = False
+        account.reason = """
+        Your account was disabled because Forget no longer had access to
+        your {service} account. Perhaps you had revoked it? By logging in,
+        you have restored access and you can now re-enable Forget if you wish.
+        """.format(service=account.service)
 
     # normalise mastodon instance popularity scores
     biggest_instance = (

@@ -12,6 +12,14 @@
     <span id='display-name' title='@{{g.viewer.account.screen_name}}'>{{g.viewer.account.display_name or g.viewer.account.screen_name}}</span>!
     <a href="{{url_for('logout')}}">Log out</a>
 </p>
+
+{% if g.viewer.account.reason %}
+<div class="banner warning" data-reason>
+    {{ g.viewer.account.reason }}
+</div>
+{% endif %}
+
+
 <div class='main-banner container'>
     {% set enabled_disabled = "enabled" if g.viewer.account.policy_enabled else "disabled" %}
     <div class="banner {{enabled_disabled}}">Forget is currently

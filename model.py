@@ -100,6 +100,8 @@ class Account(TimestampMixin, RemoteIDMixin):
     last_delete = db.Column(db.DateTime(timezone=True), index=True)
     next_delete = db.Column(db.DateTime(timezone=True), index=True)
 
+    reason = db.Column(db.String)
+
     def touch_fetch(self):
         self.last_fetch = db.func.now()
 
@@ -135,10 +137,11 @@ class Account(TimestampMixin, RemoteIDMixin):
         return value
 
     @db.validates('policy_enabled')
-    def reset_next_delete(self, key, enable):
+    def on_enable(self, key, enable):
         if not self.policy_enabled and enable:
             self.next_delete = (
                 datetime.now(timezone.utc) + self.policy_delete_every)
+            self.reason = None
         return enable
 
     # backref: tokens
