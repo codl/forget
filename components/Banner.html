@@ -1,6 +1,6 @@
 <div class='banner {{policy_enabled?'enabled':'disabled'}}'>
     <div class='btn-group right'>
-        <button class='primary' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
+        <button class='btn primary' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
     </div>
     <div>
         Forget is currently
@@ -40,25 +40,6 @@
     pointer-events: none;
 }
 
-.right {
-    float: right;
-    margin-left: 1em;
-}
-
-button.primary {
-    border: none;
-    padding: 0.5rem 1rem;
-}
-
-.enabled button.primary {
-    background-color: transparent;
-    border: 1px solid currentColor;
-}
-.disabled button.primary {
-    background-color: #37d;
-    color: white;
-    font-weight: bold;
-}
 .banner {
     transition: background-color 0.6s;
 }

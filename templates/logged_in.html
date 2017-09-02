@@ -16,6 +16,11 @@
 {% if g.viewer.account.reason %}
 <div class="banner warning" data-reason>
     {{ g.viewer.account.reason }}
+    <form class='btn-group right' action='{{url_for("dismiss")}}' method='post' enctype='multipart/form-data'>
+        <input class='btn dismiss' type='submit' value='Got it'>
+        <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
+    </form>
+    <div class='clearfix'></div>
 </div>
 {% endif %}
 

@@ -168,13 +168,22 @@ import Banner from '../components/Banner.html';
     }
     set_viewer_timeout();
 
-    let reason_banner = document.querySelector('.banner[data-reason]');
-
     banner.on('toggle', enabled => {
         send_settings({policy_enabled: enabled}).then(fetch_viewer).then(update_viewer);
-        if(enabled && reason_banner){
-            reason_banner.parentElement.removeChild(reason_banner);
-        }
         // TODO show error or spinner if it takes over a second
     })
+
+    let reason_banner = document.querySelector('.banner[data-reason]');
+    if(reason_banner){
+        let dismiss = reason_banner.querySelector('input[type=submit]');
+        dismiss.addEventListener('click', e => {
+            e.preventDefault();
+
+            // we don't care if this succeeds or fails. worst
+            // case scenario the banner appears again on a future page load
+            fetch('/api/reason', {method: 'DELETE', credentials:'same-origin'});
+
+            reason_banner.parentElement.removeChild(reason_banner);
+        })
+    }
 })();

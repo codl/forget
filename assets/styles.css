@@ -187,7 +187,7 @@ form aside {
     font-size: 0.8em;
 }
 
-a.btn {
+a.login-btn {
     color: white;
     text-decoration: none;
     background-color: #555;
@@ -198,16 +198,16 @@ a.btn {
     display: inline-block;
 }
 
-a.btn:hover {
+a.login-btn:hover {
     opacity: 0.9;
 }
 
-.btn > * {
+.login-btn > * {
     display: inline-block;
     vertical-align: middle;
 }
 
-.btn-header {
+.login-btn-header {
     flex: 0 0;
     width: 2em;
     height: 2em;
@@ -219,12 +219,41 @@ a.btn:hover {
     text-align: center;
 }
 
-.btn-header img {
+.login-btn-header img {
     margin-top: 0.4em;
     height: 1.1em;
 }
 
-.btn-content {
+.login-btn-content {
     margin: 0 .5em;
     line-height: 2em;
+}
+
+.btn {
+    border: none;
+    padding: 0.5rem 1rem;
+}
+
+.btn.dismiss,
+.enabled .btn.primary {
+    background-color: transparent;
+    border: 1px solid currentColor;
+}
+.disabled .btn.primary {
+    background-color: #37d;
+    color: white;
+    font-weight: bold;
+}
+
+.btn-group.right {
+    float: right;
+    margin-left: 1em;
+}
+
+form.btn-group {
+    margin-top: 0; margin-bottom: 0;
+}
+
+.clearfix {
+    clear: both;
 }

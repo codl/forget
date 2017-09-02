@@ -240,6 +240,7 @@ def api_settings_put():
     db.session.commit()
     return jsonify(status='success', updated=updated)
 
+
 @app.route('/api/viewer')
 @require_auth_api
 def api_viewer():
@@ -317,12 +318,30 @@ def mastodon_login_step2(instance_url):
     g.viewer = sess
     return redirect(url_for('index'))
 
+
 @app.route('/sentry/setup.js')
 def sentry_setup():
     client_dsn = app.config.get('SENTRY_DSN').split('@')
     client_dsn[:1] = client_dsn[0].split(':')
     client_dsn = ':'.join(client_dsn[0:2]) + '@' + client_dsn[3]
     resp = make_response(render_template(
-        'sentry.js', sentry_dsn = client_dsn))
+        'sentry.js', sentry_dsn=client_dsn))
     resp.headers.set('content-type', 'text/javascript')
     return resp
+
+
+@app.route('/dismiss', methods={'POST'})
+@csrf
+@require_auth
+def dismiss():
+    get_viewer().reason = None
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route('/api/reason', methods={'DELETE'})
+@require_auth_api
+def delete_reason():
+    get_viewer().reason = None
+    db.session.commit()
+    return jsonify(status='success')

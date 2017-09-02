@@ -27,10 +27,10 @@
 {% endif %}
 
 <p>
-<a style='background-color:#1da1f2' class='btn' href="/login/twitter">
-    <span class='btn-header'>
+<a style='background-color:#1da1f2' class='login-btn' href="/login/twitter">
+    <span class='login-btn-header'>
         {{picture(st, 'twitter', (20,40,80), ('webp', 'png'))}}
-    </span><span class='btn-content'>Log in with Twitter</span>
+    </span><span class='login-btn-content'>Log in with Twitter</span>
 </a>
 </p>
 
@@ -38,21 +38,21 @@
 {% for instance in mastodon_instances %}
 
 
-<a style='background-color:#282c37' class='btn' href="{{ url_for('mastodon_login_step1', instance_url=instance.instance) }}">
+<a style='background-color:#282c37' class='login-btn' href="{{ url_for('mastodon_login_step1', instance_url=instance.instance) }}">
 {% if loop.first %}
-    <span class='btn-header'>
+    <span class='login-btn-header'>
         {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
-    </span><span class='btn-content'>Log in with
+    </span><span class='login-btn-content'>Log in with
 {% else %}
-    <span class='btn-content'>
+    <span class='login-btn-content'>
 {% endif %}
         {{instance.instance}}</span>
 </a>
 
 {% endfor %}
 
-<a style='background-color:#ddd; color:inherit;' class='btn' href="{{ url_for('mastodon_login_step1') }}">
-    <span class='btn-content'>Another Mastodon instance</span>
+<a style='background-color:#ddd; color:inherit;' class='login-btn' href="{{ url_for('mastodon_login_step1') }}">
+    <span class='login-btn-content'>Another Mastodon instance</span>
 </a>
 </p>
 </section>
