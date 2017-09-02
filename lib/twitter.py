@@ -81,7 +81,7 @@ def get_twitter_for_acc(account):
                 # token revoked
 
                 if sentry:
-                    sentry.capture(
+                    sentry.client.capture(
                             'lib.twitter.creds_error',
                             stack=True,
                             data=dict(

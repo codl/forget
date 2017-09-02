@@ -84,7 +84,7 @@ def get_api_for_acc(account):
         tl = api.timeline()
         if 'error' in tl:
             if sentry:
-                sentry.capture(
+                sentry.client.capture(
                         'lib.mastodon.creds_error',
                         stack=True,
                         data=dict(
