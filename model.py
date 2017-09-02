@@ -146,7 +146,7 @@ class Account(TimestampMixin, RemoteIDMixin):
     # backref: posts
     # backref: sessions
 
-    def __repr__(self):
+    def __str__(self):
         return f"<Account({self.id}, {self.screen_name}, {self.display_name})>"
 
     def post_count(self):
@@ -238,7 +238,7 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     has_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     direct = db.Column(db.Boolean, server_default='FALSE', nullable=False)
 
-    def __repr__(self):
+    def __str__(self):
         return '<Post ({}, Author: {})>'.format(self.id, self.author_id)
 
 
