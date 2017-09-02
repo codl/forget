@@ -81,14 +81,8 @@ def get_twitter_for_acc(account):
                 # token revoked
 
                 if sentry:
-                    sentry.client.capture(
-                            'lib.twitter.creds_error',
-                            stack=True,
-                            data=dict(
-                                locals=locals(),
-                                account=account,
-                            )
-                        )
+                    sentry.captureMessage(
+                            'Twitter auth revoked', extra=locals())
                 db.session.delete(token)
                 db.session.commit()
             else:

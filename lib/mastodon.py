@@ -84,14 +84,8 @@ def get_api_for_acc(account):
         tl = api.timeline()
         if 'error' in tl:
             if sentry:
-                sentry.client.capture(
-                        'lib.mastodon.creds_error',
-                        stack=True,
-                        data=dict(
-                            locals=locals(),
-                            account=account,
-                        )
-                    )
+                sentry.captureMessage(
+                        'Mastodon auth revoked or incorrect', extra=locals())
             db.session.delete(token)
             continue
         return api
