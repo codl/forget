@@ -168,9 +168,13 @@ import Banner from '../components/Banner.html';
     }
     set_viewer_timeout();
 
+    let reason_banner = document.querySelector('.banner[data-reason]');
 
     banner.on('toggle', enabled => {
         send_settings({policy_enabled: enabled}).then(fetch_viewer).then(update_viewer);
+        if(enabled && reason_banner){
+            reason_banner.parentElement.removeChild(reason_banner);
+        }
         // TODO show error or spinner if it takes over a second
     })
 })();
