@@ -200,7 +200,8 @@ def enable():
                         else "" }
                     Go ahead?
                     """)
-        if (g.viewer.account.next_delete <
+        if (not g.viewer.account.last_delete or
+           g.viewer.account.last_delete <
            datetime.now(timezone.utc) - timedelta(days=365)):
             return render_template(
                     'warn.html',
