@@ -87,6 +87,7 @@ def get_api_for_acc(account):
                 sentry.captureMessage(
                         'Mastodon auth revoked or incorrect', extra=locals())
             db.session.delete(token)
+            db.session.commit()
             continue
         return api
 
