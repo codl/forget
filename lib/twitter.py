@@ -1,7 +1,7 @@
 from twitter import Twitter, OAuth, TwitterHTTPError
 from werkzeug.urls import url_decode
 from model import OAuthToken, Account, Post, TwitterArchive
-from app import db, app
+from app import db, app, sentry
 from math import inf
 from datetime import datetime
 import locale
@@ -79,6 +79,16 @@ def get_twitter_for_acc(account):
         except TwitterHTTPError as e:
             if e.e.code == 401:
                 # token revoked
+
+                if sentry:
+                    sentry.capture(
+                            'lib.twitter.creds_error',
+                            stack=True,
+                            data=dict(
+                                locals=locals(),
+                                account=account,
+                            )
+                        )
                 db.session.delete(token)
                 db.session.commit()
             else:

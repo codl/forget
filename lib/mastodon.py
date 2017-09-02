@@ -2,7 +2,7 @@ from mastodon import Mastodon
 from mastodon.Mastodon import MastodonAPIError
 from model import MastodonApp, Account, OAuthToken, Post
 from requests import head
-from app import db
+from app import db, sentry
 from math import inf
 import iso8601
 
@@ -83,6 +83,15 @@ def get_api_for_acc(account):
         # so we have to do this:
         tl = api.timeline()
         if 'error' in tl:
+            if sentry:
+                sentry.capture(
+                        'lib.mastodon.creds_error',
+                        stack=True,
+                        data=dict(
+                            locals=locals(),
+                            account=account,
+                        )
+                    )
             db.session.delete(token)
             continue
         return api
