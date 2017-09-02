@@ -92,7 +92,9 @@ import Banner from '../components/Banner.html';
             },
             body: JSON.stringify(body)
         })
-            .then(resp => { if(!resp.ok){ return Promise.reject(resp); } return resp; })
+            .then(resp => {
+                if(!resp.ok){ return Promise.reject(resp); }
+                return resp; })
             .then(resp => resp.json())
             .then(data => {
                 if(data.status == 'error'){ return Promise.reject(data); }
@@ -123,7 +125,15 @@ import Banner from '../components/Banner.html';
         return fetch('/api/viewer', {
             credentials: 'same-origin',
         })
-            .then(resp => { if(!resp.ok){ return Promise.reject(resp); } return resp; })
+            .then(resp => {
+                if(!resp.ok){
+                    if(resp.status == 403){
+                        // user was logged out in another client
+                        window.location = '/';
+                    }
+                    return Promise.reject(resp);
+                }
+                return resp; })
             .then(resp => resp.json());
     }
 
