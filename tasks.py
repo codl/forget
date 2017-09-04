@@ -148,7 +148,7 @@ def periodic_cleanup():
         Your account was disabled because Forget no longer had access to
         your {service} account. Perhaps you had revoked it? By logging in,
         you have restored access and you can now re-enable Forget if you wish.
-        """.format(service=account.service)
+        """.format(service=account.service.capitalize())
 
     # normalise mastodon instance popularity scores
     biggest_instance = (
