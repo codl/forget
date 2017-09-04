@@ -1,4 +1,4 @@
-from twitter import Twitter, OAuth, TwitterHTTPError
+from twitter import Twitter, OAuth, TwitterError
 from werkzeug.urls import url_decode
 from model import OAuthToken, Account, Post, TwitterArchive
 from app import db, app, sentry
@@ -7,6 +7,8 @@ from datetime import datetime
 import locale
 from zipfile import ZipFile
 from io import BytesIO
+from lib.exceptions import PermanentError, TemporaryError
+from urllib.error import URLError
 
 
 def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
@@ -76,7 +78,7 @@ def get_twitter_for_acc(account):
         try:
             t.account.verify_credentials()
             return t
-        except TwitterHTTPError as e:
+        except TwitterError as e:
             if e.e.code == 401:
                 # token revoked
 
@@ -86,8 +88,7 @@ def get_twitter_for_acc(account):
                 db.session.delete(token)
                 db.session.commit()
             else:
-                # temporary error, re-raise
-                raise e
+                raise TemporaryError(e)
 
     return None
 
@@ -140,7 +141,10 @@ def fetch_acc(account, cursor):
         if most_recent_post:
             kwargs['since_id'] = most_recent_post.twitter_id
 
-    tweets = t.statuses.user_timeline(**kwargs)
+    try:
+        tweets = t.statuses.user_timeline(**kwargs)
+    except (TwitterError, URLError) as e:
+        handle_error(e)
 
     print("processing {} tweets for {acc}".format(len(tweets), acc=account))
 
@@ -166,10 +170,13 @@ def refresh_posts(posts):
 
     t = get_twitter_for_acc(posts[0].author)
     if not t:
-        raise Exception('shit idk. twitter says no')
-    tweets = t.statuses.lookup(
-                _id=",".join((post.twitter_id for post in posts)),
-                trim_user=True, tweet_mode='extended')
+        return
+    try:
+        tweets = t.statuses.lookup(
+                    _id=",".join((post.twitter_id for post in posts)),
+                    trim_user=True, tweet_mode='extended')
+    except (URLError, TwitterError) as e:
+        handle_error(e)
     refreshed_posts = list()
     for post in posts:
         tweet = next(
@@ -201,3 +208,13 @@ def chunk_twitter_archive(archive_id):
     files.sort()
 
     return files
+
+
+def handle_error(e):
+    if isinstance(e, TwitterError):
+        if e.code and e.code == 326:
+            # account locked lol rip
+            # although this is a temporary error in twitter terms
+            # it's best not to waste api calls on locked accounts
+            raise PermanentError(e)
+    raise TemporaryError(e)

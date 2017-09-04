@@ -1,10 +1,12 @@
 from mastodon import Mastodon
-from mastodon.Mastodon import MastodonAPIError
+from mastodon.Mastodon import MastodonAPIError, MastodonNetworkError,\
+                              MastodonRatelimitError
 from model import MastodonApp, Account, OAuthToken, Post
 from requests import head
 from app import db, sentry
 from math import inf
 import iso8601
+from lib.exceptions import TemporaryError
 
 
 def get_or_create_app(instance_url, callback, website):
@@ -77,19 +79,24 @@ def get_api_for_acc(account):
                 ratelimit_method='throw',
             )
 
-        # api.verify_credentials()
-        # doesnt error even if the token is revoked lol
-        # https://github.com/tootsuite/mastodon/issues/4637
-        # so we have to do this:
-        tl = api.timeline()
-        if 'error' in tl:
-            if sentry:
-                sentry.captureMessage(
-                        'Mastodon auth revoked or incorrect', extra=locals())
-            db.session.delete(token)
-            db.session.commit()
-            continue
-        return api
+        try:
+            # api.verify_credentials()
+            # doesnt error even if the token is revoked lol
+            # https://github.com/tootsuite/mastodon/issues/4637
+            # so we have to do this:
+            tl = api.timeline()
+            if 'error' in tl:
+                if sentry:
+                    sentry.captureMessage('Mastodon auth revoked or incorrect',
+                                          extra=locals())
+                db.session.delete(token)
+                db.session.commit()
+                continue
+            return api
+        except (MastodonAPIError,
+                MastodonNetworkError,
+                MastodonRatelimitError) as e:
+            raise TemporaryError(e)
 
 
 def fetch_acc(acc, cursor=None):
@@ -98,37 +105,42 @@ def fetch_acc(acc, cursor=None):
         print('no access, aborting')
         return None
 
-    newacc = account_from_api_object(
-            api.account_verify_credentials(), acc.mastodon_instance)
-    acc = db.session.merge(newacc)
+    try:
+        newacc = account_from_api_object(
+                api.account_verify_credentials(), acc.mastodon_instance)
+        acc = db.session.merge(newacc)
 
-    kwargs = dict(limit=40)
-    if cursor:
-        kwargs.update(cursor)
+        kwargs = dict(limit=40)
+        if cursor:
+            kwargs.update(cursor)
 
-    if 'max_id' not in kwargs:
-        most_recent_post = (
-                Post.query.with_parent(acc)
-                .order_by(db.desc(Post.created_at)).first())
-        if most_recent_post:
-            kwargs['since_id'] = most_recent_post.mastodon_id
+        if 'max_id' not in kwargs:
+            most_recent_post = (
+                    Post.query.with_parent(acc)
+                    .order_by(db.desc(Post.created_at)).first())
+            if most_recent_post:
+                kwargs['since_id'] = most_recent_post.mastodon_id
 
-    statuses = api.account_statuses(acc.mastodon_id, **kwargs)
+        statuses = api.account_statuses(acc.mastodon_id, **kwargs)
 
-    if statuses:
-        kwargs['max_id'] = +inf
+        if statuses:
+            kwargs['max_id'] = +inf
 
-        for status in statuses:
-            post = post_from_api_object(status, acc.mastodon_instance)
-            db.session.merge(post)
-            kwargs['max_id'] = min(kwargs['max_id'], status['id'])
+            for status in statuses:
+                post = post_from_api_object(status, acc.mastodon_instance)
+                db.session.merge(post)
+                kwargs['max_id'] = min(kwargs['max_id'], status['id'])
 
-    else:
-        kwargs = None
+        else:
+            kwargs = None
 
-    db.session.commit()
+        db.session.commit()
 
-    return kwargs
+        return kwargs
+    except (MastodonAPIError,
+            MastodonNetworkError,
+            MastodonRatelimitError) as e:
+        raise TemporaryError(e)
 
 
 def post_from_api_object(obj, instance):
@@ -168,16 +180,23 @@ def refresh_posts(posts):
             new_post = db.session.merge(
                     post_from_api_object(status, post.mastodon_instance))
             new_posts.append(new_post)
-        except MastodonAPIError as e:
+        except (MastodonAPIError,
+                MastodonNetworkError,
+                MastodonRatelimitError) as e:
             if str(e) == 'Endpoint not found.':
                 db.session.delete(post)
             else:
-                raise e
+                raise TemporaryError(e)
 
     return new_posts
 
 
 def delete(post):
     api = get_api_for_acc(post.author)
-    api.status_delete(post.mastodon_id)
-    db.session.delete(post)
+    try:
+        api.status_delete(post.mastodon_id)
+        db.session.delete(post)
+    except (MastodonAPIError,
+            MastodonNetworkError,
+            MastodonRatelimitError) as e:
+        raise TemporaryError(e)

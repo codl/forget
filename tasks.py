@@ -5,9 +5,6 @@ from model import Session, Account, TwitterArchive, Post, OAuthToken,\
                   MastodonInstance
 import lib.twitter
 import lib.mastodon
-from mastodon.Mastodon import MastodonRatelimitError
-from twitter import TwitterError
-from urllib.error import URLError
 from datetime import timedelta
 from zipfile import ZipFile
 from io import BytesIO, TextIOWrapper
@@ -15,6 +12,7 @@ import json
 from kombu import Queue
 import random
 import version
+from lib.exceptions import PermanentError, TemporaryError
 
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'],
@@ -51,7 +49,19 @@ def noop(*args, **kwargs):
     pass
 
 
-@app.task(autoretry_for=(TwitterError, URLError, MastodonRatelimitError))
+def make_dormant(acc):
+    acc.reason = '''
+        Your account was temporarily disabled because your {service}
+        account was suspended or otherwise inaccessible. By logging into
+        it, you have reactivated your account, but be aware that some posts
+        may be missing from Forget's database, and it may take some time to
+        get back in sync.
+    '''.format(acc.service)
+    acc.dormant = True
+    db.session.commit()
+
+
+@app.task(autoretry_for=(TemporaryError,))
 def fetch_acc(id_, cursor=None):
     acc = Account.query.get(id_)
     print(f'fetching {acc}')
@@ -64,26 +74,16 @@ def fetch_acc(id_, cursor=None):
         cursor = action(acc, cursor)
         if cursor:
             fetch_acc.si(id_, cursor).apply_async()
+    except PermanentError as e:
+        db.session.rollback()
+        make_dormant(acc)
     finally:
         db.session.rollback()
         acc.touch_fetch()
         db.session.commit()
 
 
-@app.task
-def queue_fetch_for_most_stale_accounts(
-        min_staleness=timedelta(minutes=2), limit=20):
-    accs = Account.query\
-            .join(Account.tokens).group_by(Account)\
-            .filter(Account.last_fetch < db.func.now() - min_staleness)\
-            .order_by(db.asc(Account.last_fetch))\
-            .limit(limit)
-    for acc in accs:
-        fetch_acc.s(acc.id).delay()
-    db.session.commit()
-
-
-@app.task(autoretry_for=(TwitterError, URLError))
+@app.task()
 def import_twitter_archive_month(archive_id, month_path):
     ta = TwitterArchive.query.get(archive_id)
 
@@ -117,62 +117,7 @@ def import_twitter_archive_month(archive_id, month_path):
         raise e
 
 
-@app.task
-def periodic_cleanup():
-    # delete sessions after 48 hours
-    (Session.query
-     .filter(Session.updated_at < (db.func.now() - timedelta(hours=48)))
-     .delete(synchronize_session=False))
-
-    # delete twitter archives after 3 days
-    (TwitterArchive.query
-     .filter(TwitterArchive.updated_at < (db.func.now() - timedelta(days=3)))
-     .delete(synchronize_session=False))
-
-    # delete anonymous oauth tokens after 1 day
-    (OAuthToken.query
-     .filter(OAuthToken.updated_at < (db.func.now() - timedelta(days=1)))
-     .filter(OAuthToken.account_id == None)  # noqa: E711
-     .delete(synchronize_session=False))
-
-    # disable and log out users with no tokens
-    unreachable = (
-            Account.query
-            .outerjoin(Account.tokens)
-            .group_by(Account).having(db.func.count(OAuthToken.token) == 0)
-            .filter(Account.policy_enabled == True))  # noqa: E712
-    for account in unreachable:
-        account.force_log_out()
-        account.policy_enabled = False
-        account.reason = """
-        Your account was disabled because Forget no longer had access to
-        your {service} account. Perhaps you had revoked it? By logging in,
-        you have restored access and you can now re-enable Forget if you wish.
-        """.format(service=account.service.capitalize())
-
-    # normalise mastodon instance popularity scores
-    biggest_instance = (
-            MastodonInstance.query
-            .order_by(db.desc(MastodonInstance.popularity)).first())
-    if biggest_instance.popularity > 40:
-        MastodonInstance.query.update({
-            MastodonInstance.popularity:
-                MastodonInstance.popularity * 40 / biggest_instance.popularity
-        })
-
-    db.session.commit()
-
-
-@app.task
-def queue_deletes():
-    eligible_accounts = (
-            Account.query.filter(Account.policy_enabled == True)  # noqa: E712
-            .filter(Account.next_delete < db.func.now()))
-    for account in eligible_accounts:
-        delete_from_account.s(account.id).apply_async()
-
-
-@app.task(autoretry_for=(TwitterError, URLError, MastodonRatelimitError))
+@app.task(autoretry_for=(TemporaryError,))
 def delete_from_account(account_id):
     account = Account.query.get(account_id)
     latest_n_posts = (Post.query.with_parent(account)
@@ -231,34 +176,108 @@ def refresh_posts(posts):
         return lib.mastodon.refresh_posts(posts)
 
 
-@app.task(autoretry_for=(TwitterError, URLError),
-          throws=(MastodonRatelimitError))
+@app.task(autoretry_for=(TemporaryError,))
 def refresh_account(account_id):
     account = Account.query.get(account_id)
 
-    limit = 100
-    if account.service == 'mastodon':
-        limit = 5
-    posts = (Post.query.with_parent(account)
-             .order_by(db.asc(Post.updated_at)).limit(limit).all())
+    try:
+        limit = 100
+        if account.service == 'mastodon':
+            limit = 5
+        posts = (Post.query.with_parent(account)
+                 .order_by(db.asc(Post.updated_at)).limit(limit).all())
 
-    posts = refresh_posts(posts)
-    account.touch_refresh()
+        posts = refresh_posts(posts)
+        account.touch_refresh()
+        db.session.commit()
+    except PermanentError as e:
+        db.session.rollback()
+        make_dormant(account)
+
+
+@app.task
+def periodic_cleanup():
+    # delete sessions after 48 hours
+    (Session.query
+     .filter(Session.updated_at < (db.func.now() - timedelta(hours=48)))
+     .delete(synchronize_session=False))
+
+    # delete twitter archives after 3 days
+    (TwitterArchive.query
+     .filter(TwitterArchive.updated_at < (db.func.now() - timedelta(days=3)))
+     .delete(synchronize_session=False))
+
+    # delete anonymous oauth tokens after 1 day
+    (OAuthToken.query
+     .filter(OAuthToken.updated_at < (db.func.now() - timedelta(days=1)))
+     .filter(OAuthToken.account_id == None)  # noqa: E711
+     .delete(synchronize_session=False))
+
+    # disable and log out users with no tokens
+    unreachable = (
+            Account.query
+            .outerjoin(Account.tokens)
+            .group_by(Account).having(db.func.count(OAuthToken.token) == 0)
+            .filter(Account.policy_enabled == True))  # noqa: E712
+    for account in unreachable:
+        account.force_log_out()
+        account.policy_enabled = False
+        account.reason = """
+        Your account was disabled because Forget no longer had access to
+        your {service} account. Perhaps you had revoked it? By logging in,
+        you have restored access and you can now re-enable Forget if you wish.
+        """.format(service=account.service.capitalize())
+
+    # normalise mastodon instance popularity scores
+    biggest_instance = (
+            MastodonInstance.query
+            .order_by(db.desc(MastodonInstance.popularity)).first())
+    if biggest_instance.popularity > 40:
+        MastodonInstance.query.update({
+            MastodonInstance.popularity:
+                MastodonInstance.popularity * 40 / biggest_instance.popularity
+        })
+
     db.session.commit()
 
 
-@app.task(autoretry_for=(TwitterError, URLError),
-          throws=(MastodonRatelimitError))
+@app.task
+def queue_fetch_for_most_stale_accounts(
+        min_staleness=timedelta(minutes=2), limit=20):
+    accs = (Account.query
+            .join(Account.tokens).group_by(Account)
+            .filter(Account.last_fetch < db.func.now() - min_staleness)
+            .filter(~Account.dormant)
+            .order_by(db.asc(Account.last_fetch))
+            .limit(limit)
+            )
+    for acc in accs:
+        fetch_acc.s(acc.id).delay()
+    db.session.commit()
+
+
+@app.task
+def queue_deletes():
+    eligible_accounts = (
+            Account.query.filter(Account.policy_enabled == True)  # noqa: E712
+            .filter(Account.next_delete < db.func.now())
+            .filter(~Account.dormant))
+    for account in eligible_accounts:
+        delete_from_account.s(account.id).apply_async()
+
+
+@app.task
 def refresh_account_with_oldest_post():
     post = (Post.query.outerjoin(Post.author).join(Account.tokens)
+            .filter(~Account.dormant)
             .group_by(Post).order_by(db.asc(Post.updated_at)).first())
     refresh_account(post.author_id)
 
 
-@app.task(autoretry_for=(TwitterError, URLError),
-          throws=(MastodonRatelimitError))
+@app.task
 def refresh_account_with_longest_time_since_refresh():
     acc = (Account.query.join(Account.tokens).group_by(Account)
+           .filter(~Account.dormant)
            .order_by(db.asc(Account.last_refresh)).first())
     refresh_account(acc.id)
 

@@ -1,4 +1,4 @@
-from flask import render_template, url_for, redirect, request, g, Response,\
+from flask import render_template, url_for, redirect, request, g,\
                   jsonify, make_response
 from datetime import datetime, timedelta, timezone
 import lib.twitter
@@ -94,6 +94,19 @@ def twitter_login_step1():
                 url_for('index', twitter_login_error='', _anchor='log_in'))
 
 
+def login(account_id):
+    session = Session(account_id=account_id)
+    db.session.add(session)
+    db.session.commit()
+
+    session.account.dormant = False
+    db.session.commit()
+
+    tasks.fetch_acc.s(account_id).apply_async(routing_key='high')
+
+    return session
+
+
 @app.route('/login/twitter/callback')
 @limiter.limit('3/minute')
 def twitter_login_step2():
@@ -104,15 +117,10 @@ def twitter_login_step2():
                 oauth_token, oauth_verifier,
                 **app.config.get_namespace("TWITTER_"))
 
-        session = Session(account_id=token.account_id)
-        db.session.add(session)
-        db.session.commit()
+        session = login(token.account_id)
 
-        tasks.fetch_acc.s(token.account_id).apply_async(routing_key='high')
-
-        resp = Response(status=302, headers={"location": url_for('index')})
-        set_session_cookie(session, resp, app.config.get('HTTPS'))
-        return resp
+        g.viewer = session
+        return redirect(url_for('index'))
     except (TwitterError, URLError):
         if sentry:
             sentry.captureException()
@@ -305,8 +313,7 @@ def mastodon_login_step2(instance_url):
     token = lib.mastodon.receive_code(code, app, callback)
     account = token.account
 
-    sess = Session(account=account)
-    db.session.add(sess)
+    session = login(account.id)
 
     instance = MastodonInstance(instance=instance_url)
     instance = db.session.merge(instance)
@@ -314,9 +321,7 @@ def mastodon_login_step2(instance_url):
 
     db.session.commit()
 
-    tasks.fetch_acc.s(account.id).apply_async(routing_key='high')
-
-    g.viewer = sess
+    g.viewer = session
     return redirect(url_for('index'))
 
 
