@@ -3,8 +3,8 @@ from flask import render_template, url_for, redirect, request, g, Response,\
 from datetime import datetime, timedelta, timezone
 import lib.twitter
 import lib.mastodon
-from lib.auth import require_auth, require_auth_api, csrf
-from lib.session import set_session_cookie, get_viewer_session, get_viewer
+from lib.auth import require_auth, require_auth_api, csrf,\
+                     set_session_cookie, get_viewer_session, get_viewer
 from model import Session, TwitterArchive, MastodonApp, MastodonInstance
 from app import app, db, sentry, limiter
 import tasks

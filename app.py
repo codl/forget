@@ -6,7 +6,7 @@ from flask_migrate import Migrate
 import version
 from lib.cachebust import cachebust
 from flask_limiter import Limiter
-from lib.session import get_viewer
+from lib.auth import get_viewer
 import os
 import mimetypes
 
