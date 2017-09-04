@@ -9,7 +9,6 @@ from zipfile import ZipFile
 from io import BytesIO
 from lib.exceptions import PermanentError, TemporaryError
 from urllib.error import URLError
-import json
 
 
 def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
@@ -213,15 +212,12 @@ def chunk_twitter_archive(archive_id):
 
 def handle_error(e):
     if isinstance(e, TwitterHTTPError):
-        try:
-            data = json.loads(e.read())
-            if 'errors' in data.keys():
-                for error in data['errors']:
-                    if error.get('code') == 326:
-                        # account locked lol rip
-                        # although this is a temporary error in twitter terms
-                        # it's best not to waste api calls on locked accounts
-                        raise PermanentError(e)
-        except Exception:
-            pass
+        data = e.response_data
+        if isinstance(data, dict) and 'errors' in data.keys():
+            for error in data['errors']:
+                if error.get('code',0) == 326:
+                    # account locked lol rip
+                    # although this is a temporary error in twitter terms
+                    # it's best not to waste api calls on locked accounts
+                    raise PermanentError(e)
     raise TemporaryError(e)

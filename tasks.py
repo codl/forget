@@ -56,7 +56,7 @@ def make_dormant(acc):
         it, you have reactivated your account, but be aware that some posts
         may be missing from Forget's database, and it may take some time to
         get back in sync.
-    '''.format(acc.service)
+    '''.format(service=acc.service)
     acc.dormant = True
     db.session.commit()
 
