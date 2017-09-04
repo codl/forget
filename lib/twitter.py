@@ -1,4 +1,4 @@
-from twitter import Twitter, OAuth, TwitterError
+from twitter import Twitter, OAuth, TwitterHTTPError, TwitterError
 from werkzeug.urls import url_decode
 from model import OAuthToken, Account, Post, TwitterArchive
 from app import db, app, sentry
@@ -9,6 +9,7 @@ from zipfile import ZipFile
 from io import BytesIO
 from lib.exceptions import PermanentError, TemporaryError
 from urllib.error import URLError
+import json
 
 
 def get_login_url(callback='oob', consumer_key=None, consumer_secret=None):
@@ -78,7 +79,7 @@ def get_twitter_for_acc(account):
         try:
             t.account.verify_credentials()
             return t
-        except TwitterError as e:
+        except TwitterHTTPError as e:
             if e.e.code == 401:
                 # token revoked
 
@@ -211,10 +212,16 @@ def chunk_twitter_archive(archive_id):
 
 
 def handle_error(e):
-    if isinstance(e, TwitterError):
-        if e.code and e.code == 326:
-            # account locked lol rip
-            # although this is a temporary error in twitter terms
-            # it's best not to waste api calls on locked accounts
-            raise PermanentError(e)
+    if isinstance(e, TwitterHTTPError):
+        try:
+            data = json.loads(e.read())
+            if 'errors' in data.keys():
+                for error in data['errors']:
+                    if error.get('code') == 326:
+                        # account locked lol rip
+                        # although this is a temporary error in twitter terms
+                        # it's best not to waste api calls on locked accounts
+                        raise PermanentError(e)
+        except Exception:
+            pass
     raise TemporaryError(e)
