@@ -89,6 +89,8 @@ def get_twitter_for_acc(account):
                 db.session.commit()
             else:
                 raise TemporaryError(e)
+        except URLError as e:
+            raise TemporaryError(e)
 
     return None
 
