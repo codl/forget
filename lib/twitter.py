@@ -124,26 +124,26 @@ def fetch_acc(account, cursor):
         print("no twitter access, aborting")
         return
 
-    user = t.account.verify_credentials()
-    db.session.merge(account_from_api_user_object(user))
-
-    kwargs = {
-            'user_id': account.twitter_id,
-            'count': 200,
-            'trim_user': True,
-            'tweet_mode': 'extended',
-            }
-    if cursor:
-        kwargs.update(cursor)
-
-    if 'max_id' not in kwargs:
-        most_recent_post = (
-                Post.query.order_by(db.desc(Post.created_at))
-                .filter(Post.author_id == account.id).first())
-        if most_recent_post:
-            kwargs['since_id'] = most_recent_post.twitter_id
-
     try:
+        user = t.account.verify_credentials()
+        db.session.merge(account_from_api_user_object(user))
+
+        kwargs = {
+                'user_id': account.twitter_id,
+                'count': 200,
+                'trim_user': True,
+                'tweet_mode': 'extended',
+                }
+        if cursor:
+            kwargs.update(cursor)
+
+        if 'max_id' not in kwargs:
+            most_recent_post = (
+                    Post.query.order_by(db.desc(Post.created_at))
+                    .filter(Post.author_id == account.id).first())
+            if most_recent_post:
+                kwargs['since_id'] = most_recent_post.twitter_id
+
         tweets = t.statuses.user_timeline(**kwargs)
     except (TwitterError, URLError) as e:
         handle_error(e)
