@@ -26,6 +26,8 @@ app.conf.task_default_queue = 'default'
 app.conf.task_default_exchange = 'celery'
 app.conf.task_default_exchange_type = 'direct'
 
+sentry = None
+
 if 'SENTRY_DSN' in flaskapp.config:
     from raven import Client
     from raven.contrib.celery import register_signal, register_logger_signal
@@ -77,6 +79,8 @@ def fetch_acc(id_, cursor=None):
     except PermanentError as e:
         db.session.rollback()
         make_dormant(acc)
+        if sentry:
+            sentry.captureException()
     finally:
         db.session.rollback()
         acc.touch_fetch()
@@ -193,6 +197,8 @@ def refresh_account(account_id):
     except PermanentError as e:
         db.session.rollback()
         make_dormant(account)
+        if sentry:
+            sentry.captureException()
 
 
 @app.task
