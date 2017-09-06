@@ -1,6 +1,7 @@
 # Forget
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1780ac6071c04cbd9ccf75de0891e798)](https://www.codacy.com/app/codl/forget?utm_source=github.com&utm_medium=referral&utm_content=codl/forget&utm_campaign=badger)
+[![Libraries.io Badge](https://img.shields.io/librariesio/github/codl/forget.svg)](https://libraries.io/github/codl/forget)
 
 Forget is a post deleting service for Twitter and Mastodon. It lives at <https://forget.codl.fr>.
 
