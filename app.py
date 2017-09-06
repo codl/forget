@@ -39,13 +39,6 @@ metadata = MetaData(naming_convention={
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
 
-if 'SQLALCHEMY_LOG_QUERIES_TO' in app.config:
-    @event.listens_for(Engine, 'after_cursor_execute', named=True)
-    def log_queries(statement='', **kwargs):
-        with open(app.config['SQLALCHEMY_LOG_QUERIES_TO'], 'a') as f:
-            f.write(statement.replace('\n', ' ') + ';\n')
-            os.sync()
-
 sentry = None
 if 'SENTRY_DSN' in app.config:
     from raven.contrib.flask import Sentry
