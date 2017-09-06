@@ -8,10 +8,8 @@ import mimetypes
 
 
 class BrotliCache(object):
-    def __init__(self, redis_kwargs=None, max_wait=0.020, expire=60*60*6):
-        if not redis_kwargs:
-            redis_kwargs = {}
-        self.redis = redis.StrictRedis(**redis_kwargs)
+    def __init__(self, redis_uri='redis://', max_wait=0.020, expire=60*60*6):
+        self.redis = redis.StrictRedis.from_url(redis_uri)
         self.max_wait = max_wait
         self.expire = expire
         self.redis.client_setname('brotlicache')
@@ -81,5 +79,5 @@ def brotli(app, static=True, dynamic=True):
     if static:
         app.view_functions['static'] = static_maybe_gzip_brotli
     if dynamic:
-        cache = BrotliCache()
+        cache = BrotliCache(redis_uri = app.config.get('REDIS_URI'))
         app.after_request(cache.wrap_response)

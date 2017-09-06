@@ -14,7 +14,6 @@ from twitter import TwitterError
 from urllib.error import URLError
 import version
 import lib.version
-import lib.brotli
 import lib.settings
 import lib.json
 
@@ -52,9 +51,6 @@ def touch_viewer(resp):
         g.viewer.touch()
         db.session.commit()
     return resp
-
-
-lib.brotli.brotli(app)
 
 
 @app.route('/')

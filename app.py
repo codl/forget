@@ -9,18 +9,18 @@ from flask_limiter import Limiter
 from lib.auth import get_viewer
 import os
 import mimetypes
+import lib.brotli
 
 app = Flask(__name__)
 
 default_config = {
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2:///forget",
-        "CELERY_BROKER": "redis://",
         "HTTPS": True,
         "SENTRY_CONFIG": {},
-        "RATELIMIT_STORAGE_URL": "redis://",
         "REPO_URL": "https://github.com/codl/forget",
         "COMMIT_URL": "https://github.com/codl/forget/commits/{hash}",
+        "REDIS_URI": "redis://",
 }
 
 app.config.update(default_config)
@@ -37,6 +37,17 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
+
+if not 'RATELIMIT_STORAGE_URL' in app.config:
+    uri = app.config['REDIS_URI']
+    assert not uri.startswith('unix://'), "flask-limiter does not support redis over a unix socket"
+    app.config['RATELIMIT_STORAGE_URL'] = uri
+
+if not 'CELERY_BROKER' in app.config:
+    uri = app.config['REDIS_URI']
+    if uri.startswith('unix://'):
+        uri = url.replace('unix', 'redis+socket', 1)
+    app.config['CELERY_BROKER'] = uri
 
 sentry = None
 if 'SENTRY_DSN' in app.config:
@@ -100,3 +111,5 @@ def install_security_headers(resp):
 
 
 mimetypes.add_type('image/webp', '.webp')
+
+lib.brotli.brotli(app)
