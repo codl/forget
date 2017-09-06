@@ -76,7 +76,7 @@ def fetch_acc(id_, cursor=None):
         cursor = action(acc, cursor)
         if cursor:
             fetch_acc.si(id_, cursor).apply_async()
-    except PermanentError as e:
+    except PermanentError:
         db.session.rollback()
         make_dormant(acc)
         if sentry:
@@ -194,7 +194,7 @@ def refresh_account(account_id):
         posts = refresh_posts(posts)
         account.touch_refresh()
         db.session.commit()
-    except PermanentError as e:
+    except PermanentError:
         db.session.rollback()
         make_dormant(account)
         if sentry:
