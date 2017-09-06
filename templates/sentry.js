@@ -1,1 +1,2 @@
-Raven.config('{{sentry_dsn}}').install()
+/*global Raven*/
+Raven.config('{{sentry_dsn}}').install();
