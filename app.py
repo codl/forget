@@ -15,7 +15,6 @@ app = Flask(__name__)
 default_config = {
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2:///forget",
-        "SECRET_KEY": "hunter2",
         "CELERY_BROKER": "redis://",
         "HTTPS": True,
         "SENTRY_CONFIG": {},
