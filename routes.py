@@ -5,7 +5,8 @@ import lib.twitter
 import lib.mastodon
 from lib.auth import require_auth, require_auth_api, csrf,\
                      set_session_cookie, get_viewer_session, get_viewer
-from model import Session, TwitterArchive, MastodonApp, MastodonInstance
+from model import Session, TwitterArchive, MastodonApp, MastodonInstance,\
+                  Account
 from app import app, db, sentry, limiter
 import tasks
 from zipfile import BadZipFile
@@ -351,3 +352,14 @@ def delete_reason():
     get_viewer().reason = None
     db.session.commit()
     return jsonify(status='success')
+
+@app.route('/api/badge/users')
+def users_badge():
+    count = (
+        Account.query.filter(Account.policy_enabled)
+        .filter(~Account.dormant)
+        .count()
+        )
+    return redirect(
+            "https://img.shields.io/badge/active%20users-{}-blue.svg"
+            .format(count))
