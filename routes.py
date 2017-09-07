@@ -16,6 +16,7 @@ import version
 import lib.version
 import lib.settings
 import lib.json
+import re
 
 
 @app.before_request
@@ -275,6 +276,8 @@ def mastodon_login_step1(instance=None):
                 generic_error='error' in request.args
                 )
 
+    instance_url = re.sub('^https?://', '', instance_url, 
+                          count=1, flags=re.IGNORECASE)
     instance_url = instance_url.split("@")[-1].lower()
 
     callback = url_for('mastodon_login_step2',
@@ -348,6 +351,7 @@ def delete_reason():
     get_viewer().reason = None
     db.session.commit()
     return jsonify(status='success')
+
 
 @app.route('/api/badge/users')
 def users_badge():
