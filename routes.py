@@ -276,9 +276,14 @@ def mastodon_login_step1(instance=None):
                 generic_error='error' in request.args
                 )
 
-    instance_url = re.sub('^https?://', '', instance_url, 
+    instance_url = instance_url.lower()
+    # strip protocol
+    instance_url = re.sub('^https?://', '', instance_url,
                           count=1, flags=re.IGNORECASE)
-    instance_url = instance_url.split("@")[-1].lower()
+    # strip username
+    instance_url = instance_url.split("@")[-1]
+    # strip trailing path
+    instance_url = instance_url.split('/')[0]
 
     callback = url_for('mastodon_login_step2',
                        instance_url=instance_url, _external=True)
