@@ -8,15 +8,15 @@ import mimetypes
 
 
 class BrotliCache(object):
-    def __init__(self, redis_uri='redis://', max_wait=0.020, expire=60*60*6):
+    def __init__(self, redis_uri='redis://', timeout=0.020, expire=60*60*6):
         self.redis = redis.StrictRedis.from_url(redis_uri)
-        self.max_wait = max_wait
+        self.timeout = timeout
         self.expire = expire
         self.redis.client_setname('brotlicache')
 
     def compress(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
         encbody = brotli_.compress(body, mode=mode)
-        self.redis.set(cache_key, encbody, ex=self.expire)
+        self.redis.set(cache_key, encbody, px=int(self.expire*1000))
         self.redis.delete(lock_key)
 
     def wrap_response(self, response):
@@ -41,8 +41,8 @@ class BrotliCache(object):
                     target=self.compress,
                     args=(cache_key, lock_key, body, mode))
                 t.start()
-                if self.max_wait > 0:
-                    t.join(self.max_wait)
+                if self.timeout > 0:
+                    t.join(self.timeout)
                     encbody = self.redis.get(cache_key)
                     if not encbody:
                         response.headers.set('x-brotli-cache', 'TIMEOUT')
@@ -57,7 +57,7 @@ class BrotliCache(object):
         return response
 
 
-def brotli(app, static=True, dynamic=True):
+def brotli(app, static=True, dynamic=True, **kwargs):
     original_static = app.view_functions['static']
 
     def static_maybe_gzip_brotli(filename=None):
@@ -79,5 +79,5 @@ def brotli(app, static=True, dynamic=True):
     if static:
         app.view_functions['static'] = static_maybe_gzip_brotli
     if dynamic:
-        cache = BrotliCache(redis_uri = app.config.get('REDIS_URI'))
+        cache = BrotliCache(redis_uri=app.config.get('REDIS_URI'), **kwargs)
         app.after_request(cache.wrap_response)
