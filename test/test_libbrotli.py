@@ -13,9 +13,10 @@ def app(redisdb):
     app_.config['REDIS_URI'] = 'redis://localhost:15487'
     app_.debug = True
 
-    @app_.route('/')
-    def hello():
-        return 'Hello, world!'
+    @app_.route('/', defaults={'name': 'world'})
+    @app_.route('/<name>')
+    def hello(name='world'):
+        return 'Hello, {name}!'.format(name=name)
     with app_.app_context():
         yield app_
 
