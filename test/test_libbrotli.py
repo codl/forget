@@ -11,6 +11,7 @@ def app(redisdb):
     from flask import Flask
     app_ = Flask(__name__)
     app_.config['REDIS_URI'] = 'redis://localhost:15487'
+    app_.debug = True
 
     @app_.route('/')
     def hello():
@@ -89,12 +90,18 @@ def test_brotli_dynamic_cache(br_client):
 
 
 def test_brotli_dynamic_timeout(app):
-    lib.brotli.brotli(app, timeout=0.0001)
+    from secrets import token_urlsafe
+
+    lib.brotli.brotli(app, timeout=0.01)
+
+    @app.route('/hard_to_compress')
+    def hard_to_compress():
+        return token_urlsafe(2**14)
 
     client = app.test_client()
 
     resp = client.get(
-            '/',
+            '/hard_to_compress',
             headers=[('accept-encoding', 'gzip, br')])
 
     assert resp.headers.get('x-brotli-cache') == 'TIMEOUT'
