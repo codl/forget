@@ -6,3 +6,4 @@ python:
 script:
     - pytest --cov=.
     - coveralls
+cache: pip
