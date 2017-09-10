@@ -60,7 +60,6 @@ def not_found(e):
 
 
 @app.errorhandler(500)
-#@app.errorhandler(Exception)
 def internal_server_error(e):
     return (render_template('500.html', e=e), 500)
 
