@@ -257,3 +257,10 @@ form.btn-group {
 .clearfix {
     clear: both;
 }
+
+section > pre.error-log {
+    overflow: auto;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    opacity: 0.7;
+}

@@ -1,0 +1,24 @@
+{% extends 'lib/layout.html' %}
+
+{% block body -%}
+
+<section>
+    <h2>Something unexpected happened!</h2>
+    <p>
+    {%- if g.sentry_event_id %}
+    This error has been logged, please try again in a few minutes.
+    {%- else %}
+    Please try again in a few minutes.
+    {%- endif %}
+    </p>
+    <pre class='error-log'>
+    500 Internal server error
+
+    {{e}}
+
+    {%- if g.sentry_event_id %}
+    sentry://{{ g.sentry_event_id }}
+    {%- endif %}</pre>
+</section>
+
+{%- endblock %}

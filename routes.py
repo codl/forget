@@ -54,6 +54,17 @@ def touch_viewer(resp):
     return resp
 
 
+@app.errorhandler(404)
+def not_found(e):
+    return (render_template('404.html', e=e), 404)
+
+
+@app.errorhandler(500)
+@app.errorhandler(Exception)
+def internal_server_error(e):
+    return (render_template('500.html', e=e), 500)
+
+
 @app.route('/')
 def index():
     if g.viewer:
