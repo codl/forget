@@ -97,6 +97,8 @@ $ honcho -f Procfile.dev start
 
 Or you could just look at `Procfile.dev` and run those things manually. It's up to you.
 
+You can run the (currently very incomplete) test suite by running `pytest`. You'll need redis installed on your development machine, a temporary redis server will be started and shut down automatically by the test suite.
+
 ---
 
 If you're having trouble with Forget, or if you're not having trouble but you just want to tell me you like it, you can drop me a note at [@codl](https://twitter.com/codl) or [codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
