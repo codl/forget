@@ -151,9 +151,6 @@ class Account(TimestampMixin, RemoteIDMixin):
     # backref: posts
     # backref: sessions
 
-    def __str__(self):
-        return f"<Account({self.id}, {self.screen_name}, {self.display_name})>"
-
     def post_count(self):
         return Post.query.with_parent(self).count()
 
@@ -183,7 +180,8 @@ class Account(TimestampMixin, RemoteIDMixin):
 
 
 class Account(Account, db.Model):
-    pass
+    def __str__(self):
+        return f"<Account({self.id}, {self.screen_name}, {self.display_name})>"
 
 
 class OAuthToken(db.Model, TimestampMixin):
