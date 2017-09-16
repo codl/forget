@@ -183,7 +183,7 @@ def refresh_posts(posts):
         except (MastodonAPIError,
                 MastodonNetworkError,
                 MastodonRatelimitError) as e:
-            if str(e) == 'Endpoint not found.':
+            if str(e) in ('Endpoint not found.', 'Record not found.'):
                 db.session.delete(post)
             else:
                 raise TemporaryError(e)
