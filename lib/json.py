@@ -1,5 +1,6 @@
 from json import dumps
 from flask import url_for
+from app import imgproxy
 
 
 def account(acc):
@@ -14,7 +15,9 @@ def account(acc):
             eligible_for_delete_estimate=acc.estimate_eligible_for_delete(),
             display_name=acc.display_name,
             screen_name=acc.screen_name,
-            avatar_url=url_for('avatar', urlhash=acc.avatar_url_hash()),
+            avatar_url=url_for(
+                'avatar',
+                identifier=imgproxy.identifier_for(acc.avatar_url)),
             avatar_url_orig=acc.avatar_url,
             id=acc.id,
             service=acc.service,

@@ -1,5 +1,5 @@
 from flask import render_template, url_for, redirect, request, g,\
-                  make_response, abort
+                  make_response
 from datetime import datetime, timedelta, timezone
 import lib.twitter
 import lib.mastodon
@@ -19,13 +19,17 @@ import re
 
 @app.route('/')
 def index():
-    if g.viewer:
+    viewer = get_viewer()
+    if viewer:
         return render_template(
                 'logged_in.html',
                 scales=lib.interval.SCALES,
                 tweet_archive_failed='tweet_archive_failed' in request.args,
                 settings_error='settings_error' in request.args,
-                viewer_json=lib.json.account(get_viewer()),
+                viewer_json=lib.json.account(viewer),
+                viewer_avatar=url_for(
+                    'avatar',
+                    identifier=imgproxy.identifier_for(viewer.avatar_url)),
                 )
     else:
         instances = (
@@ -290,11 +294,6 @@ def dismiss():
     return redirect(url_for('index'))
 
 
-@app.route('/avatar/<urlhash>')
-@require_auth
-def avatar(urlhash):
-    viewer = get_viewer()
-    if (not viewer.avatar_url or not urlhash == viewer.avatar_url_hash()):
-        return abort(404)
-
-    return imgproxy.respond(viewer.avatar_url)
+@app.route('/avatar/<identifier>')
+def avatar(identifier):
+    return imgproxy.respond(identifier)
