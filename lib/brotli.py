@@ -14,7 +14,7 @@ class BrotliCache(object):
         self.expire = expire
         self.redis.client_setname('brotlicache')
 
-    def compress(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
+    def compress_and_cache(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
         encbody = brotli_.compress(body, mode=mode)
         self.redis.set(cache_key, encbody, px=int(self.expire*1000))
         self.redis.delete(lock_key)
@@ -38,7 +38,7 @@ class BrotliCache(object):
                     if response.content_type.startswith('text/')
                     else brotli_.MODE_GENERIC)
                 t = Thread(
-                    target=self.compress,
+                    target=self.compress_and_cache,
                     args=(cache_key, lock_key, body, mode))
                 t.start()
                 if self.timeout > 0:

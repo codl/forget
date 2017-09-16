@@ -3,6 +3,7 @@ from datetime import timedelta, datetime, timezone
 from app import db
 import secrets
 from lib.interval import decompose_interval
+import hashlib
 
 
 class TimestampMixin(object):
@@ -118,6 +119,11 @@ class Account(TimestampMixin, RemoteIDMixin):
 
     def touch_refresh(self):
         self.last_refresh = db.func.now()
+
+    def avatar_url_hash(self):
+        if not self.avatar_url:
+            return None
+        return hashlib.sha1(self.avatar_url.encode('utf-8')).hexdigest()
 
     @db.validates('policy_keep_younger', 'policy_delete_every')
     def validate_intervals(self, key, value):

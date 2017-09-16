@@ -1,4 +1,5 @@
 from json import dumps
+from flask import url_for
 
 
 def account(acc):
@@ -13,7 +14,8 @@ def account(acc):
             eligible_for_delete_estimate=acc.estimate_eligible_for_delete(),
             display_name=acc.display_name,
             screen_name=acc.screen_name,
-            avatar_url=acc.avatar_url,
+            avatar_url=url_for('avatar', urlhash=acc.avatar_url_hash()),
+            avatar_url_orig=acc.avatar_url,
             id=acc.id,
             service=acc.service,
             policy_enabled=acc.policy_enabled,

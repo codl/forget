@@ -1,12 +1,12 @@
 from flask import render_template, url_for, redirect, request, g,\
-                  make_response
+                  make_response, abort
 from datetime import datetime, timedelta, timezone
 import lib.twitter
 import lib.mastodon
 from lib.auth import require_auth, csrf,\
                      get_viewer
 from model import Session, TwitterArchive, MastodonApp, MastodonInstance
-from app import app, db, sentry, limiter
+from app import app, db, sentry, limiter, imgproxy
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
@@ -288,3 +288,13 @@ def dismiss():
     get_viewer().reason = None
     db.session.commit()
     return redirect(url_for('index'))
+
+
+@app.route('/avatar/<urlhash>')
+@require_auth
+def avatar(urlhash):
+    viewer = get_viewer()
+    if (not viewer.avatar_url or not urlhash == viewer.avatar_url_hash()):
+        return abort(404)
+
+    return imgproxy.respond(viewer.avatar_url)

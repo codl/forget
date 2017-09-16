@@ -10,6 +10,7 @@ from lib.auth import get_viewer
 import os
 import mimetypes
 import lib.brotli
+import lib.img_proxy
 
 app = Flask(__name__)
 
@@ -82,7 +83,7 @@ limiter = Limiter(app, key_func=rate_limit_key)
 @app.after_request
 def install_security_headers(resp):
     csp = ("default-src 'none';"
-           "img-src 'self' https:;"
+           "img-src 'self';"
            "style-src 'self' 'unsafe-inline';"
            "frame-ancestors 'none';"
            )
@@ -113,3 +114,5 @@ def install_security_headers(resp):
 mimetypes.add_type('image/webp', '.webp')
 
 lib.brotli.brotli(app)
+
+imgproxy = lib.img_proxy.ImgProxyCache()
