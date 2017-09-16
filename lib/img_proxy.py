@@ -5,7 +5,7 @@ from flask import make_response, abort
 
 
 class ImgProxyCache(object):
-    def __init__(self, redis_uri='redis://', timeout=1, expire=60*60*6,
+    def __init__(self, redis_uri='redis://', timeout=1, expire=60*60*24,
                  prefix='img_proxy'):
         self.redis = redis.StrictRedis.from_url(redis_uri)
         self.timeout = timeout
@@ -24,8 +24,10 @@ class ImgProxyCache(object):
         if(resp.status_code != 200):
             return
         mime = resp.headers.get('content-type', 'application/octet-stream')
-        self.redis.set(self.key('mime', url), mime, px=self.expire)
-        self.redis.set(self.key('body', url), resp.content, px=self.expire)
+        self.redis.set(self.key('mime', url),
+                       mime, px=self.expire*1000)
+        self.redis.set(self.key('body', url),
+                       resp.content, px=self.expire*1000)
 
     def respond(self, url):
         x_imgproxy_cache = 'HIT'
