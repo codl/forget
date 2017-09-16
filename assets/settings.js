@@ -8,7 +8,8 @@ import Banner from '../components/Banner.html';
     let status_timeout = null;
 
     let settings_section = document.querySelector('#settings-section');
-    let form = document.forms.settings;
+    let form = document.querySelector('form[name=settings]');
+    let inputs = Array.from(form.elements)
     let backoff_level = 0;
 
     let banner_el = document.querySelector('.main-banner');
@@ -75,7 +76,7 @@ import Banner from '../components/Banner.html';
 
     function get_all_inputs(){
         let o = Object();
-        for(let input of form.elements){
+        for(let input of inputs){
             if(input.type != 'radio' || input.checked){
                 o[input.name] = input.value;
             }
@@ -102,13 +103,14 @@ import Banner from '../components/Banner.html';
             });
     }
 
-    for(let input of form.elements){
+    for(let input of inputs){
         input.addEventListener('change', save);
     }
 
     // remove submit button since we're doing live updates
     let submit = form.querySelector('input[type=submit]');
     form.removeChild(submit);
+    inputs.splice(inputs.indexOf(submit), 1);
 
     let status_display = document.createElement('span');
     status_display.classList.add('status-display', 'hidden');
