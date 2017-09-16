@@ -121,7 +121,7 @@ def import_twitter_archive_month(archive_id, month_path):
         raise e
 
 
-@app.task(autoretry_for=(TemporaryError,))
+@app.task()
 def delete_from_account(account_id):
     account = Account.query.get(account_id)
     latest_n_posts = (Post.query.with_parent(account)
@@ -180,14 +180,14 @@ def refresh_posts(posts):
         return lib.mastodon.refresh_posts(posts)
 
 
-@app.task(autoretry_for=(TemporaryError,))
+@app.task()
 def refresh_account(account_id):
     account = Account.query.get(account_id)
 
     try:
         limit = 100
         if account.service == 'mastodon':
-            limit = 5
+            limit = 3
         posts = (Post.query.with_parent(account)
                  .order_by(db.asc(Post.updated_at)).limit(limit).all())
 
@@ -290,7 +290,7 @@ def refresh_account_with_longest_time_since_refresh():
 
 app.add_periodic_task(120, periodic_cleanup)
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
-app.add_periodic_task(15, queue_deletes)
+app.add_periodic_task(17, queue_deletes)
 app.add_periodic_task(60, refresh_account_with_oldest_post)
 app.add_periodic_task(180, refresh_account_with_longest_time_since_refresh)
 
