@@ -1,67 +1,20 @@
 from flask import render_template, url_for, redirect, request, g,\
-                  jsonify, make_response
+                  make_response
 from datetime import datetime, timedelta, timezone
 import lib.twitter
 import lib.mastodon
-from lib.auth import require_auth, require_auth_api, csrf,\
-                     set_session_cookie, get_viewer_session, get_viewer
-from model import Session, TwitterArchive, MastodonApp, MastodonInstance,\
-                  Account
+from lib.auth import require_auth, csrf,\
+                     get_viewer
+from model import Session, TwitterArchive, MastodonApp, MastodonInstance
 from app import app, db, sentry, limiter
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
 from urllib.error import URLError
-import version
 import lib.version
 import lib.settings
 import lib.json
 import re
-
-
-@app.before_request
-def load_viewer():
-    g.viewer = get_viewer_session()
-    if g.viewer and sentry:
-        sentry.user_context({
-                'id': g.viewer.account.id,
-                'username': g.viewer.account.screen_name,
-                'service': g.viewer.account.service
-            })
-
-
-@app.context_processor
-def inject_version():
-    return dict(
-            version=version.version,
-            repo_url=lib.version.url_for_version(version.version),
-        )
-
-
-@app.context_processor
-def inject_sentry():
-    if sentry:
-        return dict(sentry=True)
-    return dict()
-
-
-@app.after_request
-def touch_viewer(resp):
-    if 'viewer' in g and g.viewer:
-        set_session_cookie(g.viewer, resp, app.config.get('HTTPS'))
-        g.viewer.touch()
-        db.session.commit()
-    return resp
-
-
-@app.errorhandler(404)
-def not_found(e):
-    return (render_template('404.html', e=e), 404)
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return (render_template('500.html', e=e), 500)
 
 
 @app.route('/')
@@ -244,29 +197,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/api/settings', methods=('PUT',))
-@require_auth_api
-def api_settings_put():
-    viewer = get_viewer()
-    data = request.json
-    updated = dict()
-    for key in lib.settings.attrs:
-        if key in data:
-            setattr(viewer, key, data[key])
-            updated[key] = data[key]
-    db.session.commit()
-    return jsonify(status='success', updated=updated)
-
-
-@app.route('/api/viewer')
-@require_auth_api
-def api_viewer():
-    viewer = get_viewer()
-    resp = make_response(lib.json.account(viewer))
-    resp.headers.set('content-type', 'application/json')
-    return resp
-
-
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
 
@@ -358,23 +288,3 @@ def dismiss():
     get_viewer().reason = None
     db.session.commit()
     return redirect(url_for('index'))
-
-
-@app.route('/api/reason', methods={'DELETE'})
-@require_auth_api
-def delete_reason():
-    get_viewer().reason = None
-    db.session.commit()
-    return jsonify(status='success')
-
-
-@app.route('/api/badge/users')
-def users_badge():
-    count = (
-        Account.query.filter(Account.policy_enabled)
-        .filter(~Account.dormant)
-        .count()
-        )
-    return redirect(
-            "https://img.shields.io/badge/active%20users-{}-blue.svg"
-            .format(count))
