@@ -45,7 +45,7 @@ def index():
 
 
 @app.route('/login/twitter')
-@limiter.limit('3/minute')
+@limiter.limit('10/minute')
 def twitter_login_step1():
     try:
         return redirect(lib.twitter.get_login_url(
@@ -73,7 +73,7 @@ def login(account_id):
 
 
 @app.route('/login/twitter/callback')
-@limiter.limit('3/minute')
+@limiter.limit('10/minute')
 def twitter_login_step2():
     try:
         oauth_token = request.args['oauth_token']
