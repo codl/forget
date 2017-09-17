@@ -31,18 +31,20 @@ def index():
     else:
         return redirect(url_for('about'))
 
+
 @app.route('/about/')
 def about():
     instances = (
             MastodonInstance.query
             .filter(MastodonInstance.popularity > 13)
             .order_by(db.desc(MastodonInstance.popularity),
-                        MastodonInstance.instance)
-            .limit(5))
+                      MastodonInstance.instance)
+            .limit(5).all())
     return render_template(
             'about.html',
             mastodon_instances=instances,
             twitter_login_error='twitter_login_error' in request.args)
+
 
 @app.route('/login/twitter')
 @limiter.limit('10/minute')
