@@ -200,13 +200,17 @@ button {
     padding: 0.4em 0.8em;
     border: none;
 
-    border-color: currentColor;
+    cursor: pointer;
+}
+
+.btn-small {
+    font-size: 0.8em;
+    padding: 0.2em 0.5em;
 }
 
 .btn.primary {
     color: white;
     background-color: #37d;
-    border-color: #37d;
 }
 
 .btn.secondary {
@@ -229,6 +233,11 @@ button {
 .btn img:first-child,
 .btn picture:first-child img {
     margin-left: 0;
+}
+
+.btn-group.inline {
+    display: inline-block;
+    transform: translatey(20%);
 }
 
 .btn-group.right {
