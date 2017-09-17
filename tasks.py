@@ -304,6 +304,7 @@ def update_mastodon_instances_popularity():
             MastodonInstance.popularity:
                 MastodonInstance.popularity * 40 / biggest_instance.popularity
         })
+    db.session.commit()
 
 
 app.add_periodic_task(120, periodic_cleanup)
