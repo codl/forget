@@ -27,22 +27,22 @@ def index():
                 tweet_archive_failed='tweet_archive_failed' in request.args,
                 settings_error='settings_error' in request.args,
                 viewer_json=lib.json.account(viewer),
-                viewer_avatar=url_for(
-                    'avatar',
-                    identifier=imgproxy.identifier_for(viewer.avatar_url)),
                 )
     else:
-        instances = (
-                MastodonInstance.query
-                .filter(MastodonInstance.popularity > 13)
-                .order_by(db.desc(MastodonInstance.popularity),
-                          MastodonInstance.instance)
-                .limit(5))
-        return render_template(
-                'index.html',
-                mastodon_instances=instances,
-                twitter_login_error='twitter_login_error' in request.args)
+        return redirect(url_for('about'))
 
+@app.route('/about/')
+def about():
+    instances = (
+            MastodonInstance.query
+            .filter(MastodonInstance.popularity > 13)
+            .order_by(db.desc(MastodonInstance.popularity),
+                        MastodonInstance.instance)
+            .limit(5))
+    return render_template(
+            'about.html',
+            mastodon_instances=instances,
+            twitter_login_error='twitter_login_error' in request.args)
 
 @app.route('/login/twitter')
 @limiter.limit('10/minute')
@@ -56,7 +56,7 @@ def twitter_login_step1():
         if sentry:
             sentry.captureException()
         return redirect(
-                url_for('index', twitter_login_error='', _anchor='log_in'))
+                url_for('about', twitter_login_error='', _anchor='log_in'))
 
 
 def login(account_id):
@@ -90,7 +90,7 @@ def twitter_login_step2():
         if sentry:
             sentry.captureException()
         return redirect(
-                url_for('index', twitter_login_error='', _anchor='log_in'))
+                url_for('about', twitter_login_error='', _anchor='log_in'))
 
 
 class TweetArchiveEmptyException(Exception):
@@ -198,7 +198,7 @@ def logout():
         db.session.delete(g.viewer)
         db.session.commit()
         g.viewer = None
-    return redirect(url_for('index'))
+    return redirect(url_for('about'))
 
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))

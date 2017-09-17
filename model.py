@@ -119,6 +119,11 @@ class Account(TimestampMixin, RemoteIDMixin):
     def touch_refresh(self):
         self.last_refresh = db.func.now()
 
+    def get_avatar(self):
+        from app import imgproxy
+        from flask import url_for
+        return url_for('avatar', identifier=imgproxy.identifier_for(self.avatar_url))
+
     @db.validates('policy_keep_younger', 'policy_delete_every')
     def validate_intervals(self, key, value):
         if not (value == timedelta(0) or value >= timedelta(minutes=1)):

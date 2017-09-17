@@ -58,7 +58,7 @@ input[type=number]{
     max-width: 8ch;
 }
 
-.viewer img.avatar {
+img.avatar {
     height: 1.5em;
     width: 1.5em;
     background-color: #ccc;

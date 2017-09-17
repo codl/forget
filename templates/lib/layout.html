@@ -23,7 +23,13 @@
     <body>
         <header>
             <h1>
-                <a href="{{url_for('index')}}">
+                <a href="
+                {%- if g.viewer -%}
+                    {{url_for('index')}}
+                {%- else -%}
+                    {{url_for('about')}}
+                {%- endif -%}
+                ">
                     {{ picture(st, 'logotype', (200,400,600,800), ('webp','jpeg'), '200px', alt='forget') }}
                 </a>
             </h1>

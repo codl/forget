@@ -7,10 +7,7 @@
 {% block body -%}
 
 <section class=viewer>
-<p>Hello,
-    <img class=avatar id=avatar src="{{viewer_avatar}}" alt=""/>
-    <span id='display-name' title='@{{g.viewer.account.screen_name}}'>{{g.viewer.account.display_name or g.viewer.account.screen_name}}</span>!
-    <a href="{{url_for('logout')}}">Log out</a>
+{% include "lib/greet.html" %}
 </p>
 
 {% if g.viewer.account.reason %}

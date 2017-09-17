@@ -3,7 +3,7 @@
 {% block body %}
 
 <section>
-    <p>Hello, stranger! </p>
+{% include "lib/greet.html" %}
     <p>Forget is a service that automatically deletes your old posts that everyone has forgotten about. Shouldn't databases forget too?</p>
 </section>
 
@@ -18,6 +18,7 @@
 </ul>
 </section>
 
+{% if not g.viewer %}
 <section>
 <h2 id="sign_in">Sign in</h2>
 {% if twitter_login_error %}
@@ -35,9 +36,8 @@
 </p>
 
 <p>
+
 {% for instance in mastodon_instances %}
-
-
 <a style='background-color:#282c37' class='login-btn' href="{{ url_for('mastodon_login_step1', instance_url=instance.instance) }}">
 {% if loop.first %}
     <span class='login-btn-header'>
@@ -48,7 +48,6 @@
 {% endif %}
         {{instance.instance}}</span>
 </a>
-
 {% endfor %}
 
 <a style='background-color:#ddd; color:inherit;' class='login-btn' href="{{ url_for('mastodon_login_step1') }}">
@@ -56,6 +55,8 @@
 </a>
 </p>
 </section>
+{% endif %}
+
 <section class='policy'>
 <h2>Pledge & Privacy Policy</h2>
 <p>Forget does not post, follow, or do anything with your account other than its job: deleting posts. For it to function, Forget needs to retrieve and store some metadata about each of your posts:</p>
