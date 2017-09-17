@@ -266,10 +266,6 @@ def mastodon_login_step2(instance_url):
 
     session = login(account.id)
 
-    instance = MastodonInstance(instance=instance_url)
-    instance = db.session.merge(instance)
-    instance.bump()
-
     db.session.commit()
 
     g.viewer = session

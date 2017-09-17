@@ -234,16 +234,6 @@ def periodic_cleanup():
         you have restored access and you can now re-enable Forget if you wish.
         """.format(service=account.service.capitalize())
 
-    # normalise mastodon instance popularity scores
-    biggest_instance = (
-            MastodonInstance.query
-            .order_by(db.desc(MastodonInstance.popularity)).first())
-    if biggest_instance.popularity > 40:
-        MastodonInstance.query.update({
-            MastodonInstance.popularity:
-                MastodonInstance.popularity * 40 / biggest_instance.popularity
-        })
-
     db.session.commit()
 
 
@@ -288,11 +278,40 @@ def refresh_account_with_longest_time_since_refresh():
     refresh_account(acc.id)
 
 
+@app.task
+def update_mastodon_instances_popularity():
+    # bump score for each active account
+    for acct in (
+            Account.query
+            .filter(Account.policy_enabled)
+            .filter(~Account.dormant)
+            .filter(Account.id.like('mastodon:%'))):
+        instance = MastodonInstance.query.get(acct.mastodon_instance)
+        if not instance:
+            instance = MastodonInstance(instance=acct.mastodon_instance,
+                                        popularity=10)
+            db.session.add(instance)
+        print('bamp {}'.format(instance.instance))
+        instance.bump(0.01)
+    db.session.commit()
+
+    # normalise scores
+    biggest_instance = (
+            MastodonInstance.query
+            .order_by(db.desc(MastodonInstance.popularity)).first())
+    if biggest_instance.popularity > 40:
+        MastodonInstance.query.update({
+            MastodonInstance.popularity:
+                MastodonInstance.popularity * 40 / biggest_instance.popularity
+        })
+
+
 app.add_periodic_task(120, periodic_cleanup)
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(17, queue_deletes)
 app.add_periodic_task(60, refresh_account_with_oldest_post)
 app.add_periodic_task(180, refresh_account_with_longest_time_since_refresh)
+app.add_periodic_task(60, update_mastodon_instances_popularity)
 
 if __name__ == '__main__':
     app.worker_main()
