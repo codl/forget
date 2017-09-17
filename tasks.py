@@ -291,19 +291,18 @@ def update_mastodon_instances_popularity():
             instance = MastodonInstance(instance=acct.mastodon_instance,
                                         popularity=10)
             db.session.add(instance)
-        print('bamp {}'.format(instance.instance))
-        instance.bump(0.01)
-    db.session.commit()
+        instance.bump(0.001)
 
-    # normalise scores
-    biggest_instance = (
-            MastodonInstance.query
-            .order_by(db.desc(MastodonInstance.popularity)).first())
-    if biggest_instance.popularity > 40:
-        MastodonInstance.query.update({
-            MastodonInstance.popularity:
-                MastodonInstance.popularity * 40 / biggest_instance.popularity
-        })
+    # normalise scores so the median is 10
+    median_pop = (
+            db.session.query(
+                db.func.percentile_cont(0.5)
+                .within_group(MastodonInstance.popularity.desc())).scalar()
+            )
+    MastodonInstance.query.update({
+        MastodonInstance.popularity:
+            MastodonInstance.popularity * 10 / median_pop
+    })
     db.session.commit()
 
 
@@ -312,7 +311,7 @@ app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(17, queue_deletes)
 app.add_periodic_task(60, refresh_account_with_oldest_post)
 app.add_periodic_task(180, refresh_account_with_longest_time_since_refresh)
-app.add_periodic_task(60, update_mastodon_instances_popularity)
+app.add_periodic_task(61, update_mastodon_instances_popularity)
 
 if __name__ == '__main__':
     app.worker_main()

@@ -36,7 +36,7 @@ def index():
 def about():
     instances = (
             MastodonInstance.query
-            .filter(MastodonInstance.popularity > 13)
+            .filter(MastodonInstance.popularity > 5)
             .order_by(db.desc(MastodonInstance.popularity),
                       MastodonInstance.instance)
             .limit(5).all())
