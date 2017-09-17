@@ -1,6 +1,6 @@
 ## v0.0.10
 
-* a test suite (it only tests libbrotly for now)
+* a test suite (it only tests libbrotli for now)
 * an image proxy for those avatars that are served over http not https
 * show a message to the user when their account has been
   administratively disabled to explain why
