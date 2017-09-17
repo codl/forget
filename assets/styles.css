@@ -215,7 +215,7 @@ button {
 
 .btn.secondary {
     background-color: rgba(255,255,255,0.5);
-    border: 1px solid rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3);
     color: inherit;
 }
 
