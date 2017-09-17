@@ -1,6 +1,6 @@
 <div class='banner {{policy_enabled?'enabled':'disabled'}}'>
     <div class='btn-group right'>
-        <button class='btn primary' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
+        <button class='btn {{policy_enabled?"secondary":"primary"}}' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
     </div>
     <div>
         Forget is currently

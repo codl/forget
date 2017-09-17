@@ -187,62 +187,48 @@ form aside {
     font-size: 0.8em;
 }
 
-a.login-btn {
-    color: white;
-    text-decoration: none;
-    background-color: #555;
-    border-radius: .3em;
-    overflow: hidden;
-    height: 2em;
-
-    display: inline-block;
-}
-
-a.login-btn:hover {
-    opacity: 0.9;
-}
-
-.login-btn > * {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.login-btn-header {
-    flex: 0 0;
-    width: 2em;
-    height: 2em;
-    padding-left: 0.1em;
-    background-image: linear-gradient(0deg,
-            rgba(255,255,255,0),
-            rgba(255,255,255,0.2)
-        );
-    text-align: center;
-}
-
-.login-btn-header img {
-    margin-top: 0.4em;
-    height: 1.1em;
-}
-
-.login-btn-content {
-    margin: 0 .5em;
-    line-height: 2em;
+button {
+    font-size: inherit;
 }
 
 .btn {
+    text-decoration: none;
+    border-radius: .2rem;
+    overflow: hidden;
+
+    display: inline-block;
+    padding: 0.4em 0.8em;
     border: none;
-    padding: 0.5rem 1rem;
+
+    border-color: currentColor;
 }
 
-.btn.dismiss,
-.enabled .btn.primary {
-    background-color: transparent;
-    border: 1px solid currentColor;
-}
-.disabled .btn.primary {
-    background-color: #37d;
+.btn.primary {
     color: white;
-    font-weight: bold;
+    background-color: #37d;
+    border-color: #37d;
+}
+
+.btn.secondary {
+    background-color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.3);
+    color: inherit;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+
+.btn img {
+    height: 1.1em;
+    transform: translatey(.2em);
+    margin: 0 .3em;
+}
+
+.btn img:first-child,
+.btn picture:first-child img {
+    margin-left: 0;
 }
 
 .btn-group.right {
