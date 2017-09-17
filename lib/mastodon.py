@@ -78,23 +78,24 @@ def get_api_for_acc(account):
                 access_token=token.token,
                 ratelimit_method='throw',
             )
-
         try:
             # api.verify_credentials()
             # doesnt error even if the token is revoked lol
             # https://github.com/tootsuite/mastodon/issues/4637
             # so we have to do this:
             tl = api.timeline()
-            if 'error' in tl:
+            return api
+        except MastodonAPIError as e:
+            if 'token' in str(e):
                 if sentry:
-                    sentry.captureMessage('Mastodon auth revoked or incorrect',
-                                          extra=locals())
+                    sentry.captureMessage(
+                            'Mastodon auth revoked or incorrect',
+                            extra=locals())
                 db.session.delete(token)
                 db.session.commit()
                 continue
-            return api
-        except (MastodonAPIError,
-                MastodonNetworkError,
+            raise TemporaryError(e)
+        except (MastodonNetworkError,
                 MastodonRatelimitError) as e:
             raise TemporaryError(e)
 
