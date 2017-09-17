@@ -1,3 +1,13 @@
+## v0.0.10
+
+* a test suite (it only tests libbrotly for now)
+* an image proxy for those avatars that are served over http not https
+* show a message to the user when their account has been
+  administratively disabled to explain why
+* whjole lot of quality of life improvements
+* whole lot of bug fixes
+* some stylistic changes
+
 ## v0.0.9
 
 * logged in page now shows time of last delete and next delete
