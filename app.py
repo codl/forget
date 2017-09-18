@@ -115,4 +115,4 @@ mimetypes.add_type('image/webp', '.webp')
 
 lib.brotli.brotli(app)
 
-imgproxy = lib.img_proxy.ImgProxyCache()
+imgproxy = lib.img_proxy.ImgProxyCache(redis_uri=app.config.get('REDIS_URI'))
