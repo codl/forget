@@ -66,6 +66,10 @@ img.avatar {
     transform:translateY(25%);
 }
 
+img.avatar.mastodon {
+    border-radius: 20%;
+}
+
 .banner {
     border-left-width: .7rem;
     border-left-style: solid;

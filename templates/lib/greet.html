@@ -1,6 +1,6 @@
 {% if g.viewer %}
 <p>Hello,
-    <img class=avatar id=avatar src="{{g.viewer.account.get_avatar()}}" alt=""/>
+<img class='avatar {{g.viewer.account.service}}' id=avatar src="{{g.viewer.account.get_avatar()}}" alt=""/>
     <span id='display-name' title='@{{g.viewer.account.screen_name}}'>{{g.viewer.account.display_name or g.viewer.account.screen_name}}</span>!
     <span class='btn-group inline'>
     {% if not request or not request.endpoint == 'index' %}
