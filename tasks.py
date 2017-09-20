@@ -325,7 +325,7 @@ def update_mastodon_instances_popularity():
             instance = MastodonInstance(instance=acct.mastodon_instance,
                                         popularity=10)
             db.session.add(instance)
-        instance.bump(0.001)
+        instance.bump(0.01 / instance.popularity)
 
     # normalise scores so the median is 10
     median_pop = (
