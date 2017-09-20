@@ -165,6 +165,9 @@ def delete_from_account(account_id):
         print("deleting {}".format(to_delete))
         account.touch_delete()
         action(to_delete)
+    else:
+        account.next_delete = (
+            max(account.next_delete, db.func.now() + timedelta(minutes=3)))
 
     db.session.commit()
 
