@@ -1,5 +1,5 @@
 import pytest
-import lib.brotli
+import libforget.brotli
 
 
 BEE_SCRIPT = bytes("According to all known laws of aviation,", 'UTF-8')
@@ -22,7 +22,7 @@ def app(redisdb):
 
 @pytest.fixture
 def br_app(app):
-    lib.brotli.brotli(app, timeout=TIMEOUT_TARGET)
+    libforget.brotli.brotli(app, timeout=TIMEOUT_TARGET)
     return app
 
 
@@ -92,7 +92,7 @@ def test_brotli_dynamic_cache(br_client):
 def test_brotli_dynamic_timeout(app):
     from secrets import token_urlsafe
 
-    lib.brotli.brotli(app, timeout=0.01)
+    libforget.brotli.brotli(app, timeout=0.01)
 
     @app.route('/hard_to_compress')
     def hard_to_compress():
@@ -111,7 +111,7 @@ def test_brotli_dynamic_timeout(app):
 def test_brotli_dynamic_expire(app):
     from time import sleep
 
-    lib.brotli.brotli(app, expire=0.1)
+    libforget.brotli.brotli(app, expire=0.1)
 
     client = app.test_client()
     client.get(

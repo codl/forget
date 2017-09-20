@@ -1,8 +1,8 @@
 from app import app, db, sentry
 from flask import g, render_template, make_response, redirect
 import version
-import lib.version
-from lib.auth import get_viewer_session, set_session_cookie
+import libforget.version
+from libforget.auth import get_viewer_session, set_session_cookie
 
 
 @app.before_request
@@ -20,7 +20,7 @@ def load_viewer():
 def inject_version():
     return dict(
             version=version.version,
-            repo_url=lib.version.url_for_version(version.version),
+            repo_url=libforget.version.url_for_version(version.version),
         )
 
 

@@ -1,9 +1,9 @@
 from flask import render_template, url_for, redirect, request, g,\
                   make_response
 from datetime import datetime, timedelta, timezone
-import lib.twitter
-import lib.mastodon
-from lib.auth import require_auth, csrf,\
+import libforget.twitter
+import libforget.mastodon
+from libforget.auth import require_auth, csrf,\
                      get_viewer
 from model import Session, TwitterArchive, MastodonApp, MastodonInstance
 from app import app, db, sentry, limiter, imgproxy
@@ -11,9 +11,9 @@ import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
 from urllib.error import URLError
-import lib.version
-import lib.settings
-import lib.json
+import libforget.version
+import libforget.settings
+import libforget.json
 import re
 
 
@@ -23,10 +23,10 @@ def index():
     if viewer:
         return render_template(
                 'logged_in.html',
-                scales=lib.interval.SCALES,
+                scales=libforget.interval.SCALES,
                 tweet_archive_failed='tweet_archive_failed' in request.args,
                 settings_error='settings_error' in request.args,
-                viewer_json=lib.json.account(viewer),
+                viewer_json=libforget.json.account(viewer),
                 )
     else:
         return redirect(url_for('about'))
@@ -50,7 +50,7 @@ def about():
 @limiter.limit('10/minute')
 def twitter_login_step1():
     try:
-        return redirect(lib.twitter.get_login_url(
+        return redirect(libforget.twitter.get_login_url(
             callback=url_for('twitter_login_step2', _external=True),
             **app.config.get_namespace("TWITTER_")
             ))
@@ -80,7 +80,7 @@ def twitter_login_step2():
     try:
         oauth_token = request.args['oauth_token']
         oauth_verifier = request.args['oauth_verifier']
-        token = lib.twitter.receive_verifier(
+        token = libforget.twitter.receive_verifier(
                 oauth_token, oauth_verifier,
                 **app.config.get_namespace("TWITTER_"))
 
@@ -110,7 +110,7 @@ def upload_tweet_archive():
     db.session.commit()
 
     try:
-        files = lib.twitter.chunk_twitter_archive(ta.id)
+        files = libforget.twitter.chunk_twitter_archive(ta.id)
 
         ta.chunks = len(files)
         db.session.commit()
@@ -136,7 +136,7 @@ def upload_tweet_archive():
 def settings():
     viewer = get_viewer()
     try:
-        for attr in lib.settings.attrs:
+        for attr in libforget.settings.attrs:
             if attr in request.form:
                 setattr(viewer, attr, request.form[attr])
         db.session.commit()
@@ -235,7 +235,7 @@ def mastodon_login_step1(instance=None):
                        instance_url=instance_url, _external=True)
 
     try:
-        app = lib.mastodon.get_or_create_app(
+        app = libforget.mastodon.get_or_create_app(
                 instance_url,
                 callback,
                 url_for('index', _external=True))
@@ -243,7 +243,7 @@ def mastodon_login_step1(instance=None):
 
         db.session.commit()
 
-        return redirect(lib.mastodon.login_url(app, callback))
+        return redirect(libforget.mastodon.login_url(app, callback))
 
     except Exception:
         if sentry:
@@ -261,7 +261,7 @@ def mastodon_login_step2(instance_url):
     callback = url_for('mastodon_login_step2',
                        instance_url=instance_url, _external=True)
 
-    token = lib.mastodon.receive_code(code, app, callback)
+    token = libforget.mastodon.receive_code(code, app, callback)
     account = token.account
 
     session = login(account.id)

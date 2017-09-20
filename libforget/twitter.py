@@ -7,7 +7,7 @@ from datetime import datetime
 import locale
 from zipfile import ZipFile
 from io import BytesIO
-from lib.exceptions import PermanentError, TemporaryError
+from libforget.exceptions import PermanentError, TemporaryError
 from urllib.error import URLError
 
 

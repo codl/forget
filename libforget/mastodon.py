@@ -6,7 +6,7 @@ from requests import head
 from app import db, sentry
 from math import inf
 import iso8601
-from lib.exceptions import TemporaryError
+from libforget.exceptions import TemporaryError
 
 
 def get_or_create_app(instance_url, callback, website):

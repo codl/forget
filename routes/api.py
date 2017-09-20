@@ -1,9 +1,9 @@
 from app import app, db
-from lib.auth import require_auth_api, get_viewer
+from libforget.auth import require_auth_api, get_viewer
 from flask import jsonify, redirect, make_response, request
 from model import Account
-import lib.settings
-import lib.json
+import libforget.settings
+import libforget.json
 
 
 @app.route('/api/settings', methods=('PUT',))
@@ -12,7 +12,7 @@ def api_settings_put():
     viewer = get_viewer()
     data = request.json
     updated = dict()
-    for key in lib.settings.attrs:
+    for key in libforget.settings.attrs:
         if key in data:
             setattr(viewer, key, data[key])
             updated[key] = data[key]
@@ -24,7 +24,7 @@ def api_settings_put():
 @require_auth_api
 def api_viewer():
     viewer = get_viewer()
-    resp = make_response(lib.json.account(viewer))
+    resp = make_response(libforget.json.account(viewer))
     resp.headers.set('content-type', 'application/json')
     return resp
 

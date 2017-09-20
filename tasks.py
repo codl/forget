@@ -3,8 +3,8 @@ from app import app as flaskapp
 from app import db
 from model import Session, Account, TwitterArchive, Post, OAuthToken,\
                   MastodonInstance
-import lib.twitter
-import lib.mastodon
+import libforget.twitter
+import libforget.mastodon
 from datetime import timedelta, datetime, timezone
 from zipfile import ZipFile
 from io import BytesIO, TextIOWrapper
@@ -12,7 +12,7 @@ import json
 from kombu import Queue
 import random
 import version
-from lib.exceptions import PermanentError, TemporaryError
+from libforget.exceptions import PermanentError, TemporaryError
 import redis
 from functools import wraps
 import pickle
@@ -92,9 +92,9 @@ def fetch_acc(id_, cursor=None):
     try:
         action = noop
         if(acc.service == 'twitter'):
-            action = lib.twitter.fetch_acc
+            action = libforget.twitter.fetch_acc
         elif(acc.service == 'mastodon'):
-            action = lib.mastodon.fetch_acc
+            action = libforget.mastodon.fetch_acc
         cursor = action(acc, cursor)
         if cursor:
             fetch_acc.si(id_, cursor).apply_async()
@@ -124,7 +124,7 @@ def import_twitter_archive_month(archive_id, month_path):
                 tweets = json.load(f)
 
         for tweet in tweets:
-            post = lib.twitter.post_from_api_tweet_object(tweet)
+            post = libforget.twitter.post_from_api_tweet_object(tweet)
             existing_post = db.session.query(Post).get(post.id)
 
             if post.author_id != ta.account_id or\
@@ -166,7 +166,7 @@ def delete_from_account(account_id):
 
     action = noop
     if account.service == 'twitter':
-        action = lib.twitter.delete
+        action = libforget.twitter.delete
         posts = refresh_posts(posts)
         if posts:
             eligible = list((  # nosec
@@ -177,7 +177,7 @@ def delete_from_account(account_id):
             if eligible:
                 to_delete = random.choice(eligible)
     elif account.service == 'mastodon':
-        action = lib.mastodon.delete
+        action = libforget.mastodon.delete
         for post in posts:
             refreshed = refresh_posts((post,))
             if refreshed and \
@@ -203,9 +203,9 @@ def refresh_posts(posts):
         return []
 
     if posts[0].service == 'twitter':
-        return lib.twitter.refresh_posts(posts)
+        return libforget.twitter.refresh_posts(posts)
     elif posts[0].service == 'mastodon':
-        return lib.mastodon.refresh_posts(posts)
+        return libforget.mastodon.refresh_posts(posts)
 
 
 @app.task()

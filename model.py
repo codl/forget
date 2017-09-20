@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, timezone
 
 from app import db
 import secrets
-from lib.interval import decompose_interval
+from libforget.interval import decompose_interval
 
 
 class TimestampMixin(object):

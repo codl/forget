@@ -4,13 +4,13 @@ from sqlalchemy import MetaData, event
 from sqlalchemy.engine import Engine
 from flask_migrate import Migrate
 import version
-from lib.cachebust import cachebust
+from libforget.cachebust import cachebust
 from flask_limiter import Limiter
-from lib.auth import get_viewer
+from libforget.auth import get_viewer
 import os
 import mimetypes
-import lib.brotli
-import lib.img_proxy
+import libforget.brotli
+import libforget.img_proxy
 
 app = Flask(__name__)
 
@@ -113,6 +113,7 @@ def install_security_headers(resp):
 
 mimetypes.add_type('image/webp', '.webp')
 
-lib.brotli.brotli(app)
+libforget.brotli.brotli(app)
 
-imgproxy = lib.img_proxy.ImgProxyCache(redis_uri=app.config.get('REDIS_URI'))
+imgproxy = (
+    libforget.img_proxy.ImgProxyCache(redis_uri=app.config.get('REDIS_URI')))
