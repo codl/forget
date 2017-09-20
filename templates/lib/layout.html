@@ -36,7 +36,11 @@
         </header>
         {% block body %}{% endblock %}
         <footer>
-            <p>Forget <a href='{{repo_url}}'>{{version or "dev"}}</a> is free and open-source software.</p>
+            <p>
+                Forget <a href='{{repo_url}}'>{{version or "dev"}}</a>
+                · <a href="{{url_for('about')}}">About</a>
+                · <a href="{{url_for('privacy')}}">Privacy</a>
+            </p>
             <p>Report issues <a href='https://github.com/codl/forget/issues'>on Github</a>
                or directly to codl on
                     <a href="https://twitter.com/codl">Twitter</a>,

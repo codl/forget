@@ -46,6 +46,11 @@ def about():
             twitter_login_error='twitter_login_error' in request.args)
 
 
+@app.route('/about/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
 @app.route('/login/twitter')
 @limiter.limit('10/minute')
 def twitter_login_step1():
