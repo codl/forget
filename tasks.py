@@ -15,6 +15,7 @@ import version
 from lib.exceptions import PermanentError, TemporaryError
 import redis
 from functools import wraps
+import pickle
 
 
 app = Celery('tasks', broker=flaskapp.config['CELERY_BROKER'],
