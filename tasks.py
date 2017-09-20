@@ -63,6 +63,8 @@ def unique(fun):
             if has_lock:
                 r.delete(key)
 
+    return wrapper
+
 
 
 def noop(*args, **kwargs):
