@@ -317,7 +317,7 @@ def update_mastodon_instances_popularity():
     # bump score for each active account
     for acct in (
             Account.query
-            .filter(Account.policy_enabled)
+            .options(db.joinedload(Account.sessions))
             .filter(~Account.dormant)
             .filter(Account.id.like('mastodon:%'))):
         instance = MastodonInstance.query.get(acct.mastodon_instance)
@@ -325,7 +325,13 @@ def update_mastodon_instances_popularity():
             instance = MastodonInstance(instance=acct.mastodon_instance,
                                         popularity=10)
             db.session.add(instance)
-        instance.bump(0.01 / instance.popularity)
+        amount = 0.001
+        if acct.policy_enabled:
+            amount = 0.01
+        for session in Account.sessions:
+            amount += 0.01
+        instance.bump(amount / instance.popularity)
+
 
     # normalise scores so the median is 10
     median_pop = (
