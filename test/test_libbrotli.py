@@ -92,7 +92,7 @@ def test_brotli_dynamic_cache(br_client):
 def test_brotli_dynamic_timeout(app):
     from secrets import token_urlsafe
 
-    libforget.brotli.brotli(app, timeout=0.01)
+    libforget.brotli.brotli(app, timeout=0)
 
     @app.route('/hard_to_compress')
     def hard_to_compress():

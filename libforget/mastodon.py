@@ -7,6 +7,7 @@ from app import db, sentry
 from math import inf
 import iso8601
 from libforget.exceptions import TemporaryError
+from functools import lru_cache
 
 
 def get_or_create_app(instance_url, callback, website):
@@ -68,6 +69,7 @@ def receive_code(code, app, callback):
     return token
 
 
+@lru_cache()
 def get_api_for_acc(account):
     app = MastodonApp.query.get(account.mastodon_instance)
     for token in account.tokens:
