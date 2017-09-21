@@ -130,7 +130,7 @@ def fetch_acc(acc, cursor=None):
             for status in statuses:
                 post = post_from_api_object(status, acc.mastodon_instance)
                 db.session.merge(post)
-                kwargs['max_id'] = min(kwargs['max_id'], post.mastodon_id)
+                kwargs['max_id'] = min(kwargs['max_id'], status['id'])
 
         else:
             kwargs = None
@@ -147,7 +147,7 @@ def fetch_acc(acc, cursor=None):
 def post_from_api_object(obj, instance):
     return Post(
             mastodon_instance=instance,
-            mastodon_id=int(obj['id']),
+            mastodon_id=obj['id'],
             favourite=obj['favourited'],
             has_media=('media_attachments' in obj
                        and bool(obj['media_attachments'])),
