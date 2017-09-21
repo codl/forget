@@ -44,8 +44,8 @@ class BrotliCache(object):
                 if self.timeout > 0:
                     t.join(self.timeout)
                     encbody = self.redis.get(cache_key)
-                    if not encbody:
-                        response.headers.set('x-brotli-cache', 'TIMEOUT')
+                if not encbody:
+                    response.headers.set('x-brotli-cache', 'TIMEOUT')
             else:
                 response.headers.set('x-brotli-cache', 'LOCKED')
         if encbody:
