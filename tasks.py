@@ -49,8 +49,11 @@ class DBTask(Task):
 
 app.Task = DBTask
 
+r = None
 def unique(fun):
-    r = redis.StrictRedis.from_url(flaskapp.config['REDIS_URI'])
+    global r
+    if not r:
+        r = redis.StrictRedis.from_url(flaskapp.config['REDIS_URI'])
 
     @wraps(fun)
     def wrapper(*args, **kwargs):
