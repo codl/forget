@@ -125,12 +125,12 @@ def fetch_acc(acc, cursor=None):
         statuses = api.account_statuses(acc.mastodon_id, **kwargs)
 
         if statuses:
-            kwargs['max_id'] = +inf
-
             for status in statuses:
                 post = post_from_api_object(status, acc.mastodon_instance)
                 db.session.merge(post)
-                kwargs['max_id'] = min(kwargs['max_id'], status['id'])
+                if 'max_id' not in kwargs:
+                    kwargs['max_id'] = status['id']
+                kwargs['max_id'] = min(int(kwargs['max_id']), int(status['id']))
 
         else:
             kwargs = None
