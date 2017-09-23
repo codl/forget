@@ -10,7 +10,7 @@ import re
 
 
 class ImgProxyCache(object):
-    def __init__(self, redis_uri='redis://', timeout=5, expire=60*60,
+    def __init__(self, redis_uri='redis://', timeout=10, expire=60*60,
                  prefix='img_proxy', hmac_hash='sha1'):
         self.redis = redis.StrictRedis.from_url(redis_uri)
         self.timeout = timeout
