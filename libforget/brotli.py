@@ -8,7 +8,7 @@ import mimetypes
 
 
 class BrotliCache(object):
-    def __init__(self, redis_uri='redis://', timeout=0.020, expire=60*60*6):
+    def __init__(self, redis_uri='redis://', timeout=0.100, expire=60*60*6):
         self.redis = redis.StrictRedis.from_url(redis_uri)
         self.timeout = timeout
         self.expire = expire
