@@ -331,7 +331,7 @@ def update_mastodon_instances_popularity():
         amount = 0.001
         if acct.policy_enabled:
             amount = 0.01
-        for session in acct.sessions:
+        for _ in acct.sessions:
             amount += 0.01
         instance.bump(amount / instance.popularity)
 

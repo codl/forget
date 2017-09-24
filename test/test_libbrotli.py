@@ -14,7 +14,7 @@ def app(redisdb):
     app_.debug = True
 
     @app_.route('/')
-    def hello():
+    def hello():  # pylint: disable=W0612
         return 'Hello, world!'
     with app_.app_context():
         yield app_
@@ -95,7 +95,7 @@ def test_brotli_dynamic_timeout(app):
     libforget.brotli.brotli(app, timeout=0.001)
 
     @app.route('/hard_to_compress')
-    def hard_to_compress():
+    def hard_to_compress():  # pylint: disable=W0612
         return token_urlsafe(2**16)
 
     client = app.test_client()

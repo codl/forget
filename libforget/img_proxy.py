@@ -110,7 +110,7 @@ class ImgProxyCache(object):
 
         try:
             headers = pickle.loads(headers) # nosec
-        except Exception as e:
+        except Exception:
             self.redis.delete(self.key('headers', url))
             headers = None
 

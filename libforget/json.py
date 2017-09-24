@@ -1,6 +1,4 @@
 from json import dumps
-from flask import url_for
-from app import imgproxy
 
 
 def account(acc):
