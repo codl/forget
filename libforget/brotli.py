@@ -12,14 +12,15 @@ class BrotliCache(object):
         self.redis = redis.StrictRedis.from_url(redis_uri)
         self.timeout = timeout
         self.expire = expire
-        self.redis.client_setname('brotlicache')
 
     def compress_and_cache(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
+        self.redis.client_setname('brotlicache')
         encbody = brotli_.compress(body, mode=mode)
         self.redis.set(cache_key, encbody, px=int(self.expire*1000))
         self.redis.delete(lock_key)
 
     def wrap_response(self, response):
+        self.redis.client_setname('brotlicache')
         if 'br' not in request.accept_encodings or response.is_streamed:
             return response
 

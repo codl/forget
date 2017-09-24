@@ -1,13 +1,9 @@
-from flask import Flask, request
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData, event
-from sqlalchemy.engine import Engine
+from sqlalchemy import MetaData
 from flask_migrate import Migrate
 import version
 from libforget.cachebust import cachebust
-from flask_limiter import Limiter
-from libforget.auth import get_viewer
-import os
 import mimetypes
 import libforget.brotli
 import libforget.img_proxy
@@ -39,12 +35,7 @@ metadata = MetaData(naming_convention={
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
 
-if not 'RATELIMIT_STORAGE_URL' in app.config:
-    uri = app.config['REDIS_URI']
-    assert not uri.startswith('unix://'), "flask-limiter does not support redis over a unix socket"
-    app.config['RATELIMIT_STORAGE_URL'] = uri
-
-if not 'CELERY_BROKER' in app.config:
+if 'CELERY_BROKER' not in app.config:
     uri = app.config['REDIS_URI']
     if uri.startswith('unix://'):
         uri = url.replace('unix', 'redis+socket', 1)
@@ -64,20 +55,6 @@ def inject_static():
     def static(filename, **kwargs):
         return url_for('static', filename=filename, **kwargs)
     return {'st': static}
-
-
-def rate_limit_key():
-    viewer = get_viewer()
-    if viewer:
-        return viewer.id
-    for address in request.access_route:
-        if address != '127.0.0.1':
-            print(address)
-            return address
-    return request.remote_addr
-
-
-limiter = Limiter(app, key_func=rate_limit_key)
 
 
 @app.after_request
