@@ -2,25 +2,31 @@ import brotli as brotli_
 from flask import request, make_response
 from threading import Thread
 from hashlib import sha256
-import redis
+import redis as libredis
 import os.path
 import mimetypes
 
 
 class BrotliCache(object):
     def __init__(self, redis_uri='redis://', timeout=0.100, expire=60*60*6):
-        self.redis = redis.StrictRedis.from_url(redis_uri)
+        self._redis = None
+        self._redis_uri = redis_uri
         self.timeout = timeout
         self.expire = expire
 
+    @property
+    def redis(self):
+        if not self._redis:
+            self._redis = libredis.StrictRedis.from_url(self._redis_uri)
+            self._redis.client_setname('brotlicache')
+        return self._redis
+
     def compress_and_cache(self, cache_key, lock_key, body, mode=brotli_.MODE_GENERIC):
-        self.redis.client_setname('brotlicache')
         encbody = brotli_.compress(body, mode=mode)
         self.redis.set(cache_key, encbody, px=int(self.expire*1000))
         self.redis.delete(lock_key)
 
     def wrap_response(self, response):
-        self.redis.client_setname('brotlicache')
         if 'br' not in request.accept_encodings or response.is_streamed:
             return response
 

@@ -1,6 +1,6 @@
 import requests
 import threading
-import redis
+import redis as libredis
 from flask import make_response, abort
 import secrets
 import hmac
@@ -12,19 +12,26 @@ import re
 class ImgProxyCache(object):
     def __init__(self, redis_uri='redis://', timeout=10, expire=60*60,
                  prefix='img_proxy', hmac_hash='sha1'):
-        self.redis = redis.StrictRedis.from_url(redis_uri)
+        self._redis = None
+        self._redis_uri = redis_uri
         self.timeout = timeout
         self.expire = expire
         self.prefix = prefix
         self.hash = hmac_hash
         self.hmac_key = None
 
+    @property
+    def redis(self):
+        if not self._redis:
+            self._redis = libredis.StrictRedis.from_url(self._redis_uri)
+            self._redis.client_setname('img_proxy')
+        return self._redis
+
     def key(self, *args):
         return '{prefix}:1:{args}'.format(
                 prefix=self.prefix, args=":".join(args))
 
     def token(self):
-        self.redis.client_setname('img_proxy')
         if not self.hmac_key:
             t = self.redis.get(self.key('hmac_key'))
             if not t:
@@ -54,7 +61,6 @@ class ImgProxyCache(object):
         return url
 
     def fetch_and_cache(self, url):
-        self.redis.client_setname('img_proxy')
         resp = requests.get(url)
         if(resp.status_code != 200):
             return
@@ -84,7 +90,6 @@ class ImgProxyCache(object):
                        resp.content, px=expire*1000)
 
     def respond(self, identifier):
-        self.redis.client_setname('img_proxy')
         url = self.url_for(identifier)
         if not url:
             return abort(403)
