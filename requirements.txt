@@ -21,7 +21,6 @@ Flask-SQLAlchemy==2.2
 gunicorn==19.7.1
 honcho==1.0.1
 idna==2.6
-iso8601==0.1.12
 itsdangerous==0.24
 Jinja2==2.9.6
 kombu==4.1.0

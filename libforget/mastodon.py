@@ -5,7 +5,6 @@ from model import MastodonApp, Account, OAuthToken, Post
 from requests import head
 from app import db, sentry
 from math import inf
-import iso8601
 from libforget.exceptions import TemporaryError
 from functools import lru_cache
 
