@@ -4,7 +4,6 @@ from mastodon.Mastodon import MastodonAPIError, MastodonNetworkError,\
 from model import MastodonApp, Account, OAuthToken, Post
 from requests import head
 from app import db, sentry
-from math import inf
 from libforget.exceptions import TemporaryError
 from functools import lru_cache
 
@@ -84,7 +83,7 @@ def get_api_for_acc(account):
             # doesnt error even if the token is revoked lol
             # https://github.com/tootsuite/mastodon/issues/4637
             # so we have to do this:
-            tl = api.timeline()
+            api.timeline()
             return api
         except MastodonAPIError as e:
             if 'token' in str(e):

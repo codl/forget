@@ -5,7 +5,7 @@ from flask import make_response, abort
 import secrets
 import hmac
 import base64
-import pickle
+import pickle # nosec
 import re
 
 
@@ -109,7 +109,7 @@ class ImgProxyCache(object):
                 body = self.redis.get(self.key('body', url))
 
         try:
-            headers = pickle.loads(headers)
+            headers = pickle.loads(headers) # nosec
         except Exception as e:
             self.redis.delete(self.key('headers', url))
             headers = None
