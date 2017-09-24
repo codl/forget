@@ -6,7 +6,7 @@ import libforget.mastodon
 from libforget.auth import require_auth, csrf,\
                      get_viewer
 from model import Session, TwitterArchive, MastodonApp, MastodonInstance
-from app import app, db, sentry, limiter, imgproxy
+from app import app, db, sentry, imgproxy
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
@@ -52,7 +52,6 @@ def privacy():
 
 
 @app.route('/login/twitter')
-@limiter.limit('10/minute')
 def twitter_login_step1():
     try:
         return redirect(libforget.twitter.get_login_url(
@@ -80,7 +79,6 @@ def login(account_id):
 
 
 @app.route('/login/twitter/callback')
-@limiter.limit('10/minute')
 def twitter_login_step2():
     try:
         oauth_token = request.args['oauth_token']
@@ -105,7 +103,6 @@ class TweetArchiveEmptyException(Exception):
 
 
 @app.route('/upload_tweet_archive', methods=('POST',))
-@limiter.limit('10/10 minutes')
 @require_auth
 def upload_tweet_archive():
     ta = TwitterArchive(
