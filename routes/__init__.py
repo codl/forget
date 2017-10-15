@@ -37,7 +37,8 @@ def about():
     instances = (
             MastodonInstance.query
             .filter(MastodonInstance.popularity > 5)
-            .order_by(db.desc(MastodonInstance.popularity),
+            .order_by(db.desc(MastodonInstance.instance == 'mastodon.social'),
+                      db.desc(MastodonInstance.popularity),
                       MastodonInstance.instance)
             .limit(5).all())
     return render_template(
