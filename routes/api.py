@@ -5,6 +5,14 @@ from model import Account
 import libforget.settings
 import libforget.json
 
+@app.route('/api/health_check')
+def health_check():
+    try:
+        db.session.execute('SELECT 1')
+        return 'ok'
+    except Exception:
+        return ('bad', 500)
+
 
 @app.route('/api/settings', methods=('PUT',))
 @require_auth_api
