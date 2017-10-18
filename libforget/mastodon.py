@@ -129,7 +129,7 @@ def fetch_acc(acc, cursor=None):
                 post = post_from_api_object(status, acc.mastodon_instance)
                 db.session.merge(post)
                 if 'max_id' not in kwargs:
-                    kwargs['max_id'] = status['id']
+                    kwargs['max_id'] = int(status['id'])
                 kwargs['max_id'] = min(int(kwargs['max_id']), int(status['id']))
 
         else:
