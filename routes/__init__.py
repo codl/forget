@@ -82,8 +82,8 @@ def login(account_id):
 @app.route('/login/twitter/callback')
 def twitter_login_step2():
     try:
-        oauth_token = request.args['oauth_token']
-        oauth_verifier = request.args['oauth_verifier']
+        oauth_token = request.args.get('oauth_token', '')
+        oauth_verifier = request.args.get('oauth_verifier', '')
         token = libforget.twitter.receive_verifier(
                 oauth_token, oauth_verifier,
                 **app.config.get_namespace("TWITTER_"))
@@ -92,7 +92,7 @@ def twitter_login_step2():
 
         g.viewer = session
         return redirect(url_for('index'))
-    except (TwitterError, URLError):
+    except Exception:
         if sentry:
             sentry.captureException()
         return redirect(
