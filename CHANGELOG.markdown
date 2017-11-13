@@ -1,3 +1,14 @@
+## v0.0.11 (unreleased)
+
+* image proxy now respects max-age from cache-control header
+* image proxy now stores a handful of whitelisted headers
+* privacy policy moved to its own page
+* only one copy of each task+args can run at once
+* fix Error returning to forget after cancelling authorization #14
+* a whole lot of trying to not hit rate limits
+* removed flask-limiter
+* a whole buncha minor changes and fixes that i don't remember because i'm writing this after the fact 🤷
+
 ## v0.0.10
 
 * a test suite (it only tests libbrotli for now)
