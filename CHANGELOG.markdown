@@ -1,4 +1,4 @@
-## v0.0.11 (unreleased)
+## v1.0.0
 
 * image proxy now respects max-age from cache-control header
 * image proxy now stores a handful of whitelisted headers
