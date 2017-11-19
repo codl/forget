@@ -38,7 +38,7 @@ migrate = Migrate(app, db)
 if 'CELERY_BROKER' not in app.config:
     uri = app.config['REDIS_URI']
     if uri.startswith('unix://'):
-        uri = url.replace('unix', 'redis+socket', 1)
+        uri = uri.replace('unix', 'redis+socket', 1)
     app.config['CELERY_BROKER'] = uri
 
 sentry = None
