@@ -29,7 +29,7 @@ blinker = "*"
 [dev-packages]
 
 coverage = "*"
-coveralls = "*"
+codecov = "*"
 pytest = "*"
 "pytest-cov" = "*"
 "pytest-redis" = "*"

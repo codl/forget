@@ -1,18 +1,18 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6217b3ebbbc0522746e2ebdde089c69547427c597129ac53b6b277c374a1be70"
+            "sha256": "143682b5e5ccdd5977b0ea9c5c8268e60250ea7d3b888f9a7647b80082d72785"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
-            "implementation_version": "3.6.2",
+            "implementation_version": "3.6.3",
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "4.12.8-2-ARCH",
+            "platform_release": "4.13.12-1-ARCH",
             "platform_system": "Linux",
-            "platform_version": "#1 SMP PREEMPT Fri Aug 18 14:08:02 UTC 2017",
-            "python_full_version": "3.6.2",
+            "platform_version": "#1 SMP PREEMPT Wed Nov 8 11:54:06 CET 2017",
+            "python_full_version": "3.6.3",
             "python_version": "3.6",
             "sys_platform": "linux"
         },
@@ -113,10 +113,10 @@
         },
         "cloudpickle": {
             "hashes": [
-                "sha256:c57f69db874669a0eb2542fa567b15db23bb893b4128ae6872d7f9420d9597da",
-                "sha256:e82822730c0bc19c882762229b58d536c0117e57626afdcfd4892042653d5428"
+                "sha256:604c1cb39c2043ba44f017444dd89b7f82541701dfa8a64f5ae72e6346755c0b",
+                "sha256:b0e63dd89ed5285171a570186751bc9b84493675e99e12789e9a5dc5490ef554"
             ],
-            "version": "==0.5.1"
+            "version": "==0.5.2"
         },
         "csscompressor": {
             "hashes": [
@@ -206,10 +206,10 @@
         },
         "mastodon.py": {
             "hashes": [
-                "sha256:78d4a72f27718e6e585a8b6d561806105ec26c219908c27cd5b22839915f59eb",
-                "sha256:b0527a3dc87d50e7dee8ea35f4e0135fec3f33eb6105f4646c5ad9bef2a77291"
+                "sha256:b356726253291aad33bd64547f4d26721b643d938300b198446060e7d0454fe0",
+                "sha256:54f08160ec3f4da5fd0c23ad185e8079a3c19f6986c2c7a7dcafadbfc2e009e2"
             ],
-            "version": "==1.1.1"
+            "version": "==1.1.2"
         },
         "olefile": {
             "hashes": [
@@ -416,6 +416,13 @@
             ],
             "version": "==3.0.4"
         },
+        "codecov": {
+            "hashes": [
+                "sha256:ad82f054837b02081f86ed1eb6c04cddc029fbc734eaf92ff73da1db3a79188b",
+                "sha256:db1c182ca896244d8644d8410a33f6f6dd1cc24d80209907a65077445923f00c"
+            ],
+            "version": "==2.0.9"
+        },
         "coverage": {
             "hashes": [
                 "sha256:d1ee76f560c3c3e8faada866a07a32485445e16ed2206ac8378bd90dadffb9f0",
@@ -460,19 +467,6 @@
                 "sha256:1afccd7e27cac1b9617be8c769f6d8a6d363699c9b86820f40c74cfb3328921c"
             ],
             "version": "==4.4.2"
-        },
-        "coveralls": {
-            "hashes": [
-                "sha256:84dd8c88c5754e8db70a682f537e2781366064aa3cdd6b24c2dcecbd3181187c",
-                "sha256:510682001517bcca1def9f6252df6ce730fcb9831c62d9fff7c7d55b6fdabdf3"
-            ],
-            "version": "==1.2.0"
-        },
-        "docopt": {
-            "hashes": [
-                "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"
-            ],
-            "version": "==0.6.2"
         },
         "idna": {
             "hashes": [
