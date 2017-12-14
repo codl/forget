@@ -263,3 +263,37 @@ section > pre.error-log {
     padding-bottom: 2em;
     opacity: 0.7;
 }
+
+.radiostrip {
+    display: inline-flex;
+    flex-direction: row;
+}
+
+.radiostrip input[type=radio] {
+    position: absolute;
+    top: 0; left: 0;
+    height: 1px; width: 1px;
+}
+
+.radiostrip label {
+    padding: .3em .5em;
+    cursor: pointer;
+    user-select: none;
+    background-color: #ededed;
+    will-change: transform;
+    transition: transform 50ms;
+}
+
+.radiostrip label:not(:last-of-type) {
+    margin-right: 1px;
+}
+
+.radiostrip input[type=radio]:focus + label {
+    box-shadow: 0 0 5px #38f;
+}
+
+.radiostrip input[type=radio]:checked + label {
+    transform: scale(.95);
+    background: #37d;
+    color: white;
+}

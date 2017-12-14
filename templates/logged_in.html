@@ -70,23 +70,29 @@
     <input type=number name=policy_keep_latest min=0 step=1 style='max-width:8ch' value={{g.viewer.account.policy_keep_latest}}>
     most recent posts will expire
 </p>
-<p>Posts that you have liked / favourited will never expire
-    <span style='display:inline-block'>
-        <label><input type=radio name=policy_keep_favourites value=true {{ "checked" if g.viewer.account.policy_keep_favourites }}> Yes</label>
-        <label><input type=radio name=policy_keep_favourites value=false {{ "checked" if not g.viewer.account.policy_keep_favourites }}> No</label>
+<p>Keep posts that you have liked / favourited
+    <span class="radiostrip">
+        <input type=radio name=policy_keep_favourites value=true id=policy_keep_favourites_true {{ "checked" if g.viewer.account.policy_keep_favourites }}>
+        <label for=policy_keep_favourites_true>Yes</label>
+        <input type=radio name=policy_keep_favourites value=false id=policy_keep_favourites_false {{ "checked" if not g.viewer.account.policy_keep_favourites }}>
+        <label for=policy_keep_favourites_false>No</label>
     </span>
 </p>
-<p>Posts that have media attached will never expire
-    <span style='display:inline-block'>
-        <label><input type=radio name=policy_keep_media value=true {{ "checked" if g.viewer.account.policy_keep_media }}> Yes</label>
-        <label><input type=radio name=policy_keep_media value=false {{ "checked" if not g.viewer.account.policy_keep_media }}> No</label>
+<p>Keep posts that have media attached
+    <span class="radiostrip">
+        <input type=radio name=policy_keep_media value=true id=policy_keep_media_true {{ "checked" if g.viewer.account.policy_keep_media }}>
+        <label for=policy_keep_media_true>Yes</label>
+        <input type=radio name=policy_keep_media value=false id=policy_keep_media_false {{ "checked" if not g.viewer.account.policy_keep_media }}>
+        <label for=policy_keep_media_false>No</label>
     </span>
 </p>
 {% if g.viewer.account.service == 'mastodon' %}
-<p>Direct messages will never expire
-    <span style='display:inline-block'>
-        <label><input type=radio name=policy_keep_direct value=true {{ "checked" if g.viewer.account.policy_keep_direct }}> Yes</label>
-        <label><input type=radio name=policy_keep_direct value=false {{ "checked" if not g.viewer.account.policy_keep_direct }}> No</label>
+<p>Keep direct messages
+    <span class="radiostrip">
+        <input type=radio name=policy_keep_direct value=true id=policy_keep_direct_true {{ "checked" if g.viewer.account.policy_keep_direct }}>
+        <label for=policy_keep_direct_true>Yes</label>
+        <input type=radio name=policy_keep_direct value=false id=policy_keep_direct_false {{ "checked" if not g.viewer.account.policy_keep_direct }}>
+        <label for=policy_keep_direct_false>No</label>
     </span>
 </p>
 {% endif %}
