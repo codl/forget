@@ -283,6 +283,7 @@ def sentry_setup():
     resp = make_response(render_template(
         'sentry.js', sentry_dsn=client_dsn))
     resp.headers.set('content-type', 'text/javascript')
+    resp.headers.set('cache-control', 'public; max-age=3600')
     return resp
 
 
