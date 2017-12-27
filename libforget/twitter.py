@@ -119,6 +119,7 @@ def post_from_api_tweet_object(tweet, post=None):
         post.favourites = tweet['favorite_count']
     if 'retweet_count' in tweet:
         post.reblogs = tweet['retweet_count']
+    post.is_reblog = 'retweeted_status' in tweet
     return post
 
 

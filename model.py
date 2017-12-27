@@ -249,6 +249,8 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     favourites = db.Column(db.Integer)
     reblogs = db.Column(db.Integer)
 
+    is_reblog = db.Column(db.Boolean, server_default='FALSE', nullable=False)
+
     def __str__(self):
         return '<Post ({}, Author: {})>'.format(self.id, self.author_id)
 

@@ -156,6 +156,7 @@ def post_from_api_object(obj, instance):
             direct=obj['visibility'] == 'direct',
             favourites=obj['favourites_count'],
             reblogs=obj['reblogs_count'],
+            is_reblog=obj['reblog'] is not None,
         )
 
 
