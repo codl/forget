@@ -115,6 +115,10 @@ def post_from_api_tweet_object(tweet, post=None):
     if 'entities' in tweet:
         post.has_media = bool(
                 'media' in tweet['entities'] and tweet['entities']['media'])
+    if 'favorite_count' in tweet:
+        post.favourites = tweet['favorite_count']
+    if 'retweet_count' in tweet:
+        post.reblogs = tweet['retweet_count']
     return post
 
 
