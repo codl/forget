@@ -177,6 +177,8 @@ class Account(TimestampMixin, RemoteIDMixin):
             query = query.filter(db.or_(Post.favourite == False, Post.is_reblog))
         if(self.policy_keep_media):
             query = query.filter(db.or_(Post.has_media == False, Post.is_reblog))
+        if(self.policy_keep_direct):
+            query = query.filter(~Post.direct)
         return query.count()
 
     def force_log_out(self):
