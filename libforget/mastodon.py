@@ -154,6 +154,8 @@ def post_from_api_object(obj, instance):
             created_at=obj['created_at'],
             author_id=account_from_api_object(obj['account'], instance).id,
             direct=obj['visibility'] == 'direct',
+            favourites=obj['favourites_count'],
+            reblogs=obj['reblogs_count'],
         )
 
 

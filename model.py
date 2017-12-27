@@ -246,6 +246,9 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
     has_media = db.Column(db.Boolean, server_default='FALSE', nullable=False)
     direct = db.Column(db.Boolean, server_default='FALSE', nullable=False)
 
+    favourites = db.Column(db.Integer)
+    reblogs = db.Column(db.Integer)
+
     def __str__(self):
         return '<Post ({}, Author: {})>'.format(self.id, self.author_id)
 
