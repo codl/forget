@@ -177,8 +177,8 @@ def delete_from_account(account_id):
         if posts:
             eligible = list((  # nosec
                 post for post in posts if
-                (not account.policy_keep_favourites or not post.favourite)
-                and (not account.policy_keep_media or not post.has_media)
+                (not account.policy_keep_favourites or not post.favourite or post.is_reblog)
+                and (not account.policy_keep_media or not post.has_media or post.is_reblog)
                 ))
             if eligible:
                 to_delete = random.choice(eligible)
@@ -187,8 +187,8 @@ def delete_from_account(account_id):
         for post in posts:
             refreshed = refresh_posts((post,))
             if refreshed and \
-               (not account.policy_keep_favourites or not post.favourite) \
-               and (not account.policy_keep_media or not post.has_media)\
+               (not account.policy_keep_favourites or not post.favourite or post.is_reblog) \
+               and (not account.policy_keep_media or not post.has_media or post.is_reblog)\
                and (not account.policy_keep_direct or not post.direct):
                 to_delete = refreshed[0]
                 break
