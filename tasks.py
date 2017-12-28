@@ -337,12 +337,12 @@ def update_mastodon_instances_popularity():
             instance = MastodonInstance(instance=acct.mastodon_instance,
                                         popularity=10)
             db.session.add(instance)
-        amount = 0.001
+        amount = 0.01
         if acct.policy_enabled:
-            amount = 0.05
+            amount = 0.5
         for _ in acct.sessions:
-            amount += 0.01
-        instance.bump(amount / instance.popularity)
+            amount += 0.1
+        instance.bump(amount / max(1, instance.popularity))
 
 
     # normalise scores so the top is 20
@@ -350,11 +350,10 @@ def update_mastodon_instances_popularity():
             db.session.query(db.func.max(MastodonInstance.popularity))
             .scalar()
             )
-    if top_pop > 20.1:
-        MastodonInstance.query.update({
-            MastodonInstance.popularity:
-                MastodonInstance.popularity * 20 / top_pop
-        })
+    MastodonInstance.query.update({
+        MastodonInstance.popularity:
+            MastodonInstance.popularity * 20 / top_pop
+    })
     db.session.commit()
 
 
