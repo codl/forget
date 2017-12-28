@@ -78,12 +78,14 @@
         <label for=policy_keep_favourites_false>No</label>
     </span>
 </p>
-<p>Keep posts that have media attached
+<p>Keep posts
     <span class="radiostrip">
-        <input type=radio name=policy_keep_media value=true id=policy_keep_media_true {{ "checked" if g.viewer.account.policy_keep_media }}>
-        <label for=policy_keep_media_true>Yes</label>
-        <input type=radio name=policy_keep_media value=false id=policy_keep_media_false {{ "checked" if not g.viewer.account.policy_keep_media }}>
-        <label for=policy_keep_media_false>No</label>
+        <input type=radio name=policy_keep_media value=keeponly id=policy_keep_media_keeponly {{ "checked" if g.viewer.account.policy_keep_media == 'keeponly' }}>
+        <label for=policy_keep_media_keeponly>with media attached</label>
+        <input type=radio name=policy_keep_media value=deleteonly id=policy_keep_media_deleteonly {{ "checked" if g.viewer.account.policy_keep_media == 'deleteonly' }}>
+        <label for=policy_keep_media_deleteonly>with no media attached</label>
+        <input type=radio name=policy_keep_media value=none id=policy_keep_media_none {{ "checked" if g.viewer.account.policy_keep_media == 'none' }}>
+        <label for=policy_keep_media_none>neither</label>
     </span>
 </p>
 {% if g.viewer.account.service == 'mastodon' %}

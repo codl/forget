@@ -67,6 +67,10 @@ class RemoteIDMixin(object):
         self.id = "mastodon:{}@{}".format(id_, self.mastodon_instance)
 
 
+ThreeWayPolicyEnum = db.Enum('keeponly', 'deleteonly', 'none',
+        name='enum_3way_policy')
+
+
 @decompose_interval('policy_delete_every')
 @decompose_interval('policy_keep_younger')
 class Account(TimestampMixin, RemoteIDMixin):
@@ -79,7 +83,7 @@ class Account(TimestampMixin, RemoteIDMixin):
                                    nullable=False)
     policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE',
                                        nullable=False)
-    policy_keep_media = db.Column(db.Boolean, server_default='FALSE',
+    policy_keep_media = db.Column(ThreeWayPolicyEnum, server_default='none',
                                   nullable=False)
     policy_delete_every = db.Column(db.Interval, server_default='30 minutes',
                                     nullable=False)
@@ -174,9 +178,11 @@ class Account(TimestampMixin, RemoteIDMixin):
                          db.func.now() - self.policy_keep_younger)
                  .except_(latest_n_posts))
         if(self.policy_keep_favourites):
-            query = query.filter(db.or_(Post.favourite == False, Post.is_reblog))
-        if(self.policy_keep_media):
-            query = query.filter(db.or_(Post.has_media == False, Post.is_reblog))
+            query = query.filter(db.or_(~Post.favourite, Post.is_reblog))
+        if(self.policy_keep_media != 'none'):
+            query = query.filter(db.or_(
+                Post.has_media == (self.policy_keep_media == 'deleteonly'),
+                Post.is_reblog))
         if(self.policy_keep_direct):
             query = query.filter(~Post.direct)
         return query.count()

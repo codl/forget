@@ -170,26 +170,30 @@ def delete_from_account(account_id):
 
     to_delete = None
 
+    def is_eligible(post):
+        return (
+            post.is_reblog or
+            (
+                (
+                    not account.policy_keep_favourites or not post.favourite
+                ) and (
+                    account.policy_keep_media == 'none' or
+                    (account.policy_keep_media == 'keeponly' and not post.has_media) or
+                    (account.policy_keep_media == 'deleteonly' and post.has_media)
+                )
+            )
+        )
+
     action = noop
     if account.service == 'twitter':
         action = libforget.twitter.delete
         posts = refresh_posts(posts)
-        if posts:
-            eligible = list((  # nosec
-                post for post in posts if
-                (not account.policy_keep_favourites or not post.favourite or post.is_reblog)
-                and (not account.policy_keep_media or not post.has_media or post.is_reblog)
-                ))
-            if eligible:
-                to_delete = random.choice(eligible)
+        to_delete = next(filter(is_eligible, posts), None)
     elif account.service == 'mastodon':
         action = libforget.mastodon.delete
         for post in posts:
             refreshed = refresh_posts((post,))
-            if refreshed and \
-               (not account.policy_keep_favourites or not post.favourite or post.is_reblog) \
-               and (not account.policy_keep_media or not post.has_media or post.is_reblog)\
-               and (not account.policy_keep_direct or not post.direct):
+            if refreshed and is_eligible(refreshed[0]):
                 to_delete = refreshed[0]
                 break
 

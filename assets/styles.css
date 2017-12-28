@@ -267,6 +267,7 @@ section > pre.error-log {
 .radiostrip {
     display: inline-flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .radiostrip input[type=radio] {
@@ -280,8 +281,6 @@ section > pre.error-log {
     cursor: pointer;
     user-select: none;
     background-color: #ededed;
-    will-change: transform;
-    transition: transform 50ms;
 }
 
 .radiostrip label:not(:last-of-type) {
@@ -293,7 +292,6 @@ section > pre.error-log {
 }
 
 .radiostrip input[type=radio]:checked + label {
-    transform: scale(.95);
     background: #37d;
     color: white;
 }
