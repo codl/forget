@@ -180,6 +180,8 @@ def delete_from_account(account_id):
                     account.policy_keep_media == 'none' or
                     (account.policy_keep_media == 'keeponly' and not post.has_media) or
                     (account.policy_keep_media == 'deleteonly' and post.has_media)
+                ) and (
+                    not account.policy_keep_direct or not post.direct
                 )
             )
         )
