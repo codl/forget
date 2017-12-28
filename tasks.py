@@ -345,16 +345,16 @@ def update_mastodon_instances_popularity():
         instance.bump(amount / instance.popularity)
 
 
-    # normalise scores so the median is 10
-    median_pop = (
-            db.session.query(
-                db.func.percentile_cont(0.5)
-                .within_group(MastodonInstance.popularity.desc())).scalar()
+    # normalise scores so the top is 20
+    top_pop = (
+            db.session.query(db.func.max(MastodonInstance.popularity))
+            .scalar()
             )
-    MastodonInstance.query.update({
-        MastodonInstance.popularity:
-            MastodonInstance.popularity * 10 / median_pop
-    })
+    if top_pop > 20.1:
+        MastodonInstance.query.update({
+            MastodonInstance.popularity:
+                MastodonInstance.popularity * 20 / top_pop
+        })
     db.session.commit()
 
 
