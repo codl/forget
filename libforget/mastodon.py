@@ -1,6 +1,8 @@
 from mastodon import Mastodon
-from mastodon.Mastodon import MastodonAPIError, MastodonNetworkError,\
-                              MastodonRatelimitError
+from mastodon.Mastodon import MastodonAPIError,\
+                              MastodonNetworkError,\
+                              MastodonRatelimitError,\
+                              MastodonUnauthorizedError
 from model import MastodonApp, Account, OAuthToken, Post
 from requests import head
 from app import db, sentry
@@ -85,15 +87,15 @@ def get_api_for_acc(account):
             # so we have to do this:
             api.timeline()
             return api
+        except MastodonUnauthorizedError as e:
+            if sentry:
+                sentry.captureMessage(
+                        'Mastodon auth revoked or incorrect',
+                        extra=locals())
+            db.session.delete(token)
+            db.session.commit()
+            continue
         except MastodonAPIError as e:
-            if 'token' in str(e):
-                if sentry:
-                    sentry.captureMessage(
-                            'Mastodon auth revoked or incorrect',
-                            extra=locals())
-                db.session.delete(token)
-                db.session.commit()
-                continue
             raise TemporaryError(e)
         except (MastodonNetworkError,
                 MastodonRatelimitError) as e:

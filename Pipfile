@@ -22,7 +22,7 @@ redis = "*"
 requests = "*"
 sqlalchemy = "*"
 twitter = "*"
-"mastodon.py" = "*"
+"mastodon.py" = { git = 'https://github.com/codl/mastodon.py.git', ref = '1.2.1-forget' }
 blinker = "*"
 
 
