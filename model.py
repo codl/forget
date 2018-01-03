@@ -81,8 +81,8 @@ class Account(TimestampMixin, RemoteIDMixin):
                                nullable=False)
     policy_keep_latest = db.Column(db.Integer, server_default='100',
                                    nullable=False)
-    policy_keep_favourites = db.Column(db.Boolean, server_default='TRUE',
-                                       nullable=False)
+    policy_keep_favourites = db.Column(ThreeWayPolicyEnum,
+                                       server_default='none', nullable=False)
     policy_keep_media = db.Column(ThreeWayPolicyEnum, server_default='none',
                                   nullable=False)
     policy_delete_every = db.Column(db.Interval, server_default='30 minutes',
@@ -177,8 +177,10 @@ class Account(TimestampMixin, RemoteIDMixin):
                  .filter(Post.created_at <=
                          db.func.now() - self.policy_keep_younger)
                  .except_(latest_n_posts))
-        if(self.policy_keep_favourites):
-            query = query.filter(db.or_(~Post.favourite, Post.is_reblog))
+        if(self.policy_keep_favourites != 'none'):
+            query = query.filter(db.or_(
+                Post.favourite == (self.policy_keep_favourites == 'deleteonly'),
+                Post.is_reblog))
         if(self.policy_keep_media != 'none'):
             query = query.filter(db.or_(
                 Post.has_media == (self.policy_keep_media == 'deleteonly'),

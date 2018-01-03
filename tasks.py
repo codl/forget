@@ -175,7 +175,9 @@ def delete_from_account(account_id):
             post.is_reblog or
             (
                 (
-                    not account.policy_keep_favourites or not post.favourite
+                    account.policy_keep_favourites == 'none' or
+                    (account.policy_keep_favourites == 'keeponly' and not post.favourite) or
+                    (account.policy_keep_favourites == 'deleteonly' and post.favourite)
                 ) and (
                     account.policy_keep_media == 'none' or
                     (account.policy_keep_media == 'keeponly' and not post.has_media) or

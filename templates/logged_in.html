@@ -70,20 +70,22 @@
     <input type=number name=policy_keep_latest min=0 step=1 style='max-width:8ch' value={{g.viewer.account.policy_keep_latest}}>
     most recent posts will expire
 </p>
-<p>Keep posts that you have liked / favourited
+<p>Keep
     <span class="radiostrip">
-        <input type=radio name=policy_keep_favourites value=true id=policy_keep_favourites_true {{ "checked" if g.viewer.account.policy_keep_favourites }}>
-        <label for=policy_keep_favourites_true>Yes</label>
-        <input type=radio name=policy_keep_favourites value=false id=policy_keep_favourites_false {{ "checked" if not g.viewer.account.policy_keep_favourites }}>
-        <label for=policy_keep_favourites_false>No</label>
+        <input type=radio name=policy_keep_favourites value=keeponly id=policy_keep_favourites_keeponly {{ "checked" if g.viewer.account.policy_keep_favourites == 'keeponly' }}>
+        <label for=policy_keep_favourites_keeponly>favourited posts</label>
+        <input type=radio name=policy_keep_favourites value=deleteonly id=policy_keep_favourites_deleteonly {{ "checked" if g.viewer.account.policy_keep_favourites == 'deleteonly' }}>
+        <label for=policy_keep_favourites_deleteonly>non-favourited posts</label>
+        <input type=radio name=policy_keep_favourites value=none id=policy_keep_favourites_none {{ "checked" if g.viewer.account.policy_keep_favourites == 'none' }}>
+        <label for=policy_keep_favourites_none>neither</label>
     </span>
 </p>
-<p>Keep posts
+<p>Keep
     <span class="radiostrip">
         <input type=radio name=policy_keep_media value=keeponly id=policy_keep_media_keeponly {{ "checked" if g.viewer.account.policy_keep_media == 'keeponly' }}>
-        <label for=policy_keep_media_keeponly>with media attached</label>
+        <label for=policy_keep_media_keeponly>media posts</label>
         <input type=radio name=policy_keep_media value=deleteonly id=policy_keep_media_deleteonly {{ "checked" if g.viewer.account.policy_keep_media == 'deleteonly' }}>
-        <label for=policy_keep_media_deleteonly>with no media attached</label>
+        <label for=policy_keep_media_deleteonly>non-media posts</label>
         <input type=radio name=policy_keep_media value=none id=policy_keep_media_none {{ "checked" if g.viewer.account.policy_keep_media == 'none' }}>
         <label for=policy_keep_media_none>neither</label>
     </span>
