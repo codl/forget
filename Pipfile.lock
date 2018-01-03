@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "aec24ac40fa86cf1f0d327a76449da7f7b6f8c15b70ab40b3ce2963329149a0d"
+            "sha256": "395d40651d63971749a116a70c83b25cf5be136dce0f9107234c999f5a8ee0b4"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -205,8 +205,7 @@
             "version": "==1.0"
         },
         "mastodon.py": {
-            "git": "https://github.com/codl/mastodon.py.git",
-            "ref": "1.2.1-forget"
+            "file": "https://github.com/codl/Mastodon.py/archive/2e4467e8e9e63d141f61cd406826039374d2d79c.tar.gz"
         },
         "pillow": {
             "hashes": [
