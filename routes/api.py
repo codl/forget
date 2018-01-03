@@ -22,6 +22,10 @@ def api_settings_put():
     updated = dict()
     for key in libforget.settings.attrs:
         if key in data:
+            if (
+                    isinstance(getattr(viewer, key), bool) and
+                    isinstance(data[key], str)):
+                data[key] = data[key] == 'true'
             setattr(viewer, key, data[key])
             updated[key] = data[key]
     db.session.commit()
