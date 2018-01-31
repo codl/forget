@@ -18,9 +18,10 @@ def load_viewer():
 
 @app.context_processor
 def inject_version():
+    v = version.get_versions()
     return dict(
-            version=version.version,
-            repo_url=libforget.version.url_for_version(version.version),
+            version=v['version'],
+            repo_url=libforget.version.url_for_version(v),
         )
 
 

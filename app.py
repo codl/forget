@@ -44,7 +44,7 @@ if 'CELERY_BROKER' not in app.config:
 sentry = None
 if 'SENTRY_DSN' in app.config:
     from raven.contrib.flask import Sentry
-    app.config['SENTRY_CONFIG']['release'] = version.version
+    app.config['SENTRY_CONFIG']['release'] = version.get_versions()['version']
     sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
 
 url_for = cachebust(app)

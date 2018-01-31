@@ -37,7 +37,7 @@ sentry = None
 if 'SENTRY_DSN' in flaskapp.config:
     from raven import Client
     from raven.contrib.celery import register_signal, register_logger_signal
-    sentry = Client(flaskapp.config['SENTRY_DSN'], release=version.version)
+    sentry = Client(flaskapp.config['SENTRY_DSN'], release=version.get_versions()['version'])
     register_logger_signal(sentry)
     register_signal(sentry)
 
