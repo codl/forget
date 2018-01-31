@@ -6,15 +6,19 @@ while read old new refname; do
     branch=$(git rev-parse --abbrev-ref=strict ${refname})
     if [[ $branch == "deploy" ]]; then
 
-        systemctl --user stop forget
-        GIT_WORK_TREE='/home/codl/forget' git checkout -f deploy
+        #export GIT_WORK_TREE="/tmp/forget_$RANDOM"
+        #mkdir -p $GIT_WORK_TREE
+        #git checkout deploy
+
+        cd /home/codl/forget
+
+        #(cd $GIT_WORK_TREE; git archive deploy) | tar -x
+        git archive deploy | tar -x
 
         (
-            cd /home/codl/forget
             source venv/bin/activate
             env -u GIT_DIR -u GIT_WORK_TREE pip install -r requirements.txt
             yarn
-            tools/write-version.sh
             FLASK_APP='forget.py' flask db upgrade
             if [[ $(git diff --name-only ${old}..${new} dodo.py) == 'dodo.py' ]]
             then
@@ -23,7 +27,8 @@ while read old new refname; do
             fi
             doit
         )
-        systemctl --user start forget
+        systemctl --user restart forget
+        #rm -rf $GIT_WORK_TREE
     fi
 done
 
