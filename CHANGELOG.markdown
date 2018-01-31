@@ -1,3 +1,14 @@
+## v1.1.0
+
+Released 2018-01-31
+
+* three types of policies are now available for favs and media (keep only, delete only, ignore)
+* a new input type was introduced to avoid having messy inline radio buttons
+* sentry js init file now has 1 hour of caching
+* fav and reblog count are now stored, for GH-7
+* GH-17 reblogs are deleted regardless of media and favs
+* mastodon instance popularity scoring has been simplified
+
 ## v1.0.0
 
 * image proxy now respects max-age from cache-control header
