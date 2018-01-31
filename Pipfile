@@ -1,7 +1,9 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
+
 
 [packages]
 
@@ -11,8 +13,8 @@ celery = "*"
 csscompressor = "*"
 doit = "*"
 flask = "*"
-"flask-migrate" = "*"
-"flask-sqlalchemy" = "*"
+flask-migrate = "*"
+flask-sqlalchemy = "*"
 gunicorn = "*"
 honcho = "*"
 pillow = "*"
@@ -22,7 +24,7 @@ redis = "*"
 requests = "*"
 sqlalchemy = "*"
 twitter = "*"
-"mastodon.py" = { file = 'https://github.com/codl/Mastodon.py/archive/2e4467e8e9e63d141f61cd406826039374d2d79c.tar.gz' }
+"mastodon.py" = "*"
 blinker = "*"
 
 
@@ -31,8 +33,10 @@ blinker = "*"
 coverage = "*"
 codecov = "*"
 pytest = "*"
-"pytest-cov" = "*"
-"pytest-redis" = "*"
+pytest-cov = "*"
+pytest-redis = "*"
+
 
 [requires]
+
 python_version = "3.6"
