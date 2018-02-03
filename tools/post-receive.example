@@ -1,23 +1,24 @@
 #!/bin/sh
 
-export GIT_DIR=$(git rev-parse --absolute-git-dir)
 
 while read old new refname; do
+
+    export GIT_DIR=$(git rev-parse --absolute-git-dir)
     branch=$(git rev-parse --abbrev-ref=strict ${refname})
+
     if [[ $branch == "deploy" ]]; then
 
         cd "$HOME/forget"
 
-        (
-            unset GIT_DIR
-            unset GIT_WORK_TREE
-            git checkout deploy
-            git reset --hard upstream/deploy
-        )
+        export GIT_DIR="$PWD/.git"
+
+        git checkout deploy
+        git fetch --prune origin
+        git reset --hard origin/deploy
 
         (
             source venv/bin/activate
-            env -u GIT_DIR -u GIT_WORK_TREE pip install -r requirements.txt
+            pip install -r requirements.txt
             yarn
             FLASK_APP='forget.py' flask db upgrade
             if [[ $(git diff --name-only ${old}..${new} dodo.py) == 'dodo.py' ]]
