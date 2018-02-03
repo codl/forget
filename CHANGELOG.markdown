@@ -1,3 +1,7 @@
+## future
+
+* rewrote post-receive hook so it would play nice with versioneer
+
 ## v1.1.0
 
 Released 2018-01-31
