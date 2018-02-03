@@ -6,14 +6,14 @@ while read old new refname; do
     branch=$(git rev-parse --abbrev-ref=strict ${refname})
     if [[ $branch == "deploy" ]]; then
 
-        #export GIT_WORK_TREE="/tmp/forget_$RANDOM"
-        #mkdir -p $GIT_WORK_TREE
-        #git checkout deploy
+        cd "$HOME/forget"
 
-        cd /home/codl/forget
-
-        #(cd $GIT_WORK_TREE; git archive deploy) | tar -x
-        git archive deploy | tar -x
+        (
+            unset GIT_DIR
+            unset GIT_WORK_TREE
+            git checkout deploy
+            git reset --hard upstream/deploy
+        )
 
         (
             source venv/bin/activate
@@ -28,7 +28,6 @@ while read old new refname; do
             doit
         )
         systemctl --user restart forget
-        #rm -rf $GIT_WORK_TREE
     fi
 done
 
