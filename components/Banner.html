@@ -1,24 +1,24 @@
-<div class='banner {{policy_enabled?'enabled':'disabled'}}'>
+<div class='banner {policy_enabled?'enabled':'disabled'}'>
     <div class='btn-group right'>
-        <button class='btn {{policy_enabled?"secondary":"primary"}}' on:click='toggle(policy_enabled)'>{{policy_enabled?'Disable':'Enable'}}</button>
+        <button class='btn {policy_enabled?"secondary":"primary"}' on:click='toggle(policy_enabled)'>{policy_enabled?'Disable':'Enable'}</button>
     </div>
     <div>
         Forget is currently
-        {{#if policy_enabled }}
+        {#if policy_enabled }
         <b>enabled</b>
-        {{else}}
+        {:else}
         disabled
-        {{/if}}
+        {/if}
         on your account.
     </div>
     <div class='timers'>
-        <span class='last-delete {{(!last_delete)?'hidden':''}}' title={{last_delete}}>
-        {{#if last_delete }}
-            Last delete {{rel_past(now - last_delete)}}.
-        {{/if }}
+        <span class='last-delete {(!last_delete)?'hidden':''}' title={last_delete}>
+        {#if last_delete }
+            Last delete {rel_past(now - last_delete)}.
+        {/if }
         </span>
-        <span class='next-delete {{(!policy_enabled || !next_delete || !eligible_for_delete_estimate)?'hidden':''}}' title={{next_delete}}>
-            Next delete {{rel_future(next_delete - now)}}.
+        <span class='next-delete {(!policy_enabled || !next_delete || !eligible_for_delete_estimate)?'hidden':''}' title={next_delete}>
+            Next delete {rel_future(next_delete - now)}.
         </span>
     </div>
 </div>
