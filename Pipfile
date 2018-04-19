@@ -35,6 +35,7 @@ codecov = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-redis = "*"
+versioneer = "*"
 
 
 [requires]
