@@ -1,3 +1,11 @@
+## v1.1.3
+
+Released 2018-04-25
+
+* made radio strips more accessible
+* unified button looks
+* updated and cleaned up markup in README
+
 ## v1.1.2
 
 Released 2018-04-25
