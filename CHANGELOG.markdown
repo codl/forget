@@ -1,3 +1,9 @@
+## v1.1.2
+
+Released 2018-04-25
+
+* fixed crash when saving settings with JS disabled
+
 ## v1.1.1
 
 Released 2018-04-19
