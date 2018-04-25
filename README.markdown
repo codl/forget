@@ -101,4 +101,4 @@ You can run the (currently very incomplete) test suite by running `pytest`. You'
 
 ---
 
-If you're having trouble with Forget, or if you're not having trouble but you just want to tell me you like it, you can drop me a note at [@codl](https://twitter.com/codl) or [codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
+If you're having trouble with Forget, or if you're not having trouble but you just want to tell me you like it, you can drop me a note at [@codl@chitter.xyz](https://chitter.xyz/@codl) or [codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
