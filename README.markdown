@@ -9,7 +9,8 @@
 [![Dependencies status](https://img.shields.io/librariesio/github/codl/forget.svg)](https://libraries.io/github/codl/forget)
 
 
-Forget is a post deleting service for Twitter and Mastodon. It lives at <https://forget.codl.fr>.
+Forget is a post deleting service for Twitter and Mastodon. It lives at
+<https://forget.codl.fr>.
 
 [![](assets/screenshot.png)](https://forget.codl.fr)
 
@@ -33,9 +34,11 @@ $ python -m venv venv
 $ source venv/bin/activate
 ```
 
-If you're using `zsh` or `fish` as a shell, substitute `venv/bin/activate` with `venv/bin/activate.zsh` or `venv/bin/activate.fish`, respectively.
+If you're using `zsh` or `fish` as a shell, substitute `venv/bin/activate` with
+`venv/bin/activate.zsh` or `venv/bin/activate.fish`, respectively.
 
-You will need to "activate" the venv in every new terminal before you can use pip or any python tools included in dependencies (honcho, flask...)
+You will need to "activate" the venv in every new terminal before you can use
+pip or any python tools included in dependencies (honcho, flask...)
 
 ### Download and install dependencies
 
@@ -89,16 +92,23 @@ You'll want to use your favourite web server to proxy traffic to it.
 
 ### Development
 
-For development, you may want to use `Procfile.dev`, which starts flask in debug mode and rebuilds the static assets automatically when they change
+For development, you may want to use `Procfile.dev`, which starts flask in
+debug mode and rebuilds the static assets automatically when they change
 
 ```
 $ honcho -f Procfile.dev start
 ```
 
-Or you could just look at `Procfile.dev` and run those things manually. It's up to you.
+Or you could just look at `Procfile.dev` and run those things manually. It's up
+to you.
 
-You can run the (currently very incomplete) test suite by running `pytest`. You'll need redis installed on your development machine, a temporary redis server will be started and shut down automatically by the test suite.
+You can run the (currently very incomplete) test suite by running `pytest`.
+You'll need redis installed on your development machine, a temporary redis
+server will be started and shut down automatically by the test suite.
 
 ---
 
-If you're having trouble with Forget, or if you're not having trouble but you just want to tell me you like it, you can drop me a note at [@codl@chitter.xyz](https://chitter.xyz/@codl) or [codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
+If you're having trouble with Forget, or if you're not having trouble but you
+just want to tell me you like it, you can drop me a note at
+[@codl@chitter.xyz](https://chitter.xyz/@codl) or
+[codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
