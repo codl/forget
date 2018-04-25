@@ -280,10 +280,24 @@ section > pre.error-log {
     padding: .3em .5em;
     cursor: pointer;
     user-select: none;
-    background-color: #ededed;
+    background-color: transparent;
+    border: 1px solid rgba(0,0,0,0.3);
+}
+
+.radiostrip label:first-of-type {
+    border-radius: .2rem 0 0 .2rem;
+}
+
+.radiostrip label:last-of-type {
+    border-radius: 0 .2rem .2rem 0;
+}
+
+.radiostrip label:not(:first-of-type) {
+    border-left-color: transparent;
 }
 
 .radiostrip label:not(:last-of-type) {
+    border-right-color: transparent;
     margin-right: 1px;
 }
 
@@ -294,4 +308,5 @@ section > pre.error-log {
 .radiostrip input[type=radio]:checked + label {
     background: #37d;
     color: white;
+    border-color: transparent;
 }
