@@ -1,0 +1,3 @@
+ignore:
+    - version.py
+comment: off
