@@ -155,6 +155,13 @@ class Account(TimestampMixin, RemoteIDMixin):
             self.dormant = False
         return enable
 
+    @db.validates('policy_keep_direct')
+    def validate_bool_accept_string(self, key, value):
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return value
+
+
     # backref: tokens
     # backref: twitter_archives
     # backref: posts
