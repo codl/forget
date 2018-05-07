@@ -1,3 +1,9 @@
+## v1.2.0
+
+Released 2018-05-08
+
+* remember a user's mastodon instances and let them log in in one click (GH-36)
+
 ## v1.1.3
 
 Released 2018-04-25
