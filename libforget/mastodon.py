@@ -3,7 +3,7 @@ from mastodon.Mastodon import MastodonAPIError,\
                               MastodonNetworkError,\
                               MastodonRatelimitError,\
                               MastodonUnauthorizedError
-from model import MastodonApp, Account, OAuthToken, Post
+from model import MastodonApp, Account, OAuthToken, Post, MastodonInstance
 from requests import head
 from app import db, sentry
 from libforget.exceptions import TemporaryError
@@ -208,3 +208,13 @@ def delete(post):
             MastodonNetworkError,
             MastodonRatelimitError) as e:
         raise TemporaryError(e)
+
+
+def suggested_instances(limit=5, min_popularity=5):
+    return (
+            MastodonInstance.query
+            .filter(MastodonInstance.popularity > min_popularity)
+            .order_by(db.desc(MastodonInstance.instance == 'mastodon.social'),
+                      db.desc(MastodonInstance.popularity),
+                      MastodonInstance.instance)
+            .limit(limit).all())

@@ -5,7 +5,7 @@ import libforget.twitter
 import libforget.mastodon
 from libforget.auth import require_auth, csrf,\
                      get_viewer
-from model import Session, TwitterArchive, MastodonApp, MastodonInstance
+from model import Session, TwitterArchive, MastodonApp
 from app import app, db, sentry, imgproxy
 import tasks
 from zipfile import BadZipFile
@@ -34,13 +34,7 @@ def index():
 
 @app.route('/about/')
 def about():
-    instances = (
-            MastodonInstance.query
-            .filter(MastodonInstance.popularity > 5)
-            .order_by(db.desc(MastodonInstance.instance == 'mastodon.social'),
-                      db.desc(MastodonInstance.popularity),
-                      MastodonInstance.instance)
-            .limit(5).all())
+    instances = libforget.mastodon.suggested_instances()
     return render_template(
             'about.html',
             mastodon_instances=instances,
@@ -213,12 +207,10 @@ def mastodon_login_step1(instance=None):
                     or request.form.get('instance_url', None))
 
     if not instance_url:
-        instances = (
-            MastodonInstance
-            .query.filter(MastodonInstance.popularity > 1)
-            .order_by(db.desc(MastodonInstance.popularity),
-                      MastodonInstance.instance)
-            .limit(30))
+        instances = libforget.mastodon.suggested_instances(
+                limit=30,
+                min_popularity=1
+        )
         return render_template(
                 'mastodon_login.html', instances=instances,
                 address_error=request.method == 'POST',
