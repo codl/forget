@@ -5,7 +5,7 @@ def test_known_instances_defaults():
     ki = KnownInstances()
     assert len(ki.instances) == 1
     assert ki.instances[0]['instance'] == 'mastodon.social'
-    assert ki.instances[0]['hits'] > 0
+    assert isinstance(ki.instances[0]['hits'], int)
 
 
 def test_known_instances_clear():

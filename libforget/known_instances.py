@@ -30,7 +30,7 @@ class KnownInstances(object):
     def __default(self):
         self.instances = [{
                 "instance": "mastodon.social",
-                "hits": 5
+                "hits": 0
             }]
 
     def clear(self):
