@@ -37,12 +37,12 @@
 <p>
 
 {% for instance in mastodon_instances %}
-<a style='background-color:#282c37' class='btn primary' href="{{ url_for('mastodon_login_step1', instance_url=instance.instance) }}">
+<a style='background-color:#282c37' class='btn primary' href="{{ url_for('mastodon_login_step1', instance_url=instance) }}">
 {% if loop.first %}
     {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
     Log in with
 {% endif %}
-        {{instance.instance}}
+        {{instance}}
 </a>
 {% else %}
 <a style='background-color:#282c37' class='btn primary' href="{{ url_for('mastodon_login_step1') }}">

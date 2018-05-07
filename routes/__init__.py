@@ -35,7 +35,10 @@ def index():
 
 @app.route('/about/')
 def about():
-    instances = libforget.mastodon.suggested_instances()
+    ki = KnownInstances(request.cookies.get('forget_known_instances', ''))
+    ki.normalize()
+    instances = ki.top()
+    instances += libforget.mastodon.suggested_instances(blacklist=instances)
     return render_template(
             'about.html',
             mastodon_instances=instances,
@@ -270,7 +273,11 @@ def mastodon_login_step2(instance_url):
     ki.bump(instance_url)
 
     resp = redirect(url_for('index'))
-    resp.set_cookie('forget_known_instances', ki.serialize())
+    resp.set_cookie(
+            'forget_known_instances', ki.serialize(),
+            max_age=60*60*24*365,
+            httponly=True
+            )
     return resp
 
 

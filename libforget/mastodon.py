@@ -211,10 +211,10 @@ def delete(post):
 
 
 def suggested_instances(limit=5, min_popularity=5, blacklist=tuple()):
-    return (
+    return tuple((ins.instance for ins in (
             MastodonInstance.query
             .filter(MastodonInstance.popularity > min_popularity)
             .filter(~MastodonInstance.instance.in_(blacklist))
             .order_by(db.desc(MastodonInstance.popularity),
                       MastodonInstance.instance)
-            .limit(limit).all())
+            .limit(limit).all())))
