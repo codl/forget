@@ -1,3 +1,9 @@
+## v1.2.1
+
+Released 2018-05-08
+
+* limit number of log-in buttons to 5, and show up to 5 known instances
+
 ## v1.2.0
 
 Released 2018-05-08
