@@ -17,7 +17,8 @@ class KnownInstances(object):
         try:
             unserialised = json.loads(serialised)
             if not isinstance(unserialised, list):
-                return self.__default()
+                self.__default()
+                return
             for instance in unserialised:
                 if 'instance' in instance and 'hits' in instance:
                     self.instances.append(dict(
