@@ -25,7 +25,8 @@ class KnownInstances(object):
                         hits=instance['hits']
                         ))
         except (json.JSONDecodeError, TypeError):
-            return self.__default()
+            self.__default()
+            return
 
     def __default(self):
         self.instances = [{
