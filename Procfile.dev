@@ -1,3 +1,3 @@
-web: env FLASK_APP=forget.py FLASK_DEBUG=t flask run
+web: gunicorn -b 127.0.0.1:5000 --reload --reload-extra-file templates/ -w 4 forget:app
 worker: python tasks.py -B -Ofair
 build: doit auto
