@@ -6,6 +6,7 @@ import libforget.mastodon
 from libforget.auth import require_auth, csrf,\
                      get_viewer
 from model import Session, TwitterArchive, MastodonApp
+from libforget.known_instances import KnownInstances
 from app import app, db, sentry, imgproxy
 import tasks
 from zipfile import BadZipFile
@@ -264,7 +265,13 @@ def mastodon_login_step2(instance_url):
     db.session.commit()
 
     g.viewer = session
-    return redirect(url_for('index'))
+
+    ki = KnownInstances(request.cookies.get('forget_known_instances', ''))
+    ki.bump(instance_url)
+
+    resp = redirect(url_for('index'))
+    resp.set_cookie('forget_known_instances', ki.serialize())
+    return resp
 
 
 @app.route('/sentry/setup.js')

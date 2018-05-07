@@ -210,11 +210,11 @@ def delete(post):
         raise TemporaryError(e)
 
 
-def suggested_instances(limit=5, min_popularity=5):
+def suggested_instances(limit=5, min_popularity=5, blacklist=tuple()):
     return (
             MastodonInstance.query
             .filter(MastodonInstance.popularity > min_popularity)
-            .order_by(db.desc(MastodonInstance.instance == 'mastodon.social'),
-                      db.desc(MastodonInstance.popularity),
+            .filter(~MastodonInstance.instance.in_(blacklist))
+            .order_by(db.desc(MastodonInstance.popularity),
                       MastodonInstance.instance)
             .limit(limit).all())
