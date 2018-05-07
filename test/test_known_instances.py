@@ -38,7 +38,7 @@ def test_known_instances_bump():
 
 
 def test_known_instances_normalize_top():
-    ki = KnownInstances()
+    ki = KnownInstances(None, top_slots=3)
     ki.clear()
     ki.normalize()
     assert len(ki.instances) == 0

@@ -11,7 +11,7 @@ def find(predicate, iterator, default=None):
         return default
 
 class KnownInstances(object):
-    def __init__(self, serialised=None, top_slots=3):
+    def __init__(self, serialised=None, top_slots=5):
         self.instances = list()
         self.top_slots = top_slots
         try:

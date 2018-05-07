@@ -36,9 +36,9 @@ def index():
 @app.route('/about/')
 def about():
     ki = KnownInstances(request.cookies.get('forget_known_instances', ''))
-    ki.normalize()
     instances = ki.top()
     instances += libforget.mastodon.suggested_instances(blacklist=instances)
+    instances = instances[:5]
     return render_template(
             'about.html',
             mastodon_instances=instances,
