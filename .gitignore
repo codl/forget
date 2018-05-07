@@ -7,4 +7,4 @@ static/*
 !static/.keep
 .cache/
 .coverage
-
+.pytest_cache
