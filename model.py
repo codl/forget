@@ -226,18 +226,33 @@ class OAuthToken(db.Model, TimestampMixin):
     # token is for until we call /account/verify_credentials with it
 
 
+session_accounts = db.Table(
+        'session_accounts',
+        db.Column(
+            'session_id',
+            db.String, db.ForeignKey('sessions.id'), primary_key=True),
+        db.Column(
+            'account_id',
+            db.String, db.ForeignKey('accounts.id'), primary_key=True)
+        )
+
+
 class Session(db.Model, TimestampMixin):
     __tablename__ = 'sessions'
 
     id = db.Column(db.String, primary_key=True,
                    default=secrets.token_urlsafe)
 
-    account_id = db.Column(
+    current_account_id = db.Column(
             db.String,
-            db.ForeignKey('accounts.id',
-                          ondelete='CASCADE', onupdate='CASCADE'),
-            nullable=False, index=True)
-    account = db.relationship(Account, lazy='joined', backref='sessions')
+            db.ForeignKey(
+                'accounts.id', ondelete='SET NULL', onupdate='SET NULL'),
+            nullable=True)
+    account = db.relationship(Account)
+    accounts = db.relationship(
+            Account,
+            secondary=session_accounts,
+            lazy='joined', backref=db.backref('sessions', lazy=True))
 
     csrf_token = db.Column(db.String,
                            default=secrets.token_urlsafe,

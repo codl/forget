@@ -65,11 +65,16 @@ def twitter_login_step1():
 
 
 def login(account_id):
-    session = Session(account_id=account_id)
-    db.session.add(session)
+    session = get_viewer_session()
+    if not session:
+        session = Session()
+        db.session.add(session)
+    session.current_account_id = account_id
     db.session.commit()
 
-    session.account.dormant = False
+    session.current_account.dormant = False
+    if(session.account not in session.accounts):
+        session.accounts.append(session.account)
     db.session.commit()
 
     tasks.fetch_acc.s(account_id).apply_async(routing_key='high')
