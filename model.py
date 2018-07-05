@@ -3,6 +3,7 @@ from datetime import timedelta, datetime, timezone
 from app import db
 import secrets
 from libforget.interval import decompose_interval
+import random
 
 
 class TimestampMixin(object):
@@ -107,6 +108,12 @@ class Account(TimestampMixin, RemoteIDMixin):
     reason = db.Column(db.String)
     dormant = db.Column(db.Boolean, server_default='FALSE', nullable=False)
 
+    backoff_level = db.Column(db.Integer, server_default='0', nullable=False)
+    backoff_until = db.Column(db.DateTime(timezone=True), server_default='now', nullable=False)
+    BACKOFF_MAX = 14
+    # backoff is 10 seconds * 2^backoff_level
+    # this gives us roughly 1.8 days at level 14
+
     def touch_fetch(self):
         self.last_fetch = db.func.now()
 
@@ -199,6 +206,16 @@ class Account(TimestampMixin, RemoteIDMixin):
     def force_log_out(self):
         Session.query.with_parent(self).delete()
         db.session.commit()
+
+    def backoff(self):
+        self.backoff_level = min(self.backoff_level + 1, self.BACKOFF_MAX)
+        backoff_for = 10 * 2 ** self.backoff_level
+        backoff_for *= random.uniform(1, 1.3)
+        self.backoff_until = datetime.utcnow() + timedelta(seconds=backoff_for)
+
+    def reset_backoff(self):
+        self.backoff_until = datetime.utcnow()
+        self.backoff_level = 0
 
 
 class Account(Account, db.Model):

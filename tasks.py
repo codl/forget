@@ -87,31 +87,33 @@ def make_dormant(acc):
         get back in sync.
     '''.format(service=acc.service)
     acc.dormant = True
-    db.session.commit()
 
 
 @app.task(autoretry_for=(TemporaryError,))
 @unique
 def fetch_acc(id_, cursor=None):
-    acc = Account.query.get(id_)
-    print(f'fetching {acc}')
+    account = Account.query.get(id_)
+    print(f'fetching {account}')
     try:
         action = noop
-        if(acc.service == 'twitter'):
+        if(account.service == 'twitter'):
             action = libforget.twitter.fetch_acc
-        elif(acc.service == 'mastodon'):
+        elif(account.service == 'mastodon'):
             action = libforget.mastodon.fetch_acc
-        cursor = action(acc, cursor)
+        cursor = action(account, cursor)
         if cursor:
             fetch_acc.si(id_, cursor).apply_async()
+    except TemporaryError:
+        db.session.rollback()
+        account.backoff()
     except PermanentError:
         db.session.rollback()
-        make_dormant(acc)
+        make_dormant(account)
         if sentry:
             sentry.captureException()
     finally:
         db.session.rollback()
-        acc.touch_fetch()
+        account.touch_fetch()
         db.session.commit()
 
 
@@ -188,27 +190,35 @@ def delete_from_account(account_id):
             )
         )
 
-    action = noop
-    if account.service == 'twitter':
-        action = libforget.twitter.delete
-        posts = refresh_posts(posts)
-        to_delete = next(filter(is_eligible, posts), None)
-    elif account.service == 'mastodon':
-        action = libforget.mastodon.delete
-        for post in posts:
-            refreshed = refresh_posts((post,))
-            if refreshed and is_eligible(refreshed[0]):
-                to_delete = refreshed[0]
-                break
+    try:
+        action = noop
+        if account.service == 'twitter':
+            action = libforget.twitter.delete
+            posts = refresh_posts(posts)
+            to_delete = next(filter(is_eligible, posts), None)
+        elif account.service == 'mastodon':
+            action = libforget.mastodon.delete
+            for post in posts:
+                refreshed = refresh_posts((post,))
+                if refreshed and is_eligible(refreshed[0]):
+                    to_delete = refreshed[0]
+                    break
 
-    if to_delete:
-        print("deleting {}".format(to_delete))
-        account.touch_delete()
-        action(to_delete)
-    else:
-        account.next_delete = db.func.now() + timedelta(minutes=3)
+        if to_delete:
+            print("deleting {}".format(to_delete))
+            account.touch_delete()
+            action(to_delete)
+            account.reset_backoff()
+        else:
+            account.next_delete = db.func.now() + timedelta(minutes=3)
 
-    db.session.commit()
+
+    except TemporaryError:
+        db.session.rollback()
+        account.backoff()
+
+    finally:
+        db.session.commit()
 
 
 def refresh_posts(posts):
@@ -236,12 +246,17 @@ def refresh_account(account_id):
 
         posts = refresh_posts(posts)
         account.touch_refresh()
-        db.session.commit()
+        account.reset_backoff()
+    except TemporaryError:
+        db.session.rollback()
+        account.backoff()
     except PermanentError:
         db.session.rollback()
         make_dormant(account)
         if sentry:
             sentry.captureException()
+    finally:
+        db.session.commit()
 
 
 @app.task
@@ -288,6 +303,7 @@ def queue_fetch_for_most_stale_accounts(
     accs = (Account.query
             .join(Account.tokens).group_by(Account)
             .filter(Account.last_fetch < db.func.now() - min_staleness)
+            .filter(Account.backoff_until < db.func.now())
             .filter(~Account.dormant)
             .order_by(db.asc(Account.last_fetch))
             .limit(limit)
@@ -303,6 +319,7 @@ def queue_deletes():
     eligible_accounts = (
             Account.query.filter(Account.policy_enabled == True)  # noqa: E712
             .filter(Account.next_delete < db.func.now())
+            .filter(Account.backoff_until < db.func.now())
             .filter(~Account.dormant))
     for account in eligible_accounts:
         delete_from_account.s(account.id).apply_async()
@@ -312,6 +329,7 @@ def queue_deletes():
 @unique
 def refresh_account_with_oldest_post():
     post = (Post.query.outerjoin(Post.author).join(Account.tokens)
+            .filter(Account.backoff_until < db.func.now())
             .filter(~Account.dormant)
             .group_by(Post).order_by(db.asc(Post.updated_at)).first())
     refresh_account(post.author_id)
@@ -321,6 +339,7 @@ def refresh_account_with_oldest_post():
 @unique
 def refresh_account_with_longest_time_since_refresh():
     acc = (Account.query.join(Account.tokens).group_by(Account)
+            .filter(Account.backoff_until < db.func.now())
            .filter(~Account.dormant)
            .order_by(db.asc(Account.last_refresh)).first())
     refresh_account(acc.id)
