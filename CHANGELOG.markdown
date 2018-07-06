@@ -1,4 +1,6 @@
-## next
+## v1.3.0
+
+Released 2018-07-06
 
 * implement exponential backoff
 
