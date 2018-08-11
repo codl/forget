@@ -36,8 +36,3 @@ pytest = "*"
 pytest-cov = "*"
 pytest-redis = "*"
 versioneer = "*"
-
-
-[requires]
-
-python_version = "3.6"
