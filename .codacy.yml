@@ -1,0 +1,1 @@
+exclude_paths: ['version.py', 'versioneer.py']
