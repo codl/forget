@@ -235,9 +235,9 @@ require-relative@^0.8.7:
   version "0.8.7"
   resolved "https://registry.yarnpkg.com/require-relative/-/require-relative-0.8.7.tgz#7999539fc9e047a37928fa196f8e1563dabd36de"
 
-rollup-plugin-svelte@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-svelte/-/rollup-plugin-svelte-4.2.1.tgz#12c4eab919a0506552d5b1c909476939abde5b7e"
+rollup-plugin-svelte@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-svelte/-/rollup-plugin-svelte-4.3.0.tgz#09b968931a4106ab5bf7cf5c7153cf332a2c5eda"
   dependencies:
     require-relative "^0.8.7"
     rollup-pluginutils "^2.3.0"
