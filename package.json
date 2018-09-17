@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "rollup": "^0.65.2",
+    "rollup": "^0.66.0",
     "rollup-plugin-svelte": "^4.3.0",
     "svelte": "^2.13.4"
   }
