@@ -261,6 +261,6 @@ sourcemap-codec@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.1.tgz#c8fd92d91889e902a07aee392bdd2c5863958ba2"
 
-svelte@^2.13.4:
-  version "2.13.4"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-2.13.4.tgz#17e5e942792faa0dcde069344b30c915ba3993e5"
+svelte@^2.13.5:
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-2.13.5.tgz#23478480ed0f7d4da4816022d84a86512d503358"
