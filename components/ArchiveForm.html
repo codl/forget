@@ -16,10 +16,8 @@ function get_file_size(file_list){
     /* returns size of selected file given an <input type="file">
         or 0 if no file is selected */
     let size = 0;
-    console.log('ahh');
     for(let i = 0; i < file_list.length; i++){
         size += file_list[i].size;
-        console.log(size);
     }
     return size;
 }
@@ -31,7 +29,6 @@ export default {
     },
 
     oncreate(){
-        console.log('hello');
     },
 
     methods: {

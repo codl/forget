@@ -191,9 +191,7 @@ import ArchiveForm from '../components/ArchiveForm.html';
     }
 
     let archive_form_el = document.querySelector('#archive-form');
-    console.log('uh');
     if(archive_form_el){
-        console.log('hey');
         let csrf_token = archive_form_el.querySelector('input[name=csrf-token]').value;
         let archive_form = new ArchiveForm({
             target: archive_form_el,
