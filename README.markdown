@@ -43,7 +43,7 @@ pip or any python tools included in dependencies (honcho, flask...)
 
 ```
 $ pip install -r requirements.txt
-$ yarn || npm install
+$ npm ci
 ```
 
 Wow!! Exciting
