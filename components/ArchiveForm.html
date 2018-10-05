@@ -1,13 +1,18 @@
 <form action={action} method='post' enctype='multipart/form-data'>
     {#if file_too_big}
         <div class="banner warning">
-            The file you've selected is too large to upload.
-            blah
+            <p>The file you have selected is very large.</p>
+
+            <p>Twitter has two types of archives, <b>Forget does not support
+                "Your Twitter data" archives, only "Tweet archives"</b>
+            available from
+            <a href="https://twitter.com/settings/account#export_request">your account settings</a>.
+            Please make sure you have the right type of archive.</p>
         </div>
     {/if}
     <input type="file" name="file" accept="application/zip,.zip"
         on:change="take_file(this.files)">
-    <input type="submit" value="Upload" disabled={file_too_big}>
+    <input type="submit" value="Upload">
     <input type='hidden' name='csrf-token' value={csrf_token}>
 </form>
 
@@ -38,7 +43,7 @@ export default {
     },
 
     computed: {
-        file_too_big: ({file_size}) => file_size > 20000000, // 20 MB
+        file_too_big: ({file_size}) => file_size > 10000000, // 10 MB
     },
 }
 </script>
