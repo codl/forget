@@ -1,0 +1,47 @@
+<form action={action} method='post' enctype='multipart/form-data'>
+    {#if file_too_big}
+        <div class="banner warning">
+            The file you've selected is too large to upload.
+            blah
+        </div>
+    {/if}
+    <input type="file" name="file" accept="application/zip,.zip"
+        on:change="take_file(this.files)">
+    <input type="submit" value="Upload" disabled={file_too_big}>
+    <input type='hidden' name='csrf-token' value={csrf_token}>
+</form>
+
+<script>
+function get_file_size(file_list){
+    /* returns size of selected file given an <input type="file">
+        or 0 if no file is selected */
+    let size = 0;
+    console.log('ahh');
+    for(let i = 0; i < file_list.length; i++){
+        size += file_list[i].size;
+        console.log(size);
+    }
+    return size;
+}
+
+
+export default {
+    data(){
+        return { file_size: 0 }
+    },
+
+    oncreate(){
+        console.log('hello');
+    },
+
+    methods: {
+        take_file(file_list){
+            this.set({file_size: get_file_size(file_list)});
+        },
+    },
+
+    computed: {
+        file_too_big: ({file_size}) => file_size > 20000000, // 20 MB
+    },
+}
+</script>

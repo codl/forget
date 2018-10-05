@@ -1,4 +1,5 @@
 import Banner from '../components/Banner.html';
+import ArchiveForm from '../components/ArchiveForm.html';
 
 (function settings_init(){
     if(!('fetch' in window)){
@@ -186,6 +187,21 @@ import Banner from '../components/Banner.html';
             fetch('/api/reason', {method: 'DELETE', credentials:'same-origin'});
 
             reason_banner.parentElement.removeChild(reason_banner);
+        })
+    }
+
+    let archive_form_el = document.querySelector('#archive-form');
+    console.log('uh');
+    if(archive_form_el){
+        console.log('hey');
+        let csrf_token = archive_form_el.querySelector('input[name=csrf-token]').value;
+        let archive_form = new ArchiveForm({
+            target: archive_form_el,
+            hydrate: true,
+            data: {
+                action: archive_form_el.action,
+                csrf_token: csrf_token,
+            },
         })
     }
 })();
