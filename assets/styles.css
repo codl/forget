@@ -76,6 +76,16 @@ img.avatar.mastodon {
     padding-top: .6rem;
     padding-bottom: .6rem;
     margin-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.banner p {
+    margin: .3rem 0;
+}
+
+.banner p ~ p {
+    margin-top: 1.3rem;
 }
 
 body > section > .banner,

@@ -125,7 +125,7 @@ def task_rollup():
                 file_dep=list(chain(
                     # fuck it
                     glob('assets/*.js'),
-                    glob('components/*.html'))),
+                    glob('components/*.html'))) + ['rollup.config.js'],
                 targets=[dst],
                 clean=True,
                 actions=[
