@@ -7,6 +7,7 @@ export default {
     plugins: [
         svelte({
             include: 'components/**/*.html',
+            hydratable: true,
         }),
     ]
 }
