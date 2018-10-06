@@ -1,5 +1,7 @@
 ## v1.4.0
 
+Released 2018-10-06
+
 * added warning when it looks like an archive is a full "Your Twitter data" archive
 
 ## v1.3.0
