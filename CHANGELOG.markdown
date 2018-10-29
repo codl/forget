@@ -1,6 +1,6 @@
 ## v1.4.1 (security update)
 
-Not released
+Released 2018-10-29
 
 * updated requests to 2.20.0 ([CVE-2018-18074](https://nvd.nist.gov/vuln/detail/CVE-2018-18074))
 
