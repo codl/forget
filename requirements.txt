@@ -4,7 +4,7 @@ amqp==2.3.2
 asn1crypto==0.24.0
 billiard==3.5.0.4
 blinker==1.4
-brotli==1.0.6
+brotli==1.0.7
 celery==4.2.1
 certifi==2018.10.15
 cffi==1.11.5
