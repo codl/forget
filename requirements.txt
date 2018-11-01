@@ -39,7 +39,7 @@ raven==6.9.0
 redis==2.10.6
 requests==2.20.0
 six==1.11.0
-sqlalchemy==1.2.12
+sqlalchemy==1.2.13
 twitter==1.18.0
 urllib3==1.24
 vine==1.1.4
