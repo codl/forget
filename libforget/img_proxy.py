@@ -118,7 +118,7 @@ class ImgProxyCache(object):
             return abort(404)
 
         resp = make_response(body, 200)
-        resp.headers.set('x-imgproxy-cache', x_imgproxy_cache)
+        resp.headers.set('imgproxy-cache', x_imgproxy_cache)
         resp.headers.set('cache-control', 'max-age={}'.format(self.expire))
         for key, value in headers.items():
             resp.headers.set(key, value)

@@ -35,9 +35,9 @@ class BrotliCache(object):
         cache_key = 'brotlicache:{}'.format(digest)
 
         encbody = self.redis.get(cache_key)
-        response.headers.set('x-brotli-cache', 'HIT')
+        response.headers.set('brotli-cache', 'HIT')
         if not encbody:
-            response.headers.set('x-brotli-cache', 'MISS')
+            response.headers.set('brotli-cache', 'MISS')
             lock_key = 'brotlicache:lock:{}'.format(digest)
             if self.redis.set(lock_key, 1, nx=True, ex=10):
                 mode = (
@@ -52,9 +52,9 @@ class BrotliCache(object):
                     t.join(self.timeout)
                     encbody = self.redis.get(cache_key)
                 if not encbody:
-                    response.headers.set('x-brotli-cache', 'TIMEOUT')
+                    response.headers.set('brotli-cache', 'TIMEOUT')
             else:
-                response.headers.set('x-brotli-cache', 'LOCKED')
+                response.headers.set('brotli-cache', 'LOCKED')
         if encbody:
             response.headers.set('content-encoding', 'br')
             response.headers.set('vary', 'accept-encoding')
