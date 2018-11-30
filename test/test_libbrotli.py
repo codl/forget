@@ -65,7 +65,7 @@ def test_brotli_dynamic(br_client):
             '/',
             headers=[('accept-encoding', 'gzip, br')])
 
-    assert resp.headers.get('x-brotli-cache') == 'MISS'
+    assert resp.headers.get('brotli-cache') == 'MISS'
     assert resp.headers.get('content-encoding') == 'br'
     assert b"Hello, world!" in decompress(resp.data)
 
@@ -84,7 +84,7 @@ def test_brotli_dynamic_cache(br_client):
             '/',
             headers=[('accept-encoding', 'gzip, br')])
 
-    assert resp.headers.get('x-brotli-cache') == 'HIT'
+    assert resp.headers.get('brotli-cache') == 'HIT'
     assert resp.headers.get('content-encoding') == 'br'
     assert b"Hello, world!" in decompress(resp.data)
 
@@ -104,7 +104,7 @@ def test_brotli_dynamic_timeout(app):
             '/hard_to_compress',
             headers=[('accept-encoding', 'gzip, br')])
 
-    assert resp.headers.get('x-brotli-cache') == 'TIMEOUT'
+    assert resp.headers.get('brotli-cache') == 'TIMEOUT'
     assert resp.headers.get('content-encoding') != 'br'
 
 
@@ -124,4 +124,4 @@ def test_brotli_dynamic_expire(app):
             '/',
             headers=[('accept-encoding', 'gzip, br')])
 
-    assert resp.headers.get('x-brotli-cache') != 'HIT'
+    assert resp.headers.get('brotli-cache') != 'HIT'
