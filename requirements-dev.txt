@@ -4,7 +4,7 @@ attrs==18.2.0
 certifi==2018.11.29
 chardet==3.0.4
 codecov==2.0.15
-coverage==4.5.1
+coverage==4.5.2
 idna==2.8
 mirakuru==1.1.0
 more-itertools==6.0.0
