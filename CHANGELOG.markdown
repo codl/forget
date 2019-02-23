@@ -1,5 +1,7 @@
 ## v1.4.2
 
+* fix: picture tags having an extra comma
+* fix: outdated joke in about page
 * internals: removed `x-` prefix from custom headers, as per [section 8.3.1 of RFC7231](https://httpwg.org/specs/rfc7231.html#considerations.for.new.header.fields)
 
 ## v1.4.1 (security update)
