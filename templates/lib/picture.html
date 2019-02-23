@@ -8,7 +8,8 @@
     {%- for format in formats %}
     <source type='image/{{format}}' sizes='{{sizes}}' srcset="
     {%- for width in widths -%}
-        {{ st('{}-{}.{}'.format(basename, width, format)) }} {{width}}w,
+        {{ st('{}-{}.{}'.format(basename, width, format)) }} {{width}}w
+        {%- if not loop.last %},{% endif %}
     {%- endfor -%}
     "/>
     {% endfor %}
