@@ -103,7 +103,7 @@ def get_api_for_acc(account):
     raise TemporaryError('No access to account {}'.format(account))
 
 
-def fetch_acc(acc, cursor=None):
+def fetch_posts(acc, max_id, since_id):
     api = get_api_for_acc(acc)
 
     try:
@@ -112,32 +112,15 @@ def fetch_acc(acc, cursor=None):
         acc = db.session.merge(newacc)
 
         kwargs = dict(limit=40)
-        if cursor:
-            kwargs.update(cursor)
-
-        if 'max_id' not in kwargs:
-            most_recent_post = (
-                    Post.query.with_parent(acc)
-                    .order_by(db.desc(Post.created_at)).first())
-            if most_recent_post:
-                kwargs['since_id'] = most_recent_post.mastodon_id
+        if max_id:
+            kwargs['max_id'] = max_id
+        if since_id:
+            kwargs['since_id'] = since_id
 
         statuses = api.account_statuses(acc.mastodon_id, **kwargs)
 
-        if statuses:
-            for status in statuses:
-                post = post_from_api_object(status, acc.mastodon_instance)
-                db.session.merge(post)
-                if 'max_id' not in kwargs:
-                    kwargs['max_id'] = int(status['id'])
-                kwargs['max_id'] = min(int(kwargs['max_id']), int(status['id']))
+        return [post_from_api_object(status, acc.mastodon_instance) for status in statuses]
 
-        else:
-            kwargs = None
-
-        db.session.commit()
-
-        return kwargs
     except (MastodonAPIError,
             MastodonNetworkError,
             MastodonRatelimitError) as e:

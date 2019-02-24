@@ -67,13 +67,15 @@ def unique(fun):
         key = 'celery_unique_lock:{}'.format(
             pickle.dumps((fun.__name__, args, kwargs)))
         has_lock = False
+        result = None
         try:
             if r.set(key, 1, nx=True, ex=60 * 5):
                 has_lock = True
-                return fun(*args, **kwargs)
+                result = fun(*args, **kwargs)
         finally:
             if has_lock:
                 r.delete(key)
+        return result
 
     return wrapper
 
@@ -94,19 +96,82 @@ def make_dormant(acc):
 
 
 @app.task(autoretry_for=(TemporaryError, ))
-@unique
-def fetch_acc(id_, cursor=None):
+def fetch_acc(id_):
     account = Account.query.get(id_)
     print(f'fetching {account}')
     try:
-        action = noop
+        if not account.fetch_history_complete:
+            oldest = (db.session.query(Post)
+                      .with_parent(account, 'posts')
+                      .order_by(db.asc(Post.created_at))
+                      .first())
+            # ^ None if this is our first fetch ever, otherwise the oldest post
+            if oldest:
+                max_id = oldest.remote_id
+            else:
+                max_id = None
+            since_id = None
+        elif account.fetch_current_batch_end:
+            oldest = (db.session.query(Post)
+                      .with_parent(account, 'posts')
+                      .filter(Post.created_at > account.fetch_current_batch_end.created_at)
+                      .order_by(db.asc(Post.created_at))
+                      .first())
+            # ^ None if this is our first fetch of this batch, otherwise oldest of this batch
+            if oldest:
+                max_id = oldest.remote_id
+            else:
+                max_id = None
+            since_id = account.fetch_current_batch_end.remote_id
+        else:
+            # we shouldn't get here unless the user had no posts on the service last time we fetched
+            max_id = None
+            latest = (db.session.query(Post)
+                      .with_parent(account, 'posts')
+                      .order_by(db.desc(Post.created_at))
+                      .limit(1)
+                      .scalar())
+            # ^ should be None considering the user has no posts
+            #   will be the latest post in the off chance that something goes weird
+            if latest:
+                since_id = latest.remote_id
+            else:
+                since_id = None
+
+
+        print('max_id: {}, since_id: {}'.format(max_id, since_id))
+        fetch_posts = noop
         if (account.service == 'twitter'):
-            action = libforget.twitter.fetch_acc
+            fetch_posts = libforget.twitter.fetch_posts
         elif (account.service == 'mastodon'):
-            action = libforget.mastodon.fetch_acc
-        cursor = action(account, cursor)
-        if cursor:
-            fetch_acc.si(id_, cursor).apply_async()
+            fetch_posts = libforget.mastodon.fetch_posts
+        posts = fetch_posts(account, max_id, since_id)
+
+        if posts is None:
+            # ???
+            raise TemporaryError("Fetching posts went horribly wrong")
+
+        if len(posts) == 0:
+            # we either finished the historic fetch
+            # or we finished the current batch
+            account.fetch_history_complete = True
+            account.fetch_current_batch_end_id = (Post.query
+                    .with_parent(account, 'posts').order_by(db.desc(Post.created_at)).first()).id
+            # ^ note that this could be None if the user has no posts
+            #   this is okay
+
+            db.session.commit()
+
+        else:
+            for post in posts:
+                db.session.merge(post)
+            db.session.commit()
+
+            if not account.fetch_history_complete:
+                # reschedule immediately if we're still doing the historic fetch
+                fetch_acc.apply_async((id_,))
+
+
     except TemporaryError:
         db.session.rollback()
         account.backoff()
@@ -162,11 +227,11 @@ def delete_from_account(account_id):
     if account.next_delete > datetime.now(timezone.utc):
         return
 
-    latest_n_posts = (Post.query.with_parent(account).order_by(
+    latest_n_posts = (Post.query.with_parent(account, 'posts').order_by(
         db.desc(Post.created_at)).limit(account.policy_keep_latest)
                       .cte(name='latest'))
     posts = (
-        Post.query.with_parent(account)
+        Post.query.with_parent(account, 'posts')
         .filter(Post.created_at + account.policy_keep_younger <= db.func.now())
         .filter(~Post.id.in_(db.select((latest_n_posts.c.id, )))).order_by(
             db.func.random()).limit(100).with_for_update().all())
@@ -235,7 +300,7 @@ def refresh_account(account_id):
         limit = 100
         if account.service == 'mastodon':
             limit = 3
-        posts = (Post.query.with_parent(account).order_by(
+        posts = (Post.query.with_parent(account, 'posts').order_by(
             db.asc(Post.updated_at)).limit(limit).all())
 
         posts = refresh_posts(posts)
