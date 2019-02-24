@@ -193,6 +193,7 @@ def refresh_posts(posts):
             db.session.delete(post)
         else:
             post = db.session.merge(post_from_api_tweet_object(tweet))
+            post.touch()
             refreshed_posts.append(post)
 
     return refreshed_posts

@@ -1,6 +1,7 @@
 from mastodon import Mastodon
 from mastodon.Mastodon import MastodonAPIError,\
                               MastodonNetworkError,\
+                              MastodonNotFoundError,\
                               MastodonRatelimitError,\
                               MastodonUnauthorizedError
 from model import MastodonApp, Account, OAuthToken, Post, MastodonInstance
@@ -185,16 +186,14 @@ def refresh_posts(posts):
             status = api.status(post.mastodon_id)
             new_post = db.session.merge(
                     post_from_api_object(status, post.mastodon_instance))
+            new_post.touch()
             new_posts.append(new_post)
+        except MastodonNotFoundError:
+            db.session.delete(post)
         except (MastodonAPIError,
                 MastodonNetworkError,
                 MastodonRatelimitError) as e:
-            if any([
-                    err in str(e)
-                    for err in ('Endpoint not found', 'Record not found')]):
-                db.session.delete(post)
-            else:
-                raise TemporaryError(e)
+            raise TemporaryError(e)
 
     return new_posts
 
