@@ -1,5 +1,6 @@
 ## v1.4.2
 
+* implemented a more robust fetching algorithm, which should prevent accounts getting stuck with only a fraction of their posts fetched ([GH-13](https://github.com/codl/forget/issues/13))
 * fix: picture tags having an extra comma
 * fix: outdated joke in about page
 * internals: removed `x-` prefix from custom headers, as per [section 8.3.1 of RFC7231](https://httpwg.org/specs/rfc7231.html#considerations.for.new.header.fields)
@@ -32,7 +33,7 @@ Released 2018-05-08
 
 Released 2018-05-08
 
-* remember a user's mastodon instances and let them log in in one click (GH-36)
+* remember a user's mastodon instances and let them log in in one click ([GH-36](https://github.com/codl/forget/issues/36))
 
 ## v1.1.3
 

@@ -92,7 +92,7 @@ def get_twitter_for_acc(account):
         except URLError as e:
             raise TemporaryError(e)
 
-    return None
+    raise TemporaryError("No access to account {}".format(account))
 
 
 locale.setlocale(locale.LC_TIME, 'C')
@@ -123,11 +123,8 @@ def post_from_api_tweet_object(tweet, post=None):
     return post
 
 
-def fetch_acc(account, cursor):
+def fetch_posts(account, max_id, since_id):
     t = get_twitter_for_acc(account)
-    if not t:
-        print("no twitter access, aborting")
-        return
 
     try:
         user = t.account.verify_credentials()
@@ -139,45 +136,22 @@ def fetch_acc(account, cursor):
                 'trim_user': True,
                 'tweet_mode': 'extended',
                 }
-        if cursor:
-            kwargs.update(cursor)
-
-        if 'max_id' not in kwargs:
-            most_recent_post = (
-                    Post.query.order_by(db.desc(Post.created_at))
-                    .filter(Post.author_id == account.id).first())
-            if most_recent_post:
-                kwargs['since_id'] = most_recent_post.twitter_id
+        if max_id:
+            kwargs['max_id'] = max_id
+        if since_id:
+            kwargs['since_id'] = since_id
 
         tweets = t.statuses.user_timeline(**kwargs)
     except (TwitterError, URLError) as e:
         handle_error(e)
 
-    print("processing {} tweets for {acc}".format(len(tweets), acc=account))
-
-    if len(tweets) > 0:
-
-        kwargs['max_id'] = +inf
-
-        for tweet in tweets:
-            db.session.merge(post_from_api_tweet_object(tweet))
-            kwargs['max_id'] = min(tweet['id'] - 1, kwargs['max_id'])
-
-    else:
-        kwargs = None
-
-    db.session.commit()
-
-    return kwargs
-
+    return [post_from_api_tweet_object(tweet) for tweet in tweets]
 
 def refresh_posts(posts):
     if not posts:
         return posts
 
     t = get_twitter_for_acc(posts[0].author)
-    if not t:
-        return
     try:
         tweets = t.statuses.lookup(
                     _id=",".join((post.twitter_id for post in posts)),
