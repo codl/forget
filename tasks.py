@@ -296,6 +296,8 @@ def refresh_posts(posts):
 def refresh_account(account_id):
     account = Account.query.get(account_id)
 
+    print("Refreshing account {}".format(account))
+
     try:
         limit = 100
         if account.service == 'mastodon':
