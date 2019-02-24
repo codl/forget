@@ -1,6 +1,8 @@
 ## v1.4.2
 
-* implemented a more robust fetching algorithm, which should prevent accounts getting stuck with only a fraction of their posts fetched ([GH-13](https://github.com/codl/forget/issues/13))
+Released 2019-02-24
+
+* fix: implemented a more robust fetching algorithm, which should prevent accounts getting stuck with only a fraction of their posts fetched ([GH-13](https://github.com/codl/forget/issues/13))
 * fix: picture tags having an extra comma
 * fix: outdated joke in about page
 * fix: posts' status not getting refreshed (ie whether or not they were faved, or deleted externally)
