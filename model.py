@@ -4,6 +4,7 @@ from app import db
 import secrets
 from libforget.interval import decompose_interval
 import random
+from sqlalchemy.ext.declarative import declared_attr
 
 
 class TimestampMixin(object):
@@ -67,6 +68,13 @@ class RemoteIDMixin(object):
     def mastodon_id(self, id_):
         self.id = "mastodon:{}@{}".format(id_, self.mastodon_instance)
 
+    @property
+    def remote_id(self):
+        if self.service == 'twitter':
+            return self.twitter_id
+        elif self.service == 'mastodon':
+            return self.mastodon_id
+
 
 ThreeWayPolicyEnum = db.Enum('keeponly', 'deleteonly', 'none',
         name='enum_3way_policy')
@@ -104,6 +112,19 @@ class Account(TimestampMixin, RemoteIDMixin):
                              server_default='epoch', index=True)
     last_delete = db.Column(db.DateTime(timezone=True), index=True)
     next_delete = db.Column(db.DateTime(timezone=True), index=True)
+
+    fetch_history_complete = db.Column(db.Boolean, server_default='FALSE',
+                                       nullable=False)
+
+    @declared_attr
+    def fetch_current_batch_end_id(cls):
+        return db.Column(db.String, db.ForeignKey('posts.id', ondelete='SET NULL'))
+    @declared_attr
+    def fetch_current_batch_end(cls):
+        return db.relationship("Post", foreign_keys=(cls.fetch_current_batch_end_id,))
+    # the declared_attr is necessary because of the foreign key
+    # and because this class is technically one big mixin
+    # https://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/mixins.html#mixing-in-relationships
 
     reason = db.Column(db.String)
     dormant = db.Column(db.Boolean, server_default='FALSE', nullable=False)
@@ -175,7 +196,7 @@ class Account(TimestampMixin, RemoteIDMixin):
     # backref: sessions
 
     def post_count(self):
-        return Post.query.with_parent(self).count()
+        return Post.query.with_parent(self, 'posts').count()
 
     def estimate_eligible_for_delete(self):
         """
@@ -184,10 +205,10 @@ class Account(TimestampMixin, RemoteIDMixin):
         refresh every single post every time we need to know how many posts are
         eligible to delete
         """
-        latest_n_posts = (Post.query.with_parent(self)
+        latest_n_posts = (Post.query.with_parent(self, 'posts')
                           .order_by(db.desc(Post.created_at))
                           .limit(self.policy_keep_latest))
-        query = (Post.query.with_parent(self)
+        query = (Post.query.with_parent(self, 'posts')
                  .filter(Post.created_at <=
                          db.func.now() - self.policy_keep_younger)
                  .except_(latest_n_posts))
@@ -273,6 +294,7 @@ class Post(db.Model, TimestampMixin, RemoteIDMixin):
             nullable=False)
     author = db.relationship(
             Account,
+            foreign_keys = (author_id,),
             backref=db.backref('posts',
                                order_by=lambda: db.desc(Post.created_at)))
 
