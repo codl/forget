@@ -100,13 +100,11 @@ def get_api_for_acc(account):
         except (MastodonNetworkError,
                 MastodonRatelimitError) as e:
             raise TemporaryError(e)
+    raise TemporaryError('No access to account {}'.format(account))
 
 
 def fetch_acc(acc, cursor=None):
     api = get_api_for_acc(acc)
-    if not api:
-        print('no access, aborting')
-        return None
 
     try:
         newacc = account_from_api_object(
@@ -176,8 +174,6 @@ def account_from_api_object(obj, instance):
 def refresh_posts(posts):
     acc = posts[0].author
     api = get_api_for_acc(acc)
-    if not api:
-        raise Exception('no access')
 
     new_posts = list()
     for post in posts:
