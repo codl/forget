@@ -16,10 +16,10 @@
     "default": {
         "alembic": {
             "hashes": [
-                "sha256:0fe570f23dc48fb1bbda6f6a396f1c0c28d7045c0ad14018c104a511e6c1fe8a"
+                "sha256:16505782b229007ae905ef9e0ae6e880fddafa406f086ac7d442c1aaf712f8c2"
             ],
             "index": "pypi",
-            "version": "==1.0.1"
+            "version": "==1.0.7"
         },
         "amqp": {
             "hashes": [
