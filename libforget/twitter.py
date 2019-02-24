@@ -92,7 +92,7 @@ def get_twitter_for_acc(account):
         except URLError as e:
             raise TemporaryError(e)
 
-    return None
+    raise TemporaryError("No access to account {}".format(account))
 
 
 locale.setlocale(locale.LC_TIME, 'C')
@@ -125,9 +125,6 @@ def post_from_api_tweet_object(tweet, post=None):
 
 def fetch_acc(account, cursor):
     t = get_twitter_for_acc(account)
-    if not t:
-        print("no twitter access, aborting")
-        return
 
     try:
         user = t.account.verify_credentials()
@@ -176,8 +173,6 @@ def refresh_posts(posts):
         return posts
 
     t = get_twitter_for_acc(posts[0].author)
-    if not t:
-        return
     try:
         tweets = t.statuses.lookup(
                     _id=",".join((post.twitter_id for post in posts)),
