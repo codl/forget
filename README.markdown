@@ -1,7 +1,7 @@
 # Forget
 
 ![User count](https://forget.codl.fr/api/badge/users)
-![Maintenance status](https://img.shields.io/maintenance/yes/2018.svg)
+![Maintenance status](https://img.shields.io/maintenance/yes/2019.svg)
 
 [![Build status](https://img.shields.io/travis/codl/forget.svg)](https://travis-ci.org/codl/forget/)
 [![Test coverage](https://img.shields.io/codecov/c/github/codl/forget.svg)](https://codecov.io/gh/codl/forget)
