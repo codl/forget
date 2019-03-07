@@ -41,7 +41,7 @@ pip or any python tools included in dependencies (honcho, flask...)
 
 ```
 $ pip install -r requirements.txt
-$ npm ci
+$ npm install
 ```
 
 Wow!! Exciting
