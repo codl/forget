@@ -389,7 +389,8 @@ def refresh_account_with_oldest_post():
             .filter(Account.backoff_until < db.func.now())
             .filter(~Account.dormant).group_by(Post).order_by(
                 db.asc(Post.updated_at)).first())
-    refresh_account(post.author_id)
+    if post:
+        refresh_account(post.author_id)
 
 
 @app.task
@@ -399,7 +400,8 @@ def refresh_account_with_longest_time_since_refresh():
            .filter(Account.backoff_until < db.func.now())
            .filter(~Account.dormant).order_by(db.asc(
                Account.last_refresh)).first())
-    refresh_account(acc.id)
+    if acc:
+        refresh_account(acc.id)
 
 
 @app.task
