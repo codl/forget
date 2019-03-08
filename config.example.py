@@ -27,8 +27,8 @@ TWITTER CREDENTIALS
 Apply for api keys on the developer portal <https://developer.twitter.com/en/apps>
 Twitter locked me out of it so I can't guide you more than that. Sorry.
 """
-# TWITTER_CONSUMER_KEY='vdsvdsvds'
-# TWITTER_CONSUMER_SECRET='hjklhjklhjkl'
+# TWITTER_CONSUMER_KEY='yN3DUNVO0Me63IAQdhTfCA'
+# TWITTER_CONSUMER_SECRET='c768oTKdzAjIYCmpSNIdZbGaG0t6rOhSFQP0S5uC79g'
 
 """
 SERVER ADDRESS
