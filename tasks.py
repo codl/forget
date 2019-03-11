@@ -234,7 +234,7 @@ def delete_from_account(account_id):
         Post.query.with_parent(account, 'posts')
         .filter(Post.created_at + account.policy_keep_younger <= db.func.now())
         .filter(~Post.id.in_(db.select((latest_n_posts.c.id, )))).order_by(
-            db.func.random()).limit(100).with_for_update().all())
+            db.func.random()).limit(100).all())
 
     to_delete = None
 
