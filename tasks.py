@@ -316,6 +316,11 @@ def refresh_account(account_id):
         make_dormant(account)
         if sentry:
             sentry.captureException()
+    except Exception as e:
+        db.session.rollback()
+        account.backoff()
+        db.session.commit()
+        raise e
     finally:
         db.session.commit()
 
