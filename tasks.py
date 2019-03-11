@@ -96,6 +96,7 @@ def make_dormant(acc):
 
 
 @app.task(autoretry_for=(TemporaryError, ))
+@unique
 def fetch_acc(id_):
     account = Account.query.get(id_)
     print(f'fetching {account}')
