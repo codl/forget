@@ -155,11 +155,12 @@ def fetch_acc(id_):
             # we either finished the historic fetch
             # or we finished the current batch
             account.fetch_history_complete = True
-            account.fetch_current_batch_end_id = (Post.query
-                    .with_parent(account, 'posts').order_by(db.desc(Post.created_at)).first()).id
-            # ^ note that this could be None if the user has no posts
-            #   this is okay
-
+            batch_end = (Post.query.with_parent(account, 'posts').order_by(
+                db.desc(Post.created_at)).first())
+            if batch_end:
+                account.fetch_current_batch_end_id = batch_end.id
+            else:
+                account.fetch_current_batch_end_id = None
             db.session.commit()
 
         else:
