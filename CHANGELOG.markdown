@@ -1,3 +1,13 @@
+## v1.4.3
+
+Released 2019-03-11
+
+* documentation improvements
+* fix: deadlock when refreshing or deleting from mastodon accounts ([GH-19](https://github.com/codl/forget/issues/19))
+* fix: crash in fetch\_acc when user has no posts
+* fix: not backing off if something crashes in refresh\_account
+* fix: crashes when trying to refresh but no accounts have been created yet
+
 ## v1.4.2
 
 Released 2019-02-24
