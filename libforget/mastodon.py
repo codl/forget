@@ -160,19 +160,21 @@ def refresh_posts(posts):
     api = get_api_for_acc(acc)
 
     new_posts = list()
-    for post in posts:
-        try:
-            status = api.status(post.mastodon_id)
-            new_post = db.session.merge(
-                    post_from_api_object(status, post.mastodon_instance))
-            new_post.touch()
-            new_posts.append(new_post)
-        except MastodonNotFoundError:
-            db.session.delete(post)
-        except (MastodonAPIError,
-                MastodonNetworkError,
-                MastodonRatelimitError) as e:
-            raise TemporaryError(e)
+    with db.session.no_autoflush:
+        for post in posts:
+            print('Refreshing {}'.format(post))
+            try:
+                status = api.status(post.mastodon_id)
+                new_post = db.session.merge(
+                        post_from_api_object(status, post.mastodon_instance))
+                new_post.touch()
+                new_posts.append(new_post)
+            except MastodonNotFoundError:
+                db.session.delete(post)
+            except (MastodonAPIError,
+                    MastodonNetworkError,
+                    MastodonRatelimitError) as e:
+                raise TemporaryError(e)
 
     return new_posts
 
