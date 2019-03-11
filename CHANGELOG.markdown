@@ -1,6 +1,8 @@
 ## next
 
-* internals: make fetch_acc unique
+* back off before hitting rate limit on mastodon instances
+* fix: fetch\_acc running multiple copies fetching the same posts
+* internals: increased frequency of refresh jobs, decreased frequency of bookkeeping jobs
 
 ## v1.4.3
 

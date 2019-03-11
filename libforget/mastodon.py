@@ -87,6 +87,8 @@ def get_api_for_acc(account):
             # https://github.com/tootsuite/mastodon/issues/4637
             # so we have to do this:
             api.timeline()
+            if api.ratelimit_remaining / api.ratelimit_limit < 1/4:
+                raise TemporaryError("Rate limit too low")
             return api
         except MastodonUnauthorizedError as e:
             if sentry:
