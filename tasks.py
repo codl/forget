@@ -438,12 +438,12 @@ def update_mastodon_instances_popularity():
     db.session.commit()
 
 
-app.add_periodic_task(120, periodic_cleanup)
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(9, queue_deletes)
-app.add_periodic_task(60, refresh_account_with_oldest_post)
-app.add_periodic_task(180, refresh_account_with_longest_time_since_refresh)
-app.add_periodic_task(61, update_mastodon_instances_popularity)
+app.add_periodic_task(25, refresh_account_with_oldest_post)
+app.add_periodic_task(50, refresh_account_with_longest_time_since_refresh)
+app.add_periodic_task(300, periodic_cleanup)
+app.add_periodic_task(300, update_mastodon_instances_popularity)
 
 if __name__ == '__main__':
     app.worker_main()
