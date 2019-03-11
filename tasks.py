@@ -96,9 +96,10 @@ def make_dormant(acc):
 
 
 @app.task(autoretry_for=(TemporaryError, ))
+@unique
 def fetch_acc(id_):
     account = Account.query.get(id_)
-    print(f'fetching {account}')
+    print("Fetching {}".format(account))
     try:
         if not account.fetch_history_complete:
             oldest = (db.session.query(Post)
@@ -139,7 +140,6 @@ def fetch_acc(id_):
                 since_id = None
 
 
-        print('max_id: {}, since_id: {}'.format(max_id, since_id))
         fetch_posts = noop
         if (account.service == 'twitter'):
             fetch_posts = libforget.twitter.fetch_posts
@@ -266,7 +266,7 @@ def delete_from_account(account_id):
                     break
 
         if to_delete:
-            print("deleting {}".format(to_delete))
+            print("Deleting {}".format(to_delete))
             account.touch_delete()
             action(to_delete)
             account.reset_backoff()
@@ -438,12 +438,12 @@ def update_mastodon_instances_popularity():
     db.session.commit()
 
 
-app.add_periodic_task(120, periodic_cleanup)
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(9, queue_deletes)
-app.add_periodic_task(60, refresh_account_with_oldest_post)
-app.add_periodic_task(180, refresh_account_with_longest_time_since_refresh)
-app.add_periodic_task(61, update_mastodon_instances_popularity)
+app.add_periodic_task(25, refresh_account_with_oldest_post)
+app.add_periodic_task(50, refresh_account_with_longest_time_since_refresh)
+app.add_periodic_task(300, periodic_cleanup)
+app.add_periodic_task(300, update_mastodon_instances_popularity)
 
 if __name__ == '__main__':
     app.worker_main()
