@@ -64,7 +64,7 @@
 <script type="application/json" id="top_instances">
 [
 {% for instance in mastodon_instances %}
-    "{{instance}}"
+    {"instance": "{{instance}}"}
     {%- if not loop.last -%}
     ,
     {%- endif %}
@@ -74,7 +74,7 @@
 
 <script type="text/html+template" id="instance_button_template">
     <a style='background-color:#282c37' class='btn primary'
-        href="{{ url_for('mastodon_login_step1') }}/${encodeURIcomponent(instance)}">
+        href="{{ url_for('mastodon_login_step1') }}/${encodeURIComponent(instance)}">
         ${ !first? '' : `
             {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
             Log in with
@@ -89,5 +89,11 @@
     </a>
 </script>
 
+
 {% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+<script defer src="{{st('instance_buttons.js')}}"></script>
 {% endblock %}

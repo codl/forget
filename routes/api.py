@@ -67,7 +67,7 @@ def known_instances():
     if request.method == 'GET':
         known = request.cookies.get('forget_known_instances', '')
         if not known:
-            return Response('[]', 404, mimetype='application/json')
+            return Response('[]', 200, mimetype='application/json')
 
         # pad to avoid oracle attacks
         for _ in range(random.randint(0, 1000)):

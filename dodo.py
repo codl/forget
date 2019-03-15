@@ -116,7 +116,7 @@ def task_minify_css():
 def task_rollup():
     """rollup javascript bundle"""
 
-    filenames = ['settings.js']
+    filenames = ['settings.js', 'instance_buttons.js']
     for filename in filenames:
         src = 'assets/{}'.format(filename)
         dst = 'static/{}'.format(filename)

@@ -68,7 +68,7 @@ def install_security_headers(resp):
         csp += "script-src 'self' https://cdn.ravenjs.com/;"
         csp += "connect-src 'self' https://sentry.io/;"
     else:
-        csp += "script-src 'self';"
+        csp += "script-src 'self' 'unsafe-eval';"
         csp += "connect-src 'self';"
 
     if 'CSP_REPORT_URI' in app.config:
