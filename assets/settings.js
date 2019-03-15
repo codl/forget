@@ -145,7 +145,6 @@ import {known_load, known_save} from './known_instances.js'
     function update_viewer(viewer){
         let dumped = JSON.stringify(viewer);
         if(last_viewer == dumped){
-            console.log('viewers is the same');
             return;
         }
         last_viewer = dumped;
@@ -228,7 +227,6 @@ import {known_load, known_save} from './known_instances.js'
     }
 
     if(viewer_from_dom['service'] == 'mastodon' && location.hash == '#bump_instance'){
-        console.log('bumpin')
         bump_instance(viewer_from_dom['id'].split('@')[1])
         let url = new URL(location.href)
         url.hash = '';
