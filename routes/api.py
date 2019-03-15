@@ -4,6 +4,7 @@ from flask import jsonify, redirect, make_response, request, Response
 from model import Account
 import libforget.settings
 import libforget.json
+import random
 
 @app.route('/api/health_check')
 def health_check():
@@ -67,6 +68,10 @@ def known_instances():
         known = request.cookies.get('forget_known_instances', '')
         if not known:
             return Response('[]', 404, mimetype='application/json')
+
+        # pad to avoid oracle attacks
+        for _ in range(random.randint(0, 1000)):
+                known += random.choice((' ', '\t', '\n'))
 
         return Response(known, mimetype='application/json')
 
