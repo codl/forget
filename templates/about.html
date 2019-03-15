@@ -74,7 +74,7 @@
 
 <script type="text/html+template" id="instance_button_template">
     <a style='background-color:#282c37' class='btn primary'
-        href="{{ url_for('mastodon_login_step1') }}/${encodeURIComponent(instance)}">
+        href="{{ url_for('mastodon_login_step1') }}?instance_url=${encodeURIComponent(instance)}">
         ${ !first? '' : `
             {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
             Log in with

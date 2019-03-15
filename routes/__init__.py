@@ -265,7 +265,7 @@ def mastodon_login_step2(instance_url):
 
     g.viewer = session
 
-    resp = redirect(url_for('index'))
+    resp = redirect(url_for('index', _anchor='bump_instance'))
     return resp
 
 

@@ -1,5 +1,6 @@
 import Banner from '../components/Banner.html';
 import ArchiveForm from '../components/ArchiveForm.html';
+import {known_load, known_save} from './known_instances.js'
 
 (function settings_init(){
     if(!('fetch' in window)){
@@ -142,10 +143,12 @@ import ArchiveForm from '../components/ArchiveForm.html';
 
     let last_viewer = {};
     function update_viewer(viewer){
-        if(last_viewer == JSON.stringify(viewer)){
+        let dumped = JSON.stringify(viewer);
+        if(last_viewer == dumped){
+            console.log('viewers is the same');
             return;
         }
-        last_viewer = JSON.stringify(viewer);
+        last_viewer = dumped;
 
         document.querySelector('#post-count').textContent = viewer.post_count;
         document.querySelector('#eligible-estimate').textContent = viewer.eligible_for_delete_estimate;
@@ -163,7 +166,9 @@ import ArchiveForm from '../components/ArchiveForm.html';
         banner.set(viewer);
     }
 
-    update_viewer(JSON.parse(document.querySelector('script[data-viewer]').textContent))
+    let viewer_from_dom = JSON.parse(document.querySelector('script[data-viewer]').textContent)
+
+    update_viewer(viewer_from_dom)
 
     function set_viewer_timeout(){
         setTimeout(() => fetch_viewer().then(update_viewer).then(set_viewer_timeout, set_viewer_timeout),
@@ -201,5 +206,32 @@ import ArchiveForm from '../components/ArchiveForm.html';
                 csrf_token: csrf_token,
             },
         })
+    }
+
+    function bump_instance(instance_name){
+        let known_instances = known_load();
+        let found = false;
+        for(let instance of known_instances){
+            if(instance['instance'] == instance_name){
+                instance.hits ++;
+                found = true;
+                break;
+            }
+        }
+        if(!found){
+            let instance = {"instance": instance_name, "hits": 1};
+            known_instances.push(instance);
+        }
+
+        known_save(known_instances);
+
+    }
+
+    if(viewer_from_dom['service'] == 'mastodon' && location.hash == '#bump_instance'){
+        console.log('bumpin')
+        bump_instance(viewer_from_dom['id'].split('@')[1])
+        let url = new URL(location.href)
+        url.hash = '';
+        history.replaceState('', '', url);
     }
 })();

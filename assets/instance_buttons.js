@@ -1,8 +1,8 @@
+const SLOTS = 5;
+
+import {known_load, known_save} from './known_instances.js';
+
 (function instance_buttons(){
-
-    const SLOTS = 5;
-
-    const STORAGE_KEY = 'forget_known_instances';
 
     const container = document.querySelector('#mastodon_instance_buttons');
     const button_template = Function('first', 'instance',
@@ -14,8 +14,7 @@
         Function('return JSON.parse(`' + document.querySelector('#top_instances').innerHTML + '`);')();
 
     async function get_known(){
-        let known = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        let has_been_fetched = false;
+        let known = known_load();
         if(!known){
             let resp = await fetch('/api/known_instances');
             if(resp.ok && resp.headers.get('content-type') == 'application/json'){
@@ -27,7 +26,7 @@
                     "hits": 0
                 }];
             }
-            save(known)
+            known_save(known)
             fetch('/api/known_instances', {method: 'DELETE'})
         }
 
@@ -64,15 +63,12 @@
         return head.concat(tail)
     }
 
-    function save(known){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(known));
-    }
 
     async function replace_buttons(){
         let known = await get_known();
 
         known = normalize(known);
-        save(known);
+        known_save(known);
 
         let filtered_top_instances = []
         for(let instance of top_instances){
