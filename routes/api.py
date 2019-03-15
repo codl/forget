@@ -1,6 +1,6 @@
 from app import app, db
 from libforget.auth import require_auth_api, get_viewer
-from flask import jsonify, redirect, make_response, request
+from flask import jsonify, redirect, make_response, request, Response
 from model import Account
 import libforget.settings
 import libforget.json
@@ -59,3 +59,18 @@ def users_badge():
     return redirect(
             "https://img.shields.io/badge/active%20users-{}-blue.svg"
             .format(count))
+
+
+@app.route('/api/known_instances', methods=('GET', 'DELETE'))
+def known_instances():
+    if request.method == 'GET':
+        known = request.cookies.get('forget_known_instances', '')
+        if not known:
+            return Response('[]', 404, mimetype='application/json')
+
+        return Response(known, mimetype='application/json')
+
+    elif request.method == 'DELETE':
+        resp = Response('', 204)
+        resp.set_cookie('forget_known_instances', '', max_age=0)
+        return resp
