@@ -34,7 +34,7 @@
 </a>
 </p>
 
-<p>
+<p id='mastodon_instance_buttons'>
 
 {% for instance in mastodon_instances %}
 <a style='background-color:#282c37' class='btn primary' href="{{ url_for('mastodon_login_step1', instance_url=instance) }}">
@@ -59,5 +59,35 @@
 
 </p>
 </section>
+
+
+<script type="application/json" id="top_instances">
+[
+{% for instance in mastodon_instances %}
+    "{{instance}}"
+    {%- if not loop.last -%}
+    ,
+    {%- endif %}
+{% endfor %}
+]
+</script>
+
+<script type="text/html+template" id="instance_button_template">
+    <a style='background-color:#282c37' class='btn primary'
+        href="{{ url_for('mastodon_login_step1') }}/${encodeURIcomponent(instance)}">
+        ${ !first? '' : `
+            {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
+            Log in with
+            `}
+        ${ instance }
+    </a>
+</script>
+
+<script type="text/html+template" id="another_instance_button_template">
+    <a class='btn secondary' href="{{ url_for('mastodon_login_step1') }}">
+        Another Mastodon instance
+    </a>
+</script>
+
 {% endif %}
 {% endblock %}
