@@ -1,6 +1,4 @@
-const SLOTS = 5;
-
-import {known_load, known_save} from './known_instances.js';
+import {SLOTS, normalize_known, known_load, known_save} from './known_instances.js';
 
 (function instance_buttons(){
 
@@ -33,41 +31,11 @@ import {known_load, known_save} from './known_instances.js';
         return known;
     }
 
-    function normalize(known){
-        /*
-
-        move instances with the most hits to the top SLOTS slots,
-        making sure not to reorder anything that is already there
-
-        */
-        let head = known.slice(0, SLOTS);
-        let tail = known.slice(SLOTS);
-
-        if(tail.length == 0){
-            return known;
-        }
-
-        for(let i = 0; i < SLOTS; i++){
-            let head_min = head.reduce((acc, cur) => acc.hits < cur.hits ? acc : cur);
-            let tail_max = tail.reduce((acc, cur) => acc.hits > cur.hits ? acc : cur);
-            if(head_min.hits < tail_max.hits){
-                // swappy
-                let i = head.indexOf(head_min);
-                let j = tail.indexOf(tail_max);
-                let buf = head[i];
-                head[i] = tail[j];
-                tail[j] = buf;
-            }
-        }
-
-        return head.concat(tail)
-    }
-
 
     async function replace_buttons(){
         let known = await get_known();
 
-        known = normalize(known);
+        known = normalize_known(known);
         known_save(known);
 
         let filtered_top_instances = []
