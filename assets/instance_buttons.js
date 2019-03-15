@@ -74,7 +74,7 @@ import {known_load, known_save} from './known_instances.js';
         for(let instance of top_instances){
             let found = false;
             for(let k of known){
-                if(k['instance'] == instance){
+                if(k['instance'] == instance['instance']){
                     found = true;
                     break;
                 }
