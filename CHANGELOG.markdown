@@ -1,4 +1,6 @@
-## next
+## v1.5.0
+
+Released 2019-03-15
 
 * back off before hitting rate limit on mastodon instances
 * tracking of used instances for the login buttons on the front page is now entirely client-side,
