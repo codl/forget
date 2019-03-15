@@ -1,6 +1,8 @@
 ## next
 
 * back off before hitting rate limit on mastodon instances
+* tracking of used instances for the login buttons on the front page is now entirely client-side,
+  avoiding a potential information disclosure vulnerability ([GH-175](https://github.com/codl/forget/issues/175))
 * fix: fetch\_acc running multiple copies fetching the same posts
 * internals: increased frequency of refresh jobs, decreased frequency of bookkeeping jobs
 

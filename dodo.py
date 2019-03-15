@@ -116,10 +116,11 @@ def task_minify_css():
 def task_rollup():
     """rollup javascript bundle"""
 
-    filenames = ['settings.js']
+    filenames = ['settings.js', 'instance_buttons.js']
     for filename in filenames:
         src = 'assets/{}'.format(filename)
         dst = 'static/{}'.format(filename)
+        name = filename.split('.')[0]
         yield dict(
                 name=filename,
                 file_dep=list(chain(
@@ -130,7 +131,7 @@ def task_rollup():
                 clean=True,
                 actions=[
                     ['node_modules/.bin/rollup', '-c',
-                     '-i', src, '-o', dst, '-f', 'iife'],
+                     '-i', src, '-o', dst, '-n', name, '-f', 'iife'],
                 ],
             )
 
