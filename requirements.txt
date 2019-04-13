@@ -1,5 +1,5 @@
 -i https://pypi.python.org/simple/
-alembic==1.0.7
+alembic==1.0.8
 amqp==2.4.2
 asn1crypto==0.24.0
 billiard==3.5.0.5
