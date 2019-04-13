@@ -4,7 +4,7 @@ attrs==19.1.0
 certifi==2019.3.9
 chardet==3.0.4
 codecov==2.0.15
-coverage==4.5.2
+coverage==4.5.3
 idna==2.8
 mirakuru==1.1.0
 more-itertools==7.0.0 ; python_version > '2.7'
