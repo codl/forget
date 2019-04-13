@@ -458,10 +458,10 @@
         },
         "sqlalchemy": {
             "hashes": [
-                "sha256:8027fa183f5be466030617a497b2d64e0e16c8d615e5a34bdf9fab6f66bf4723"
+                "sha256:d5432832f91d200c3d8b473a266d59442d825f9ea744c467e68c5d9a9479fbce"
             ],
             "index": "pypi",
-            "version": "==1.2.18"
+            "version": "==1.3.2"
         },
         "twitter": {
             "hashes": [
