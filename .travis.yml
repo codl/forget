@@ -12,4 +12,6 @@ script:
     - pytest --cov=.
 after_success:
     - codecov
-cache: pip
+cache:
+    - pip
+    - npm
