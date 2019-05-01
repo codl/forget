@@ -45,7 +45,7 @@ class ImgProxyCache(object):
         return base64.urlsafe_b64encode(
                 '{}:{}'.format(url_hmac.hexdigest(), url)
                 .encode('UTF-8')
-                ).strip(b'=')
+                ).strip(b'=').decode('UTF-8')
 
     def url_for(self, identifier):
         try:
