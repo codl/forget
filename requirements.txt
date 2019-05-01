@@ -27,7 +27,7 @@ jinja2==2.10.1
 kombu==4.5.0
 mako==1.0.9
 markupsafe==1.1.1
-mastodon.py==1.3.1
+mastodon.py==1.4.0
 pillow==5.4.1
 psycopg2==2.7.7
 pycparser==2.19
