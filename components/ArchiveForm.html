@@ -11,12 +11,14 @@
         </div>
     {/if}
     <input type="file" name="file" accept="application/zip,.zip"
-        on:change="take_file(this.files)">
+        on:change={take_file(this.files)}>
     <input type="submit" value="Upload">
     <input type='hidden' name='csrf-token' value={csrf_token}>
 </form>
 
 <script>
+export let csrf_token, action;
+
 function get_file_size(file_list){
     /* returns size of selected file given an <input type="file">
         or 0 if no file is selected */
@@ -27,23 +29,10 @@ function get_file_size(file_list){
     return size;
 }
 
-
-export default {
-    data(){
-        return { file_size: 0 }
-    },
-
-    oncreate(){
-    },
-
-    methods: {
-        take_file(file_list){
-            this.set({file_size: get_file_size(file_list)});
-        },
-    },
-
-    computed: {
-        file_too_big: ({file_size}) => file_size > 10000000, // 10 MB
-    },
+function take_file(file_list){
+    file_size: get_file_size(file_list);
 }
+
+let file_size = 0;
+$: file_too_big = file_size > 10000000; // 10 MB
 </script>

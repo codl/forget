@@ -1,6 +1,6 @@
 <div class='banner {policy_enabled?'enabled':'disabled'}'>
     <div class='btn-group right'>
-        <button class='btn {policy_enabled?"secondary":"primary"}' on:click='toggle(policy_enabled)'>{policy_enabled?'Disable':'Enable'}</button>
+        <button class='btn {policy_enabled?"secondary":"primary"}' on:click={toggle}>{policy_enabled?'Disable':'Enable'}</button>
     </div>
     <div>
         Forget is currently
@@ -12,12 +12,13 @@
         on your account.
     </div>
     <div class='timers'>
-        <span class='last-delete {(!last_delete)?'hidden':''}' title={last_delete}>
+        <span class='last-delete' class:hidden={!last_delete} title={last_delete}>
         {#if last_delete }
             Last delete {rel_past(now - last_delete)}.
         {/if }
         </span>
-        <span class='next-delete {(!policy_enabled || !next_delete || !eligible_for_delete_estimate)?'hidden':''}' title={next_delete}>
+        <span class='next-delete'
+              class:hidden={!policy_enabled || !next_delete || !eligible_for_delete_estimate} title={next_delete}>
             Next delete {rel_future(next_delete - now)}.
         </span>
     </div>
@@ -47,6 +48,7 @@
 
 <script>
 function absmod(n, x){
+    // it's like modulo but never negative
     n = n % x;
     if(n < 0){
         n += x
@@ -61,6 +63,7 @@ function s(n){
     return '';
 }
 function rel(millis){
+    // returns human-readable duration from duration in millis
     let secs = Math.round(millis/1000)
     if(secs <= 120){
         return `${secs} seconds`;
@@ -81,58 +84,50 @@ function rel(millis){
     return `${days} days`;
 }
 
-export default {
-    data(){
-        return {
-            policy_enabled: false,
-            next_delete: null,
-            last_delete: null,
-            now: +(new Date()),
+function rel_future(millis){
+    // returns relative time from timestamp, assuming time is in the future
+    if(millis < 2000){
+        let secs = Math.floor(millis/1000)
+        let ndots = absmod(-secs, 3);
+        let out = 'anytime now';
+        for(; ndots > 0; ndots--){
+            out += '.';
         }
-    },
+        return out;
+    }
+    return `in ${rel(millis)}`;
+}
 
-    helpers: {
-        rel_future(millis){
-            if(millis < 2000){
-                let secs = Math.floor(millis/1000)
-                let ndots = absmod(-secs, 3);
-                let out = 'anytime now';
-                for(; ndots > 0; ndots--){
-                    out += '.';
-                }
-                return out;
-            }
-            return `in ${rel(millis)}`;
-        },
-        rel_past(millis){
-            if(millis < 2000){
-                return 'just now';
-            }
-            return `${rel(millis)} ago`;
-        },
-    },
+function rel_past(millis){
+    // returns relative time from timestamp, assuming time is in the past
+    if(millis < 2000){
+        return 'just now';
+    }
+    return `${rel(millis)} ago`;
+}
 
-    methods: {
-        toggle(policy_enabled){
-            policy_enabled = !policy_enabled;
-            let obj = {policy_enabled}
-            if(policy_enabled){
-                obj.next_delete = null;
-            }
-            this.set(obj);
-            this.fire('toggle', policy_enabled);
-        }
-    },
+import { onDestroy, createEventDispatcher } from 'svelte';
 
-    oncreate () {
-      this.interval = setInterval( () => {
-        this.set({ now: +(new Date()) });
-      }, 1000 );
-    },
+const dispatch = createEventDispatcher();
 
-    ondestroy () {
-      clearInterval( this.interval );
-    },
+function toggle(){
+    console.log(policy_enabled);
+    policy_enabled = !policy_enabled;
+    if(policy_enabled){
+        next_delete = null;
+    }
+    dispatch('toggle', policy_enabled);
+}
 
-};
+
+export let next_delete, last_delete, eligible_for_delete_estimate;
+export let policy_enabled = false;
+
+let now = +(new Date());
+
+let interval = setInterval(() =>
+    now = +(new Date())
+, 1000 );
+
+onDestroy(()=> clearInterval(interval));
 </script>

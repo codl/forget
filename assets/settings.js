@@ -162,7 +162,7 @@ import {known_load, known_save} from './known_instances.js'
         if(viewer.last_delete){
             viewer.last_delete = new Date(viewer.last_delete);
         }
-        banner.set(viewer);
+        banner.$set(viewer);
     }
 
     let viewer_from_dom = JSON.parse(document.querySelector('script[data-viewer]').textContent)
@@ -175,7 +175,8 @@ import {known_load, known_save} from './known_instances.js'
     }
     set_viewer_timeout();
 
-    banner.on('toggle', enabled => {
+    banner.$on('toggle', event => {
+        let enabled = event.detail;
         send_settings({policy_enabled: enabled}).then(fetch_viewer).then(update_viewer);
         // TODO show error or spinner if it takes over a second
     })
