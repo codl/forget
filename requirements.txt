@@ -16,7 +16,7 @@ csscompressor==0.9.5
 decorator==4.4.0
 doit==0.31.1
 flask-migrate==2.4.0
-flask-sqlalchemy==2.3.2
+flask-sqlalchemy==2.4.0
 flask==1.0.2
 gunicorn==19.9.0
 honcho==1.0.1
