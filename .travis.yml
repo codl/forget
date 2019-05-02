@@ -13,5 +13,7 @@ script:
 after_success:
     - codecov
 cache:
-    - pip
-    - npm
+    pip: true
+    directories:
+        - node_modules
+
