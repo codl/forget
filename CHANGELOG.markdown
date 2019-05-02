@@ -1,3 +1,10 @@
+## v1.5.1
+
+Released 2019-05-02
+
+* fix: proxied avatars not working in some environments
+* dependency updates
+
 ## v1.5.0
 
 Released 2019-03-15
