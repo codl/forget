@@ -234,8 +234,24 @@ def delete_from_account(account_id):
     posts = (
         Post.query.with_parent(account, 'posts')
         .filter(Post.created_at + account.policy_keep_younger <= db.func.now())
-        .filter(~Post.id.in_(db.select((latest_n_posts.c.id, )))).order_by(
-            db.func.random()).limit(100).all())
+        .filter(~Post.id.in_(db.select((latest_n_posts.c.id, )))))
+
+    if(account.policy_keep_favourites != 'none'):
+        posts = posts.filter(db.or_(
+            Post.favourite == (account.policy_keep_favourites == 'deleteonly'),
+            Post.is_reblog))
+    if(account.policy_keep_media != 'none'):
+        posts = posts.filter(db.or_(
+            Post.has_media == (account.policy_keep_media == 'deleteonly'),
+            Post.is_reblog))
+    if(account.policy_keep_direct):
+        posts = posts.filter(~Post.direct)
+
+    limit = 100
+    if account.service == 'mastodon':
+        limit = 10
+
+    posts = posts.order_by(db.func.random()).limit(limit).all()
 
     to_delete = None
 
