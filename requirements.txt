@@ -13,7 +13,7 @@ cloudpickle==1.1.1
 csscompressor==0.9.5
 decorator==4.4.0
 doit==0.31.1
-flask-migrate==2.4.0
+flask-migrate==2.5.2
 flask-sqlalchemy==2.4.0
 flask==1.0.3
 gunicorn==19.9.0
