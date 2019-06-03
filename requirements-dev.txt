@@ -9,16 +9,19 @@ idna==2.8
 importlib-metadata==0.17
 mirakuru==1.1.0
 more-itertools==7.0.0 ; python_version > '2.7'
+packaging==19.0
 pluggy==0.12.0
 port-for==0.4
 psutil==5.6.2
 py==1.8.0
+pyparsing==2.4.0
 pytest-cov==2.6.1
 pytest-redis==1.3.2
-pytest==4.4.1
+pytest==4.6.1
 redis==3.2.1
 requests==2.21.0
 six==1.12.0
 urllib3==1.24.3
 versioneer==0.18
+wcwidth==0.1.7
 zipp==0.5.1
