@@ -6,9 +6,11 @@ from mastodon.Mastodon import MastodonAPIError,\
                               MastodonUnauthorizedError
 from model import MastodonApp, Account, OAuthToken, Post, MastodonInstance
 from requests import head
+import requests
 from app import db, sentry
 from libforget.exceptions import TemporaryError
 from functools import lru_cache
+from libforget.session import make_session
 
 
 def get_or_create_app(instance_url, callback, website):
@@ -37,11 +39,13 @@ def get_or_create_app(instance_url, callback, website):
     return app
 
 
+
 def anonymous_api(app):
     return Mastodon(
             app.client_id,
             client_secret=app.client_secret,
             api_base_url='{}://{}'.format(app.protocol, app.instance),
+            session=make_session(),
             )
 
 
@@ -80,6 +84,7 @@ def get_api_for_acc(account):
                 api_base_url='{}://{}'.format(app.protocol, app.instance),
                 access_token=token.token,
                 ratelimit_method='throw',
+                session=make_session(),
             )
         try:
             # api.verify_credentials()
