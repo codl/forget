@@ -1,3 +1,7 @@
+## v1.5.2
+
+* fix: stock user agent when querying mastodon servers
+
 ## v1.5.1
 
 Released 2019-05-02
