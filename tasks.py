@@ -276,10 +276,11 @@ def delete_from_account(account_id):
         elif account.service == 'mastodon':
             action = libforget.mastodon.delete
             for post in posts:
-                refreshed = refresh_posts((post, ))
-                if refreshed and is_eligible(refreshed[0]):
-                    to_delete = refreshed[0]
-                    break
+                if is_eligible(post) or post.updated_at < datetime.now(timezone.utc) - timedelta(hours=6):
+                    refreshed = refresh_posts((post, ))
+                    if refreshed and is_eligible(refreshed[0]):
+                        to_delete = refreshed[0]
+                        break
 
         if to_delete:
             print("Deleting {}".format(to_delete))
