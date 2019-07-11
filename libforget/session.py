@@ -1,4 +1,5 @@
-from requests import Session
+import requests
+import version
 
 
 def make_session():
