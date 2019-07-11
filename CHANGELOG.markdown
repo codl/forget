@@ -1,4 +1,12 @@
+## v1.5.3
+
+Released 2019-07-11
+
+* fix: everything related to mastodon broken because of a typo
+
 ## v1.5.2
+
+Released 2019-07-11
 
 * fix: stock user agent when querying mastodon servers
 
