@@ -16,6 +16,7 @@ from libforget.exceptions import PermanentError, TemporaryError
 import redis
 from functools import wraps
 import pickle
+import logging
 
 app = Celery(
     'tasks',
