@@ -16,7 +16,7 @@ default_config = {
         "HTTPS": True,
         "SENTRY_CONFIG": {},
         "REPO_URL": "https://github.com/codl/forget",
-        "COMMIT_URL": "https://github.com/codl/forget/commits/{hash}",
+        "CHANGELOG_URL": "https://github.com/codl/forget/blob/{hash}/CHANGELOG.markdown",
         "REDIS_URI": "redis://",
 }
 
