@@ -17,7 +17,7 @@
 {% endif %}
 
 <p>
-<a style='background-color:#1da1f2' class='btn primary' href="/login/twitter">
+<a class='btn primary twitter-colored' href="/login/twitter">
     {{picture(st, 'twitter', (20,40,80), ('webp', 'png'))}}
     Log in with Twitter
 </a>
@@ -26,7 +26,7 @@
 <p id='mastodon_instance_buttons'>
 
 {% for instance in mastodon_instances %}
-<a style='background-color:#282c37' class='btn primary' href="{{ url_for('mastodon_login_step1', instance_url=instance) }}">
+<a class='btn primary mastodon-colored' href="{{ url_for('mastodon_login_step1', instance_url=instance) }}">
 {% if loop.first %}
     {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
     Log in with
@@ -34,7 +34,7 @@
         {{instance}}
 </a>
 {% else %}
-<a style='background-color:#282c37' class='btn primary' href="{{ url_for('mastodon_login_step1') }}">
+<a class='btn primary mastodon-colored' href="{{ url_for('mastodon_login_step1') }}">
     {{picture(st, 'mastodon', (20,40,80), ('webp', 'png'))}}
     Log in with Mastodon
 </a>
