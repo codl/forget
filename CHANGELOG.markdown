@@ -1,5 +1,6 @@
 ## next
 
+* increased frequency of refresh jobs
 * version number in footer now links to changelog instead of commit log
 
 ## v1.5.3
