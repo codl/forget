@@ -1,4 +1,6 @@
-## next
+## v1.6.0
+
+Released 2019-07-23
 
 * increased frequency of refresh jobs
 * version number in footer now links to changelog instead of commit log
