@@ -4,18 +4,7 @@
 
 <section>
 {% include "lib/greet.html" %}
-    <p>Forget is a service that automatically deletes your old posts that everyone has forgotten about. Shouldn't databases forget too?</p>
-</section>
-
-<section>
-<h2>Features</h2>
-<ul>
-    <li>Delete your stale bad posts without even having to look at them again!</li>
-    <li>Set it and <em>forget</em> it. Once you set up an post age limit and/or a post count limit, posts will be considered for deletion as soon as they age past these limits.</li>
-    <li>Choose your pace: delete one post every minute, one post a day, etc...</li>
-    <li>Optionally mark posts that you want to keep, by giving them a favourite.</li>
-    <li>Optionally keep posts with media.</li>
-</ul>
+    <p>Forget is a service that automatically deletes your old posts. Shouldn't databases forget too?</p>
 </section>
 
 {% if not g.viewer %}
@@ -91,6 +80,26 @@
 
 
 {% endif %}
+
+<section>
+<h2>Features</h2>
+<ul>
+    <li>Delete your posts when they cross an age threshold.</li>
+    <li>Or keep your post count in check, deleting old posts when you go over.</li>
+    <li>Preserve old posts that matter by giving them a favourite.</li>
+    <li>Set it and <i>forget</i> it. Forget works continuously in the background.</li>
+</ul>
+</section>
+
+<section>
+<h2>Non-features</h2>
+<p>
+    Forget is not a one-time purging tool.
+    It is designed to prune your account continuously, not quickly.
+    If you need a lot of posts gone fast, you may want to look for another more-suited tool.
+</p>
+</section>
+
 {% endblock %}
 
 

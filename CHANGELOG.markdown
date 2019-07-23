@@ -2,6 +2,7 @@
 
 * increased frequency of refresh jobs
 * version number in footer now links to changelog instead of commit log
+* updated about page. less negative, more succint, clarifies that forget is not a purging tool
 
 ## v1.5.3
 
