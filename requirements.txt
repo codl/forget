@@ -14,7 +14,7 @@ decorator==4.4.0
 doit==0.31.1
 flask-migrate==2.5.2
 flask-sqlalchemy==2.4.0
-flask==1.0.3
+flask==1.1.1
 gunicorn==19.9.0
 honcho==1.0.1
 idna==2.8
