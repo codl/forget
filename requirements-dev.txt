@@ -4,7 +4,7 @@ attrs==19.1.0
 certifi==2019.6.16
 chardet==3.0.4
 codecov==2.0.15
-coverage==4.5.3
+coverage==4.5.4
 idna==2.8
 importlib-metadata==0.19
 mirakuru==2.0.1
@@ -24,4 +24,4 @@ six==1.12.0
 urllib3==1.25.3
 versioneer==0.18
 wcwidth==0.1.7
-zipp==0.5.2
+zipp==0.6.0
