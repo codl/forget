@@ -1,3 +1,7 @@
+## next
+
+* fix: newer twitter accounts not fetching new posts past the initial historical fetch
+
 ## v1.6.1
 
 Released 2019-07-23

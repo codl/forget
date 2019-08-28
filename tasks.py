@@ -157,7 +157,11 @@ def fetch_acc(id_):
             # ???
             raise TemporaryError("Fetching posts went horribly wrong")
 
-        if len(posts) == 0:
+        if (
+            len([post for post in posts if post.remote_id not in (max_id, since_id)])
+            == 0
+        ):
+            # if there are no posts other than the edges
             # we either finished the historic fetch
             # or we finished the current batch
             account.fetch_history_complete = True
