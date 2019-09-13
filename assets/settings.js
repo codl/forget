@@ -1,5 +1,4 @@
 import Banner from '../components/Banner.html';
-import ArchiveForm from '../components/ArchiveForm.html';
 import {known_load, known_save} from './known_instances.js'
 
 (function settings_init(){
@@ -192,19 +191,6 @@ import {known_load, known_save} from './known_instances.js'
             fetch('/api/reason', {method: 'DELETE', credentials:'same-origin'});
 
             reason_banner.parentElement.removeChild(reason_banner);
-        })
-    }
-
-    let archive_form_el = document.querySelector('#archive-form');
-    if(archive_form_el){
-        let csrf_token = archive_form_el.querySelector('input[name=csrf-token]').value;
-        let archive_form = new ArchiveForm({
-            target: archive_form_el,
-            hydrate: true,
-            data: {
-                action: archive_form_el.action,
-                csrf_token: csrf_token,
-            },
         })
     }
 

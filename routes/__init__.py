@@ -93,38 +93,9 @@ def twitter_login_step2():
                 url_for('about', twitter_login_error='', _anchor='log_in'))
 
 
-class TweetArchiveEmptyException(Exception):
-    pass
-
-
 @app.route('/upload_tweet_archive', methods=('POST',))
-@require_auth
 def upload_tweet_archive():
-    ta = TwitterArchive(
-            account=g.viewer.account,
-            body=request.files['file'].read())
-    db.session.add(ta)
-    db.session.commit()
-
-    try:
-        files = libforget.twitter.chunk_twitter_archive(ta.id)
-
-        ta.chunks = len(files)
-        db.session.commit()
-
-        if not ta.chunks > 0:
-            raise TweetArchiveEmptyException()
-
-        for filename in files:
-            tasks.import_twitter_archive_month.s(ta.id, filename).apply_async()
-
-        return redirect(url_for('index', _anchor='recent_archives'))
-    except (BadZipFile, TweetArchiveEmptyException):
-        if sentry:
-            sentry.captureException()
-        return redirect(
-                url_for('index', tweet_archive_failed='',
-                        _anchor='tweet_archive_import'))
+    return 403, 'Tweet archive support is temporarily disabled, see banner on the front page.'
 
 
 @app.route('/settings', methods=('POST',))

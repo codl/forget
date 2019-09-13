@@ -148,8 +148,10 @@
     <div class="banner error">The file you uploaded is not a valid tweet archive. No posts have been imported.</div>
     {% endif %}
 
+    <div class="banner warning">Archive imports are temporarily disabled. The tweet archive format has been quietly dropped by Twitter and replaced by a more comprehensive data archive format. Support for this format will come soon.</div>
+
     <form action='{{url_for('upload_tweet_archive')}}' method='post' enctype='multipart/form-data' id='archive-form'>
-        <input type="file" name='file' accept='application/zip,.zip'><input type="submit" value="Upload">
+        <input disabled type="file" name='file' accept='application/zip,.zip'><input disabled type="submit" value="Upload">
         <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
     </form>
 
