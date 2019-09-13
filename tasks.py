@@ -180,7 +180,8 @@ def fetch_acc(id_):
 
             if not account.fetch_history_complete:
                 # reschedule immediately if we're still doing the historic fetch
-                fetch_acc.apply_async((id_,))
+                print("{} is not done fetching history, resheduling.".format(account))
+                fetch_acc.apply_async((id_,), countdown=1)
 
 
     except TemporaryError:
