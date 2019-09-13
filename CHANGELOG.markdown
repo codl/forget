@@ -1,6 +1,13 @@
-## next
+## v2.0.0
+
+Released 2019-09-13
 
 * fix: newer twitter accounts not fetching new posts past the initial historical fetch
+  <https://github.com/codl/forget/pull/254>
+* fix: fetching task not getting rescheduled properly when doing the initial historic fetch
+  <https://github.com/codl/forget/pull/264>
+* BREAKING: disabled tweet archive upload since twitter has dropped support for them
+  <https://github.com/codl/forget/pull/265>
 
 ## v1.6.1
 
