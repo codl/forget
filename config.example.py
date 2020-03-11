@@ -2,6 +2,9 @@
 this is an example config file for Forget
 
 copy this file to config.py before editing
+
+lines starting with # demonstrate default or example values
+the # should be removed before editing
 """
 
 """
@@ -22,15 +25,6 @@ for syntax reference
 # REDIS_URI='redis://'
 
 """
-TWITTER CREDENTIALS
-
-Apply for api keys on the developer portal <https://developer.twitter.com/en/apps>
-Twitter locked me out of it so I can't guide you more than that. Sorry.
-"""
-# TWITTER_CONSUMER_KEY='yN3DUNVO0Me63IAQdhTfCA'
-# TWITTER_CONSUMER_SECRET='c768oTKdzAjIYCmpSNIdZbGaG0t6rOhSFQP0S5uC79g'
-
-"""
 SERVER ADDRESS
 
 This is the address at which forget will be reached.
@@ -39,6 +33,14 @@ External services will redirect to this address when logging in.
 # SERVER_NAME="localhost:5000"
 # HTTPS=True
 
+"""
+TWITTER CREDENTIALS
+
+Apply for api keys on the developer portal <https://developer.twitter.com/en/apps>
+When prompted for it, your callback URL is {SERVER_NAME}/login/twitter/callback
+"""
+# TWITTER_CONSUMER_KEY='yN3DUNVO0Me63IAQdhTfCA'
+# TWITTER_CONSUMER_SECRET='c768oTKdzAjIYCmpSNIdZbGaG0t6rOhSFQP0S5uC79g'
 
 """
 SENTRY
