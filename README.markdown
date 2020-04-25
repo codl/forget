@@ -18,7 +18,7 @@ Forget is a post deleting service for Twitter and Mastodon. It lives at
 * Postgresql
 * Redis
 * Python 3.6+
-* Yarn or NPM
+* NPM
 
 
 ### Set up venv
