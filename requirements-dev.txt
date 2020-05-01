@@ -1,4 +1,4 @@
--i https://pypi.python.org/simple
+-i https://pypi.python.org/simple/
 attrs==19.3.0
 certifi==2020.4.5.1
 chardet==3.0.4
@@ -16,7 +16,7 @@ pyparsing==2.4.7
 pytest-cov==2.8.1
 pytest-redis==2.0.0
 pytest==5.4.1
-redis==3.4.1
+redis==3.5.0
 requests==2.23.0
 six==1.14.0
 urllib3==1.25.9
