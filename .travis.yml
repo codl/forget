@@ -8,7 +8,6 @@ python:
     - 3.6
     - 3.7
     - 3.8
-    - 3.9-dev
 install:
     - pip install -r requirements.txt -r requirements-dev.txt
     - nvm install 10
