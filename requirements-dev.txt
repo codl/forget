@@ -1,13 +1,13 @@
--i https://pypi.python.org/simple
+-i https://pypi.python.org/simple/
 attrs==19.3.0
 certifi==2020.4.5.1
 chardet==3.0.4
-codecov==2.0.22
+codecov==2.1.3
 coverage==5.1
 idna==2.9
-mirakuru==2.2.0
-more-itertools==8.2.0
-packaging==20.3
+mirakuru==2.3.0
+more-itertools==8.3.0
+packaging==20.4
 pluggy==0.13.1
 port-for==0.4
 psutil==5.7.0 ; sys_platform != 'cygwin'
@@ -18,7 +18,7 @@ pytest-redis==2.0.0
 pytest==5.4.1
 redis==3.4.1
 requests==2.23.0
-six==1.14.0
+six==1.15.0
 urllib3==1.25.9
 versioneer==0.18
 wcwidth==0.1.9
