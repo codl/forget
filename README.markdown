@@ -103,9 +103,19 @@ You can run the (currently very incomplete) test suite by running `pytest`.
 You'll need redis installed on your development machine, a temporary redis
 server will be started and shut down automatically by the test suite.
 
----
+## Contact
 
 If you're having trouble with Forget, or if you're not having trouble but you
 just want to tell me you like it, you can drop me a note at
 [@codl@chitter.xyz](https://chitter.xyz/@codl) or
-[codl@codl.fr](mailto:codl@codl.fr). Thanks for reading this readme.
+[codl@codl.fr](mailto:codl@codl.fr).
+
+## Greetz
+
+Thank you bea, for making ephemeral, inspiring me to make [limiter][], then this,
+in an attempt to bring ephemeral with me everywhere. ☕
+
+[limiter]: https://github.com/codl/limiter
+
+Thank you to the kind folks who have emailed me to tell me Forget has made their
+time on social media less stressful. 🌻
