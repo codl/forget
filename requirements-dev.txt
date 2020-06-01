@@ -13,7 +13,7 @@ port-for==0.4
 psutil==5.7.0 ; sys_platform != 'cygwin'
 py==1.8.1
 pyparsing==2.4.7
-pytest-cov==2.8.1
+pytest-cov==2.9.0
 pytest-redis==2.0.0
 pytest==5.4.1
 redis==3.4.1
@@ -21,4 +21,4 @@ requests==2.23.0
 six==1.15.0
 urllib3==1.25.9
 versioneer==0.18
-wcwidth==0.1.9
+wcwidth==0.2.2
