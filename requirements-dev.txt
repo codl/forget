@@ -15,7 +15,7 @@ py==1.8.1
 pyparsing==2.4.7
 pytest-cov==2.9.0
 pytest-redis==2.0.0
-pytest==5.4.1
+pytest==5.4.2
 redis==3.4.1
 requests==2.23.0
 six==1.15.0
