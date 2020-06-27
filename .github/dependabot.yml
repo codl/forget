@@ -4,15 +4,13 @@ updates:
   directory: "/"
   schedule:
     interval: monthly
-    time: "06:00"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 3
   assignees:
   - codl
 - package-ecosystem: npm
   directory: "/"
   schedule:
     interval: monthly
-    time: "06:00"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 3
   assignees:
   - codl
