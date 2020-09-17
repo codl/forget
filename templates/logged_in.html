@@ -68,18 +68,18 @@
     {{interval_input(g.viewer.account, 'policy_keep_younger', scales)}}
     old and are not one of your
     <input type=number name=policy_keep_latest min=0 step=1 style='max-width:8ch' value={{g.viewer.account.policy_keep_latest}}>
-    most recent posts will expire
+    most recent posts will be considered for deletion
 </p>
-<p>Keep
+<p>…unless you
     <span class="radiostrip">
         <span class="choice">
         <input type=radio name=policy_keep_favourites value=keeponly id=policy_keep_favourites_keeponly {{ "checked" if g.viewer.account.policy_keep_favourites == 'keeponly' }}>
-        <label for=policy_keep_favourites_keeponly>favourited posts</label>
+        <label for=policy_keep_favourites_keeponly>favourited them</label>
         </span>
 
         <span class="choice">
         <input type=radio name=policy_keep_favourites value=deleteonly id=policy_keep_favourites_deleteonly {{ "checked" if g.viewer.account.policy_keep_favourites == 'deleteonly' }}>
-        <label for=policy_keep_favourites_deleteonly>non-favourited posts</label>
+        <label for=policy_keep_favourites_deleteonly>have not favourited them</label>
         </span>
 
         <span class="choice">
@@ -88,16 +88,16 @@
         </span>
     </span>
 </p>
-<p>Keep
+<p>…or unless they
     <span class="radiostrip">
         <span class="choice">
         <input type=radio name=policy_keep_media value=keeponly id=policy_keep_media_keeponly {{ "checked" if g.viewer.account.policy_keep_media == 'keeponly' }}>
-        <label for=policy_keep_media_keeponly>media posts</label>
+        <label for=policy_keep_media_keeponly>have media</label>
         </span>
 
         <span class="choice">
         <input type=radio name=policy_keep_media value=deleteonly id=policy_keep_media_deleteonly {{ "checked" if g.viewer.account.policy_keep_media == 'deleteonly' }}>
-        <label for=policy_keep_media_deleteonly>non-media posts</label>
+        <label for=policy_keep_media_deleteonly>do not have media</label>
         </span>
 
         <span class="choice">
@@ -106,7 +106,7 @@
     </span>
 </p>
 {% if g.viewer.account.service == 'mastodon' %}
-<p>Keep direct messages
+<p>Keep direct messages:
     <span class="radiostrip">
         <span class="choice">
         <input type=radio name=policy_keep_direct value=true id=policy_keep_direct_true {{ "checked" if g.viewer.account.policy_keep_direct }}>
@@ -122,7 +122,7 @@
 {% endif %}
 <p>Every
     {{interval_input(g.viewer.account, 'policy_delete_every', scales)}},
-    one expired post will be picked at random and deleted.
+    one post matching these rules will be picked at random and deleted.
 </p>
 <input type=submit value='Save settings'>
 <input type='hidden' name='csrf-token' value='{{g.viewer.csrf_token}}'>
