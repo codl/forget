@@ -1,3 +1,8 @@
+## vNEXT
+
+* fix: wording on "favourited posts" is unclear
+  <https://github.com/codl/forget/pull/366>
+
 ## v2.0.0
 
 Released 2019-09-13
