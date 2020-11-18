@@ -7,6 +7,7 @@ from libforget.cachebust import cachebust
 import mimetypes
 import libforget.brotli
 import libforget.img_proxy
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 
@@ -94,3 +95,5 @@ libforget.brotli.brotli(app)
 
 imgproxy = (
     libforget.img_proxy.ImgProxyCache(redis_uri=app.config.get('REDIS_URI')))
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
