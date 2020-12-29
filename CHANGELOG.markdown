@@ -1,3 +1,8 @@
+## vNEXT
+
+* fix: lowered database impact of a background task
+  <https://github.com/codl/forget/issue/166>
+
 ## v2.0.0
 
 Released 2019-09-13
