@@ -16,7 +16,7 @@ pyparsing==2.4.7
 pytest-cov==2.10.1
 pytest-redis==2.0.0
 pytest==5.4.2
-redis==3.4.1
+redis==3.5.3
 requests==2.23.0
 urllib3==1.25.11
 versioneer==0.18
