@@ -5,9 +5,9 @@ chardet==3.0.4
 codecov==2.1.11
 coverage==5.1
 idna==2.10
+iniconfig==1.1.1
 mirakuru==2.3.0
-more-itertools==8.6.0
-packaging==20.8
+packaging==20.9
 pluggy==0.13.1
 port-for==0.4
 psutil==5.8.0 ; sys_platform != 'cygwin'
@@ -15,9 +15,9 @@ py==1.10.0
 pyparsing==2.4.7
 pytest-cov==2.10.1
 pytest-redis==2.0.0
-pytest==5.4.2
+pytest==6.2.2
 redis==3.5.3
 requests==2.23.0
+toml==0.10.2
 urllib3==1.25.11
 versioneer==0.18
-wcwidth==0.2.5
