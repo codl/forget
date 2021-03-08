@@ -7,8 +7,10 @@ export default {
     },
     plugins: [
         svelte({
+            extensions: ['.html'],
             include: 'components/**/*.html',
-            hydratable: true,
+            compilerOptions: {hydratable: true},
+            emitCss: false,
         }),
         node_resolve(),
     ]
