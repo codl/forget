@@ -1,5 +1,7 @@
 ## vNEXT
 
+* fix: lowered database impact of a background task
+  <https://github.com/codl/forget/issue/166>
 * fix: wording on "favourited posts" is unclear
   <https://github.com/codl/forget/pull/366>
 

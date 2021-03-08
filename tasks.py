@@ -419,10 +419,16 @@ def queue_deletes():
 @unique
 def refresh_account_with_oldest_post():
     then = time()
-    post = (Post.query.outerjoin(Post.author).join(Account.tokens)
-            .filter(Account.backoff_until < db.func.now())
-            .filter(~Account.dormant).group_by(Post).order_by(
-                db.asc(Post.updated_at)).first())
+    post = db.session.query(Post).from_statement(db.text("""
+    SELECT posts.id, posts.author_id
+        FROM posts, accounts, oauth_tokens
+        WHERE accounts.id = posts.author_id
+        AND accounts.id = oauth_tokens.account_id
+        AND accounts.backoff_until < now()
+        AND NOT accounts.dormant
+        ORDER BY posts.updated_at ASC
+        LIMIT 1;
+    """).columns(Post.id, Post.author_id)).one()
     if post:
         aid = post.author_id
         refresh_account(aid)
