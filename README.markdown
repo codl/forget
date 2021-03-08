@@ -85,7 +85,6 @@ $ honcho start
 
 The application server will listen on `http://127.0.0.1:42157`.
 You'll want to use your favourite web server to proxy traffic to it.
-<small>This author suggests Caddy.</small>
 
 ### Development
 
