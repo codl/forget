@@ -4,7 +4,7 @@ amqp==2.6.1
 billiard==3.6.3.0
 blinker==1.4
 blurhash==1.1.4
-brotli==1.0.7
+brotli==1.0.9
 celery==4.4.2
 certifi==2020.12.5
 chardet==4.0.0
