@@ -12,7 +12,7 @@ click==7.1.2
 cloudpickle==1.6.0
 csscompressor==0.9.5
 decorator==4.4.2
-doit==0.32.0
+doit==0.33.1
 flask-migrate==2.5.3
 flask-sqlalchemy==2.4.4
 flask==1.1.2
@@ -27,7 +27,7 @@ markupsafe==1.1.1
 mastodon.py==1.5.1
 pillow==8.1.2
 psycopg2==2.8.5
-pyinotify==0.9.6
+pyinotify==0.9.6 ; sys_platform == 'linux'
 python-dateutil==2.8.1
 python-editor==1.0.4
 python-magic==0.4.22

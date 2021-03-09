@@ -139,10 +139,11 @@
         },
         "doit": {
             "hashes": [
-                "sha256:323d0411e50a0babb945e2a639aa6e633fbb84a9f98086df0c880e739237750c"
+                "sha256:211fc0de3fd9ee31e5c4ccb36bc1a4054b5c4a4a44f915ca413896155b684bfa",
+                "sha256:37c3b35c2151647b968b2af24481112b2f813c30f695366db0639d529190a143"
             ],
             "index": "pypi",
-            "version": "==0.32.0"
+            "version": "==0.33.1"
         },
         "flask": {
             "hashes": [
@@ -346,6 +347,7 @@
             "hashes": [
                 "sha256:9c998a5d7606ca835065cdabc013ae6c66eb9ea76a00a1e3bc6e0cfe2b4f71f4"
             ],
+            "markers": "sys_platform == 'linux'",
             "version": "==0.9.6"
         },
         "python-dateutil": {
