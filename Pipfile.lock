@@ -699,11 +699,11 @@
         },
         "versioneer": {
             "hashes": [
-                "sha256:08e395c0acc544f78645b9c0ebfccaf47950ae61e0c85bd1aaea98ff59609aeb",
-                "sha256:ead1f78168150011189521b479d3a0dd2f55c94f5b07747b484fd693c3fbf335"
+                "sha256:691e0ded8da37494f27197ccc1fb8a0bba370632dba820c09c240bc410161435",
+                "sha256:a4fed39bbebcbd2d07f8a86084773f303cb442709491955a0e6754858e47afae"
             ],
             "index": "pypi",
-            "version": "==0.18"
+            "version": "==0.19"
         }
     }
 }

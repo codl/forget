@@ -20,4 +20,4 @@ redis==3.5.3
 requests==2.25.1
 toml==0.10.2
 urllib3==1.26.3
-versioneer==0.18
+versioneer==0.19
