@@ -13,7 +13,7 @@ port-for==0.4
 psutil==5.8.0 ; sys_platform != 'cygwin'
 py==1.10.0
 pyparsing==2.4.7
-pytest-cov==2.10.1
+pytest-cov==2.11.1
 pytest-redis==2.0.0
 pytest==6.2.2
 redis==3.5.3
