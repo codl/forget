@@ -1,5 +1,5 @@
 from app import app, db, sentry
-from flask import g, render_template, make_response, redirect
+from flask import g, render_template, make_response, redirect, request
 import version
 import libforget.version
 from libforget.auth import get_viewer_session, set_session_cookie
@@ -48,6 +48,8 @@ def not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
+    if request.endpoint and request.endpoint.startswith('api_'):
+        return e.get_response()
     return (render_template('500.html', e=e), 500)
 
 

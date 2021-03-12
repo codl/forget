@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, imgproxy
 from libforget.auth import require_auth_api, get_viewer
 from flask import jsonify, redirect, make_response, request, Response
 from model import Account
@@ -6,13 +6,20 @@ import libforget.settings
 import libforget.json
 import random
 
-@app.route('/api/health_check')
-def health_check():
+@app.route('/api/health_check') # deprecated 2021-03-12
+@app.route('/api/status_check')
+def api_status_check():
     try:
         db.session.execute('SELECT 1')
-        return 'ok'
     except Exception:
-        return ('bad', 500)
+        return ('PostgreSQL bad', 500)
+
+    try:
+        imgproxy.redis.set('forget-status-check', 'howdy', ex=5)
+    except Exception:
+        return ('Redis bad', 500)
+
+    return 'OK'
 
 
 @app.route('/api/settings', methods=('PUT',))
