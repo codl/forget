@@ -5,6 +5,7 @@ from hashlib import sha256
 import redis as libredis
 import os.path
 import mimetypes
+from redis.exceptions import RedisError
 
 
 class BrotliCache(object):
@@ -34,32 +35,35 @@ class BrotliCache(object):
         digest = sha256(body).hexdigest()
         cache_key = 'brotlicache:{}'.format(digest)
 
-        encbody = self.redis.get(cache_key)
-        response.headers.set('brotli-cache', 'HIT')
-        if not encbody:
-            response.headers.set('brotli-cache', 'MISS')
-            lock_key = 'brotlicache:lock:{}'.format(digest)
-            if self.redis.set(lock_key, 1, nx=True, ex=10):
-                mode = (
-                    brotli_.MODE_TEXT
-                    if response.content_type.startswith('text/')
-                    else brotli_.MODE_GENERIC)
-                t = Thread(
-                    target=self.compress_and_cache,
-                    args=(cache_key, lock_key, body, mode))
-                t.start()
-                if self.timeout > 0:
-                    t.join(self.timeout)
-                    encbody = self.redis.get(cache_key)
-                if not encbody:
-                    response.headers.set('brotli-cache', 'TIMEOUT')
-            else:
-                response.headers.set('brotli-cache', 'LOCKED')
-        if encbody:
-            response.headers.set('content-encoding', 'br')
-            response.headers.set('vary', 'accept-encoding')
-            response.set_data(encbody)
-            return response
+        try:
+            encbody = self.redis.get(cache_key)
+            response.headers.set('brotli-cache', 'HIT')
+            if not encbody:
+                response.headers.set('brotli-cache', 'MISS')
+                lock_key = 'brotlicache:lock:{}'.format(digest)
+                if self.redis.set(lock_key, 1, nx=True, ex=10):
+                    mode = (
+                        brotli_.MODE_TEXT
+                        if response.content_type.startswith('text/')
+                        else brotli_.MODE_GENERIC)
+                    t = Thread(
+                        target=self.compress_and_cache,
+                        args=(cache_key, lock_key, body, mode))
+                    t.start()
+                    if self.timeout > 0:
+                        t.join(self.timeout)
+                        encbody = self.redis.get(cache_key)
+                    if not encbody:
+                        response.headers.set('brotli-cache', 'TIMEOUT')
+                else:
+                    response.headers.set('brotli-cache', 'LOCKED')
+            if encbody:
+                response.headers.set('content-encoding', 'br')
+                response.headers.set('vary', 'accept-encoding')
+                response.set_data(encbody)
+                return response
+        except RedisError:
+            response.headers.set('brotli-cache', 'ERROR')
 
         return response
 
