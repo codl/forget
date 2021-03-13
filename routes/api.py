@@ -19,6 +19,12 @@ def api_status_check():
     except Exception:
         return ('Redis bad', 500)
 
+    if db.session.execute(db.text("""
+        SELECT count(*) FROM accounts
+        WHERE last_delete > now() - '10 minutes'::INTERVAL;
+    """)).fetchone() < 1:
+        return ('Deletes stalled', 500)
+
     return 'OK'
 
 
