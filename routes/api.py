@@ -20,10 +20,13 @@ def api_status_check():
         return ('Redis bad', 500)
 
     if db.session.execute(db.text("""
-        SELECT count(*) FROM accounts
-        WHERE last_delete > now() - '10 minutes'::INTERVAL;
-    """)).fetchone() < 1:
-        return ('Deletes stalled', 500)
+        SELECT 1 FROM accounts
+        WHERE last_delete > now() - '60 minutes'::INTERVAL
+        OR last_fetch > now() - '60 minutes'::INTERVAL
+        OR last_refresh > now() - '60 minutes'::INTERVAL
+        LIMIT 1;
+    """)).fetchone() is None:
+        return ('Celery stalled', 500)
 
     return 'OK'
 
