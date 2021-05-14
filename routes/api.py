@@ -96,13 +96,20 @@ def import_statuses():
     viewer = get_viewer()
     if not isinstance(statuses, list):
         raise MalformedStatusList()
+
+    expected_keys = ('id', 'favourite', 'has_media', 'direct', 'is_reblog')
+    boolean_keys = ('favourite', 'has_media', 'direct', 'is_reblog')
+
     with db.session.no_autoflush:
         for post in statuses:
-            expected_keys = ('id', 'favourite', 'has_media', 'direct', 'is_reblog')
-            if set(post.keys()) != expected_keys:
+            if not isinstance(post, dict) or set(post.keys()) != expected_keys:
                 raise MalformedStatusList()
 
+            for key in boolean_keys:
+                post[key] = post[key] == 'true'
+
             post['author_id'] = viewer.id
+
             if viewer.service == 'twitter':
                 post['id'] = "twitter:{}".format(post['id'])
             elif viewer.service == 'mastodon':
