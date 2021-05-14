@@ -1,10 +1,11 @@
 from app import app, db
 from libforget.auth import require_auth_api, get_viewer
 from flask import jsonify, redirect, make_response, request, Response
-from model import Account
+from model import Account, Post
 import libforget.settings
 import libforget.json
 import random
+from werkzeug.exceptions import BadRequest
 
 @app.route('/api/health_check')
 def health_check():
@@ -79,3 +80,36 @@ def known_instances():
         resp = Response('', 204)
         resp.set_cookie('forget_known_instances', '', max_age=0)
         return resp
+
+class MalformedStatusList(werkzeug.exceptions.BadRequest):
+    pass
+
+@app.route('/api/import_statuses', method=('POST',))
+@require_auth_api
+def import_statuses():
+    """
+    accepts json in the form
+
+    [ {id, favourite, has_media, direct, is_reblog}, ... ]
+    """
+    statuses = request.json
+    viewer = get_viewer()
+    if not isinstance(statuses, list):
+        raise MalformedStatusList()
+    with db.session.no_autoflush:
+        for post in statuses:
+            expected_keys = ('id', 'favourite', 'has_media', 'direct', 'is_reblog')
+            if set(post.keys()) != expected_keys:
+                raise MalformedStatusList()
+
+            post['author_id'] = viewer.id
+            if viewer.service == 'twitter':
+                post['id'] = "twitter:{}".format(post['id'])
+            elif viewer.service == 'mastodon':
+                post['id'] = "mastodon:{}:{}".format(
+                        viewer.mastdon_instance,
+                        post['id'])
+
+            db.session.merge(Post(**post))
+
+    db.session.commit()
