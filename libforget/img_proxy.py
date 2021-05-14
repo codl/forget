@@ -65,7 +65,7 @@ class ImgProxyCache(object):
         if(resp.status_code != 200):
             return
 
-        header_whitelist = [
+        allowed_headers = [
                 'content-type',
                 'cache-control',
                 'etag',
@@ -81,7 +81,7 @@ class ImgProxyCache(object):
                 if match:
                     expire = max(self.expire, int(match.group(1)))
 
-        for key in header_whitelist:
+        for key in allowed_headers:
             if key in resp.headers:
                 headers[key] = resp.headers[key]
         self.redis.set(self.key('headers', url), pickle.dumps(headers, -1),
