@@ -33,7 +33,7 @@ def get_or_create_app(instance_url, callback, website):
             app.client_secret = None
         else:
             # register the app
-            r = post('{}://{}/api/app/create', json = {
+            r = post('{}://{}/api/app/create'.format(app.protocol, app.instance), json = {
                 'name': 'forget',
                 'description': website,
                 'permission': ['read:favorites', 'write:notes'],

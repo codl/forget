@@ -249,7 +249,7 @@ def misskey_login(instance=None):
             min_popularity = 1
         )
         return render_template(
-                'mastodon_login.html', instances=instances,
+                'misskey_login.html', instances=instances,
                 address_error=request.method == 'POST',
                 generic_error='error' in request.args
                 )
