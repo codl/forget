@@ -5,6 +5,7 @@ from model import Session, Account, TwitterArchive, Post, OAuthToken,\
                   MastodonInstance
 import libforget.twitter
 import libforget.mastodon
+import libforget.misskey
 from datetime import timedelta, datetime, timezone
 from time import time
 from zipfile import ZipFile
@@ -151,6 +152,8 @@ def fetch_acc(id_):
             fetch_posts = libforget.twitter.fetch_posts
         elif (account.service == 'mastodon'):
             fetch_posts = libforget.mastodon.fetch_posts
+        elif (account.service == 'misskey'):
+            fetch_posts = libforget.misskey.fetch_posts
         posts = fetch_posts(account, max_id, since_id)
 
         if posts is None:
@@ -291,6 +294,10 @@ def delete_from_account(account_id):
                 if refreshed and is_eligible(refreshed[0]):
                     to_delete = refreshed[0]
                     break
+        elif account.service == 'misskey':
+            action = libforget.misskey.delete
+            posts = refresh_posts(posts)
+            to_delete = next(filter(is_eligible, posts), None)
 
         if to_delete:
             print("Deleting {}".format(to_delete))
@@ -317,6 +324,8 @@ def refresh_posts(posts):
         return libforget.twitter.refresh_posts(posts)
     elif posts[0].service == 'mastodon':
         return libforget.mastodon.refresh_posts(posts)
+    elif posts[0].service == 'misskey':
+        return libforget.misskey.refresh_posts(posts)
 
 
 @app.task()
@@ -474,6 +483,33 @@ def update_mastodon_instances_popularity():
     })
     db.session.commit()
 
+@app.task
+def update_misskey_instances_popularity():
+    # bump score for each active account
+    for acct in (Account.query.options(db.joinedload(Account.sessions))
+                 .filter(~Account.dormant).filter(
+                     Account.id.like('misskey:%'))):
+        instance = MisskeyInstance.query.get(acct.misskey_instance)
+        if not instance:
+            instance = MisskeyInstance(
+                instance=acct.Misskey_instance, popularity=10)
+            db.session.add(instance)
+        amount = 0.01
+        if acct.policy_enabled:
+            amount = 0.5
+        for _ in acct.sessions:
+            amount += 0.1
+        instance.bump(amount / max(1, instance.popularity))
+
+    # normalise scores so the top is 20
+    top_pop = (db.session.query(db.func.max(MisskeyInstance.popularity))
+               .scalar())
+    MisskeyInstance.query.update({
+        MisskeyInstance.popularity:
+        MisskeyInstance.popularity * 20 / top_pop
+    })
+    db.session.commit()
+
 
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(9, queue_deletes)
@@ -481,6 +517,7 @@ app.add_periodic_task(6, refresh_account_with_oldest_post)
 app.add_periodic_task(50, refresh_account_with_longest_time_since_refresh)
 app.add_periodic_task(300, periodic_cleanup)
 app.add_periodic_task(300, update_mastodon_instances_popularity)
+app.add_periodic_task(300, update_misskey_instances_popularity)
 
 if __name__ == '__main__':
     app.worker_main()
