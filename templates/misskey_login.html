@@ -1,0 +1,29 @@
+{% extends 'lib/layout.html' %}
+{% block body %}
+<section>
+    <h2>Log in with Misskey</h2>
+
+{% if generic_error %}
+    <div class='banner error'>Something went wrong while logging in. Try again?</div>
+{% endif %}
+
+{% if address_error %}
+    <div class='banner error'>This doesn't look like a misskey instance url. Try again?</div>
+{% endif %}
+
+    <form method='post'>
+        <label>misskey instance:
+            <input type='text' name='instance_url' list='instances' placeholder='social.example.net'/>
+        </label>
+        <datalist id='instances'>
+            <option value=''>
+            {% for instance in instances %}
+            <option value='{{instance}}'>
+            {% endfor %}
+        </datalist>
+        <input name='confirm' value='Log in' type='submit'/>
+    </form>
+
+</div>
+</section>
+{% endblock %}

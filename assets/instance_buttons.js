@@ -3,13 +3,22 @@ import {SLOTS, normalize_known, known_load, known_save} from './known_instances.
 (function instance_buttons(){
 
     const container = document.querySelector('#mastodon_instance_buttons');
-    const button_template = Function('first', 'instance',
-        'return `' + document.querySelector('#instance_button_template').innerHTML + '`;');
-    const another_button_template = Function(
+    const mastodon_button_template = Function('first', 'instance',
+        'return `' + document.querySelector('#mastodon_instance_button_template').innerHTML + '`;');
+    const mastodon_another_button_template = Function(
         'return `' +
-            document.querySelector('#another_instance_button_template').innerHTML + '`;');
-    const top_instances =
-        Function('return JSON.parse(`' + document.querySelector('#top_instances').innerHTML + '`);')();
+            document.querySelector('#mastodon_another_instance_button_template').innerHTML + '`;');
+    const mastodon_top_instances =
+        Function('return JSON.parse(`' + document.querySelector('#mastodon_top_instances').innerHTML + '`);')();
+		
+	const misskey_container = document.querySelector('#misskey_instance_buttons');
+    const misskey_button_template = Function('first', 'instance',
+        'return `' + document.querySelector('#misskey_instance_button_template').innerHTML + '`;');
+    const misskey_another_button_template = Function(
+        'return `' +
+            document.querySelector('#misskey_another_instance_button_template').innerHTML + '`;');
+    const misskey_top_instances =
+        Function('return JSON.parse(`' + document.querySelector('#misskey_top_instances').innerHTML + '`);')();
 
     async function get_known(){
         let known = known_load();
@@ -39,7 +48,7 @@ import {SLOTS, normalize_known, known_load, known_save} from './known_instances.
         known_save(known);
 
         let filtered_top_instances = []
-        for(let instance of top_instances){
+        for(let instance of mastodon_top_instances){
             let found = false;
             for(let k of known){
                 if(k['instance'] == instance['instance']){
@@ -58,13 +67,13 @@ import {SLOTS, normalize_known, known_load, known_save} from './known_instances.
 
         let first = true;
         for(let instance of instances){
-            html += button_template(first, instance['instance'])
+            html += mastodon_button_template(first, instance['instance'])
             first = false;
         }
 
-        html += another_button_template();
+        html += mastodon_another_button_template();
 
-        container.innerHTML = html;
+        mastodon_container.innerHTML = html;
     }
 
     replace_buttons();
