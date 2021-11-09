@@ -174,7 +174,7 @@ def logout():
 
 
 def domain_from_url(url):
-    urlparse(url).netloc.lower()
+    return urlparse(url).netloc.lower() or urlparse("//"+url).netloc.lower()
 
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
