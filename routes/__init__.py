@@ -11,6 +11,7 @@ from app import app, db, sentry, imgproxy
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
+from urllib.parse import urlparse
 from urllib.error import URLError
 import libforget.version
 import libforget.settings
@@ -172,6 +173,9 @@ def logout():
     return redirect(url_for('about'))
 
 
+def domain_from_url(url):
+    urlparse(url).netloc.lower()
+
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
 
@@ -189,14 +193,7 @@ def mastodon_login_step1(instance=None):
                 generic_error='error' in request.args
                 )
 
-    instance_url = instance_url.lower()
-    # strip protocol
-    instance_url = re.sub('^https?://', '', instance_url,
-                          count=1, flags=re.IGNORECASE)
-    # strip username
-    instance_url = instance_url.split("@")[-1]
-    # strip trailing path
-    instance_url = instance_url.split('/')[0]
+    instance_url = domain_from_url(instance_url)
 
     callback = url_for('mastodon_login_step2',
                        instance_url=instance_url, _external=True)
@@ -257,14 +254,7 @@ def misskey_login(instance=None):
                 generic_error='error' in request.args
                 )
 
-    instance_url = instance_url.lower()
-    # strip protocol
-    instance_url = re.sub('^https?://', '', instance_url,
-                          count=1, flags=re.IGNORECASE)
-    # strip username
-    instance_url = instance_url.split("@")[-1]
-    # strip trailing path
-    instance_url = instance_url.split('/')[0]
+    instance_url = domain_from_url(instance_url)
     
     callback = url_for('misskey_callback',
                        instance_url=instance_url, _external=True)
