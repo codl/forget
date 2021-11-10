@@ -2,7 +2,7 @@ import {SLOTS, normalize_known, known_load, known_save} from './known_instances.
 
 (function instance_buttons(){
 
-    const container = document.querySelector('#mastodon_instance_buttons');
+    const mastodon_container = document.querySelector('#mastodon_instance_buttons');
     const mastodon_button_template = Function('first', 'instance',
         'return `' + document.querySelector('#mastodon_instance_button_template').innerHTML + '`;');
     const mastodon_another_button_template = Function(
