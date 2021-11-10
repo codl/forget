@@ -1,10 +1,11 @@
 from app import app, db, imgproxy
 from libforget.auth import require_auth_api, get_viewer
 from flask import jsonify, redirect, make_response, request, Response
-from model import Account
+from model import Account, WorkerCheckin
 import libforget.settings
 import libforget.json
 import random
+from datetime import datetime, timedelta
 
 @app.route('/api/health_check') # deprecated 2021-03-12
 @app.route('/api/status_check')
@@ -19,14 +20,23 @@ def api_status_check():
     except Exception:
         return ('Redis bad', 500)
 
-    if db.session.execute(db.text("""
-        SELECT 1 FROM accounts
-        WHERE last_delete > now() - '60 minutes'::INTERVAL
-        OR last_fetch > now() - '60 minutes'::INTERVAL
-        OR last_refresh > now() - '60 minutes'::INTERVAL
-        LIMIT 1;
-    """)).fetchone() is None:
-        return ('Celery stalled', 500)
+    CHECKIN_EVENTS = 5
+    CHECKIN_PERIOD = timedelta(minutes=10)
+    # sorry about the obtuse variable names, this trips if the frequency is
+    # lower than events/period
+    checkin_count = db.session.query(WorkerCheckin)\
+            .filter(WorkerCheckin.created_at > db.func.now() - CHECKIN_PERIOD)\
+            .count()
+    if checkin_count < events:
+        return ('Celery slow, {} check-ins in {}'.format(
+            checkin_count, CHECKIN_PERIOD
+        ), 500)
+
+    CHECKIN_LATENESS_THRESHOLD = timedelta(minutes=5)
+    checkin = db.session.query(WorkerCheckin.created_at)\
+            .order_by(db.desc(WorkerCheckin.created_at)).first()
+    if checkin + CHECKIN_LATENESS_THRESHOLD < datetime.utcnow():
+        return ('Celery late, last check-in was {}'.format(checkin), 500)
 
     return 'OK'
 

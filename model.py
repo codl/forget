@@ -408,3 +408,7 @@ class MisskeyInstance(db.Model):
 
     def bump(self, value=1):
         self.popularity = (self.popularity or 10) + value
+
+class WorkerCheckin(db.Model, TimestampMixin):
+    __tablename__ = 'worker_checkins'
+    id = db.Column(db.Integer, primary_key=True)

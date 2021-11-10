@@ -2,7 +2,7 @@ from celery import Celery, Task
 from app import app as flaskapp
 from app import db
 from model import Session, Account, TwitterArchive, Post, OAuthToken,\
-                  MastodonInstance, MisskeyInstance
+                  MastodonInstance, MisskeyInstance, WorkerCheckin
 import libforget.twitter
 import libforget.mastodon
 import libforget.misskey
@@ -398,6 +398,11 @@ def periodic_cleanup():
         you have restored access and you can now re-enable Forget if you wish.
         """.format(service=account.service.capitalize())
 
+    # delete worker check-ins after 48 hours
+    (WorkerCheckin.query.filter(
+        WorkerCheckin.updated_at < (db.func.now() - timedelta(hours=48)))
+     .delete(synchronize_session=False))
+
     db.session.commit()
 
 
@@ -513,6 +518,10 @@ def update_misskey_instances_popularity():
     })
     db.session.commit()
 
+@app.task
+def report_in():
+    db.session.add(WorkerCheckin())
+    db.session.commit()
 
 app.add_periodic_task(40, queue_fetch_for_most_stale_accounts)
 app.add_periodic_task(9, queue_deletes)
@@ -521,6 +530,7 @@ app.add_periodic_task(50, refresh_account_with_longest_time_since_refresh)
 app.add_periodic_task(300, periodic_cleanup)
 app.add_periodic_task(300, update_mastodon_instances_popularity)
 app.add_periodic_task(300, update_misskey_instances_popularity)
+app.add_periodic_task(60, report_in)
 
 if __name__ == '__main__':
     app.worker_main()
