@@ -21,7 +21,7 @@ def get_or_create_app(instance_url, callback, website, session):
             proto = 'http'
         
         # check if miauth is available or we have to use legacy auth
-        miauth = 'miauth' in r.json()['features']
+        miauth = r.json().get('miauth', False)
         
         app = MisskeyApp()
         app.instance = instance_url
