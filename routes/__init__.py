@@ -6,6 +6,7 @@ import libforget.mastodon
 import libforget.misskey
 from libforget.auth import require_auth, csrf,\
                      get_viewer
+from libforget.session import make_session
 from model import Session, TwitterArchive, MastodonApp
 from app import app, db, sentry, imgproxy
 import tasks
@@ -260,15 +261,17 @@ def misskey_login(instance=None):
                        instance_url=instance_url, _external=True)
 
     try:
+        session = make_session()
         app = libforget.misskey.get_or_create_app(
                 instance_url,
                 callback_legacy,
-                url_for('index', _external=True))
+                url_for('index', _external=True),
+                session)
         db.session.merge(app)
 
         db.session.commit()
 
-        return redirect(libforget.misskey.login_url(app, callback))
+        return redirect(libforget.misskey.login_url(app, callback, session))
 
     except Exception:
         if sentry:

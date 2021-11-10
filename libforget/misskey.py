@@ -1,22 +1,22 @@
 from app import db, sentry
 from model import MisskeyApp, MisskeyInstance, Account, OAuthToken
-from requests import get, post
 from uuid import uuid4
 from hashlib import sha256
 from libforget.exceptions import TemporaryError, PermanentError
+from libforget.session import make_session
 
-def get_or_create_app(instance_url, callback, website):
+def get_or_create_app(instance_url, callback, website, session):
     instance_url = instance_url
     app = MisskeyApp.query.get(instance_url)
     
     if not app:
         # check if the instance uses https while getting instance infos
         try:
-            r = post('https://{}/api/meta'.format(instance_url))
+            r = session.post('https://{}/api/meta'.format(instance_url))
             r.raise_for_status()
             proto = 'https'
         except Exception:
-            r = post('http://{}/api/meta'.format(instance_url))
+            r = session.post('http://{}/api/meta'.format(instance_url))
             r.raise_for_status()
             proto = 'http'
         
@@ -33,7 +33,7 @@ def get_or_create_app(instance_url, callback, website):
             app.client_secret = None
         else:
             # register the app
-            r = post('{}://{}/api/app/create'.format(app.protocol, app.instance), json = {
+            r = session.post('{}://{}/api/app/create'.format(app.protocol, app.instance), json = {
                 'name': 'forget',
                 'description': website,
                 'permission': ['read:favorites', 'write:notes'],
@@ -44,12 +44,12 @@ def get_or_create_app(instance_url, callback, website):
 
     return app
 
-def login_url(app, callback):
+def login_url(app, callback, session):
     if app.miauth:
         return "{}://{}/miauth/{}?name=forget&callback={}&permission=read:favorites,write:notes".format(app.protocol, app.instance, uuid4(), callback)
     else:
         # will use the callback we gave the server in `get_or_create_app`
-        r = post('{}://{}/api/auth/session/generate'.format(app.protocol, app.instance), json = {
+        r = session.post('{}://{}/api/auth/session/generate'.format(app.protocol, app.instance), json = {
             'appSecret': app.client_secret
         })
         r.raise_for_status()
@@ -58,8 +58,10 @@ def login_url(app, callback):
         return r.json()['url']
 
 def receive_token(token, app):
+    session = make_session()
+
     if app.miauth:
-        r = get('{}://{}/api/miauth/{}/check'.format(app.protocol, app.instance, token))
+        r = session.get('{}://{}/api/miauth/{}/check'.format(app.protocol, app.instance, token))
         r.raise_for_status()
         
         token = r.json()['token']
@@ -70,7 +72,7 @@ def receive_token(token, app):
         token = db.session.merge(token)
         token.account = acc
     else:
-        r = post('{}://{}/api/auth/session/userkey'.format(app.protocol, app.instance), json = {
+        r = session.post('{}://{}/api/auth/session/userkey'.format(app.protocol, app.instance), json = {
             'appSecret': app.client_secret,
             'token': token
         })
@@ -86,9 +88,9 @@ def receive_token(token, app):
 
     return token
 
-def check_auth(account, app):
+def check_auth(account, app, session):
     if app.miauth:
-        r = get('{}://{}/api/miauth/{}/check'.format(app.protocol, app.instance, account.token))
+        r = session.get('{}://{}/api/miauth/{}/check'.format(app.protocol, app.instance, account.token))
 
         if r.status_code != 200:
             raise TemporaryError("{} {}".format(r.status_code, r.body))
@@ -104,7 +106,7 @@ def check_auth(account, app):
     else: 
         # there is no such check for legacy auth, instead we check if we can
         # get the user info
-        r = post('{}://{}/api/i'.format(app.protocol, app.instance), json = {'i': account.token})
+        r = session.post('{}://{}/api/i'.format(app.protocol, app.instance), json = {'i': account.token})
 
         if r.status_code != 200:
             raise TemporaryError("{} {}".format(r.status_code, r.body))
@@ -139,7 +141,8 @@ def post_from_api_object(obj):
 
 def fetch_posts(acc, max_id, since_id):
     app = MisskeyApp.query.get(acc.misskey_instance)
-    check_auth(acc, app)
+    session = make_session()
+    check_auth(acc, app, session)
     if not verify_credentials(acc, app):
         raise PermanentError()
     try:
@@ -149,7 +152,7 @@ def fetch_posts(acc, max_id, since_id):
         if since_id:
             kwargs['sinceId'] = since_id
 
-        notes = post('{}://{}/api/users/notes'.format(app.protocol, app.misskey_instance), json=kwargs)
+        notes = session.post('{}://{}/api/users/notes'.format(app.protocol, app.misskey_instance), json=kwargs)
         notes.raise_for_status()
 
         return [post_from_api_object(status) for note in notes.json()]
@@ -161,13 +164,14 @@ def fetch_posts(acc, max_id, since_id):
 def refresh_posts(posts):
     acc = posts[0].author
     app = MisskeyApp.query.get(acc.misskey_instance)
-    check_auth(acc, app)
+    session = make_session()
+    check_auth(acc, app, session)
 
     new_posts = list()
     with db.session.no_autoflush:
         for post in posts:
             print('Refreshing {}'.format(post))
-            r = post('{}://{}/api/notes/show'.format(app.protocol, app.misskey_instance), json={
+            r = session.post('{}://{}/api/notes/show'.format(app.protocol, app.misskey_instance), json={
                 'noteId': post.misskey_id
             })
             if r.status_code != 200:
@@ -186,12 +190,13 @@ def refresh_posts(posts):
 
 def delete(post):
     app = MisskeyApp.query.get(post.misskey_instance)
+    session = make_session()
     if not app:
         # how? if this happens, it doesnt make sense to repeat it,
         # so use a permanent error
         raise PermanentError("instance not registered for delete")
 
-    r = post('{}://{}/api/notes/delete'.format(app.protocol, app.misskey_instance), json = {
+    r = session.post('{}://{}/api/notes/delete'.format(app.protocol, app.misskey_instance), json = {
         'noteId': post.misskey_id
     })
     
