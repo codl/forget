@@ -7,7 +7,7 @@ import libforget.misskey
 from libforget.auth import require_auth, csrf,\
                      get_viewer
 from libforget.session import make_session
-from model import Session, TwitterArchive, MastodonApp
+from model import Session, TwitterArchive, MastodonApp, MisskeyApp
 from app import app, db, sentry, imgproxy
 import tasks
 from zipfile import BadZipFile
@@ -264,7 +264,7 @@ def misskey_login(instance=None):
         session = make_session()
         app = libforget.misskey.get_or_create_app(
                 instance_url,
-                callback_legacy,
+                callback,
                 url_for('index', _external=True),
                 session)
         db.session.merge(app)

@@ -2,7 +2,7 @@ from celery import Celery, Task
 from app import app as flaskapp
 from app import db
 from model import Session, Account, TwitterArchive, Post, OAuthToken,\
-                  MastodonInstance
+                  MastodonInstance, MisskeyInstance
 import libforget.twitter
 import libforget.mastodon
 import libforget.misskey
@@ -492,7 +492,7 @@ def update_misskey_instances_popularity():
         instance = MisskeyInstance.query.get(acct.misskey_instance)
         if not instance:
             instance = MisskeyInstance(
-                instance=acct.Misskey_instance, popularity=10)
+                instance=acct.misskey_instance, popularity=10)
             db.session.add(instance)
         amount = 0.01
         if acct.policy_enabled:
