@@ -37,10 +37,12 @@ def index():
 
 @app.route('/about/')
 def about():
-    instances = libforget.mastodon.suggested_instances()
+    mastodon_instances = libforget.mastodon.suggested_instances()
+    misskey_instances = libforget.misskey.suggested_instances()
     return render_template(
             'about.html',
-            mastodon_instances=instances,
+            mastodon_instances=mastodon_instances,
+            misskey_instances=misskey_instances,
             twitter_login_error='twitter_login_error' in request.args)
 
 
