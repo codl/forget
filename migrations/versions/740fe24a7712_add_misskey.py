@@ -46,3 +46,4 @@ def upgrade():
 def downgrade():
     op.drop_table('misskey_instances')
     op.drop_table('misskey_apps')
+    op.execute('DROP TYPE enum_protocol_misskey;')
