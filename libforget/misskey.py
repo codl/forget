@@ -20,60 +20,46 @@ def get_or_create_app(instance_url, callback, website, session):
             r.raise_for_status()
             proto = 'http'
         
-        # check if miauth is available or we have to use legacy auth
-        miauth = r.json().get('miauth', False)
+        # This is using the legacy authentication method, because the newer
+        # Miauth method breaks the ability to log out and log back into forget.
         
         app = MisskeyApp()
         app.instance = instance_url
         app.protocol = proto
-        app.miauth = miauth
         
-        if miauth:
-            # apps do not have to be registered for miauth
-            app.client_secret = None
-        else:
-            # register the app
-            r = session.post('{}://{}/api/app/create'.format(app.protocol, app.instance), json = {
-                'name': 'forget',
-                'description': website,
-                'permission': ['read:favorites', 'write:notes'],
-                'callbackUrl': callback
-            })
-            r.raise_for_status()
-            app.client_secret = r.json()['secret']
+        # register the app
+        r = session.post('{}://{}/api/app/create'.format(app.protocol, app.instance), json = {
+            'name': 'forget',
+            'description': website,
+            'permission': ['read:favorites', 'write:notes'],
+            'callbackUrl': callback
+        })
+        r.raise_for_status()
+        app.client_secret = r.json()['secret']
 
     return app
 
 def login_url(app, callback, session):
-    if app.miauth:
-        return "{}://{}/miauth/{}?name=forget&callback={}&permission=read:favorites,write:notes".format(app.protocol, app.instance, uuid4(), callback)
-    else:
-        # will use the callback we gave the server in `get_or_create_app`
-        r = session.post('{}://{}/api/auth/session/generate'.format(app.protocol, app.instance), json = {
-            'appSecret': app.client_secret
-        })
-        r.raise_for_status()
-        # we already get the retrieval token here, but we get it again later so
-        # we do not have to store it
-        return r.json()['url']
+    # will use the callback we gave the server in `get_or_create_app`
+    r = session.post('{}://{}/api/auth/session/generate'.format(app.protocol, app.instance), json = {
+        'appSecret': app.client_secret
+    })
+    r.raise_for_status()
+    # we already get the retrieval token here, but we get it again later so
+    # we do not have to store it
+    return r.json()['url']
 
 def receive_token(token, app):
     session = make_session()
 
-    if app.miauth:
-        r = session.post('{}://{}/api/miauth/{}/check'.format(app.protocol, app.instance, token))
-        r.raise_for_status()
-        
-        token = r.json()['token']
-    else:
-        r = session.post('{}://{}/api/auth/session/userkey'.format(app.protocol, app.instance), json = {
-            'appSecret': app.client_secret,
-            'token': token
-        })
-        r.raise_for_status()
-        
-        token = sha256(r.json()['accessToken'].encode('utf-8') + app.client_secret.encode('utf-8')).hexdigest()
-        
+    r = session.post('{}://{}/api/auth/session/userkey'.format(app.protocol, app.instance), json = {
+        'appSecret': app.client_secret,
+        'token': token
+    })
+    r.raise_for_status()
+
+    token = sha256(r.json()['accessToken'].encode('utf-8') + app.client_secret.encode('utf-8')).hexdigest()
+
     acc = account_from_user(r.json()['user'], app.instance)
     acc = db.session.merge(acc)
     token = OAuthToken(token = token)
@@ -192,7 +178,7 @@ def delete(post):
     
     if r.status_code != 204:
         raise TemporaryError("{} {}".format(r.status_code, r.text))
-    
+
     db.session.delete(post)
 
 def suggested_instances(limit=5, min_popularity=5, blocklist=tuple()):

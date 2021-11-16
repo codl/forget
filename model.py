@@ -400,9 +400,7 @@ class MisskeyApp(db.Model, TimestampMixin):
 
     instance = db.Column(db.String, primary_key=True)
     protocol = db.Column(db.String, nullable=False)
-    miauth = db.Column(db.Boolean, nullable=False)
-    # only legacy auth uses client_secret
-    client_secret = db.Column(db.String, nullable=True)
+    client_secret = db.Column(db.String, nullable=False)
 
 class MisskeyInstance(db.Model):
     """

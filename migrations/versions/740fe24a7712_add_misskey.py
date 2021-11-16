@@ -36,8 +36,7 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('instance', sa.String(), nullable=False),
-    sa.Column('miauth', sa.Boolean(), nullable=False),
-    sa.Column('client_secret', sa.String(), nullable=True),
+    sa.Column('client_secret', sa.String(), nullable=False),
     sa.Column('protocol', sa.Enum('http', 'https', name='enum_protocol_misskey'), nullable=False),
     sa.PrimaryKeyConstraint('instance', name=op.f('pk_misskey_apps'))
     )
