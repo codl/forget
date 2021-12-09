@@ -1,5 +1,23 @@
-const STORAGE_KEY = 'forget_known_instances';
+const STORAGE_KEY = 'forget_known_instances@2021-12-09';
 export const SLOTS = 5;
+
+function load_and_migrate_old(){
+    const OLD_KEY = "forget_known_instances";
+    let olddata = localStorage.getItem(OLD_KEY);
+    if(olddata != null){
+        olddata = JSON.parse(olddata)
+        let newdata = {
+            mastodon: olddata,
+            misskey: [
+                "instance": "misskey.io",
+                "hits": 0
+            ]
+        };
+        known_save(newdata);
+        localStorage.removeItem(OLD_KEY);
+        return newdata;
+    }
+}
 
 export function known_save(known){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(known));
@@ -9,6 +27,8 @@ export function known_load(){
     let known = localStorage.getItem(STORAGE_KEY);
     if(known){
         known = JSON.parse(known);
+    } else {
+        known = load_and_migrate_old();
     }
     return known;
 }
