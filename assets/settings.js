@@ -194,10 +194,10 @@ import {known_load, known_save} from './known_instances.js'
         })
     }
 
-    function bump_instance(instance_name){
+    function bump_instance(service, instance_name){
         let known_instances = known_load();
         let found = false;
-        for(let instance of known_instances){
+        for(let instance of known_instances[service]){
             if(instance['instance'] == instance_name){
                 instance.hits ++;
                 found = true;
@@ -206,15 +206,17 @@ import {known_load, known_save} from './known_instances.js'
         }
         if(!found){
             let instance = {"instance": instance_name, "hits": 1};
-            known_instances.push(instance);
+            known_instances[service].push(instance);
         }
 
         known_save(known_instances);
 
     }
 
-    if(viewer_from_dom['service'] == 'mastodon' && location.hash == '#bump_instance'){
-        bump_instance(viewer_from_dom['id'].split('@')[1])
+    if(location.hash == '#bump_instance' && (
+        viewer_from_dom['service'] == 'mastodon' || viewer_from_dom['service'] == 'misskey'
+    )){
+        bump_instance(viewer_from_dom['service'], viewer_from_dom['id'].split('@')[1])
         let url = new URL(location.href)
         url.hash = '';
         history.replaceState('', '', url);
