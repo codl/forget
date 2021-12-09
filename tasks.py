@@ -428,7 +428,7 @@ def refresh_account_with_oldest_post():
         AND NOT accounts.dormant
         ORDER BY posts.updated_at ASC
         LIMIT 1;
-    """).columns(Post.id, Post.author_id)).one()
+    """).columns(Post.id, Post.author_id)).one_or_none()
     if post:
         aid = post.author_id
         refresh_account(aid)
