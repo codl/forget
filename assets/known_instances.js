@@ -8,10 +8,10 @@ function load_and_migrate_old(){
         olddata = JSON.parse(olddata)
         let newdata = {
             mastodon: olddata,
-            misskey: [
+            misskey: [{
                 "instance": "misskey.io",
                 "hits": 0
-            ]
+            }]
         };
         known_save(newdata);
         localStorage.removeItem(OLD_KEY);

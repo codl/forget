@@ -33,10 +33,10 @@ import {SLOTS, normalize_known, known_load, known_save} from './known_instances.
                         "instance": "mastodon.social",
                         "hits": 0
                     }],
-                    misskey:[
+                    misskey:[{
                         "instance": "misskey.io",
                         "hits": 0
-                    ],
+                    }],
                 };
             }
             known_save(known)
