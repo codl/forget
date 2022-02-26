@@ -116,7 +116,7 @@ def fetch_posts(acc, max_id, since_id):
     check_auth(acc, app, session)
 
     kwargs = dict(
-        limit=40,
+        limit=100,
         userId=acc.misskey_id,
         # for some reason the token is needed so misskey also sends `myReaction`
         i=acc.tokens[0].token
