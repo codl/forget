@@ -1,11 +1,10 @@
 [![Forget](assets/promo.gif)](https://forget.codl.fr)
 
 ![User count](https://forget.codl.fr/api/badge/users)
-![Maintenance status](https://img.shields.io/maintenance/yes/2021.svg)
+![Maintenance status](https://img.shields.io/maintenance/yes/2022.svg)
 
 [![Build status](https://img.shields.io/travis/codl/forget.svg)](https://travis-ci.org/codl/forget/)
 [![Test coverage](https://img.shields.io/codecov/c/github/codl/forget.svg)](https://codecov.io/gh/codl/forget)
-[![Code quality](https://img.shields.io/codacy/grade/1780ac6071c04cbd9ccf75de0891e798.svg)](https://www.codacy.com/app/codl/forget?utm_source=github.com&utm_medium=referral&utm_content=codl/forget&utm_campaign=badger)
 
 Forget is a post deleting service for Twitter, Mastodon, and Misskey. It lives
 at <https://forget.codl.fr>.
