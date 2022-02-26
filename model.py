@@ -67,6 +67,34 @@ class RemoteIDMixin(object):
     @mastodon_id.setter
     def mastodon_id(self, id_):
         self.id = "mastodon:{}@{}".format(id_, self.mastodon_instance)
+        
+    @property
+    def misskey_instance(self):
+        if not self.id:
+            return None
+        if self.service != "misskey":
+            raise Exception(
+                "tried to get misskey instance for a {} {}"
+                .format(self.service, type(self)))
+        return self.id.split(":", 1)[1].split('@')[1]
+        
+    @misskey_instance.setter
+    def misskey_instance(self, instance):
+        self.id = "misskey:{}@{}".format(self.misskey_id, instance)
+        
+    @property
+    def misskey_id(self):
+        if not self.id:
+            return None
+        if self.service != "misskey":
+            raise Exception(
+                    "tried to get misskey id for a {} {}"
+                    .format(self.service, type(self)))
+        return self.id.split(":", 1)[1].split('@')[0]
+
+    @misskey_id.setter
+    def misskey_id(self, id_):
+        self.id = "misskey:{}@{}".format(id_, self.misskey_instance)
 
     @property
     def remote_id(self):
@@ -74,6 +102,8 @@ class RemoteIDMixin(object):
             return self.twitter_id
         elif self.service == 'mastodon':
             return self.mastodon_id
+        elif self.service == 'misskey':
+            return self.misskey_id
 
 
 ThreeWayPolicyEnum = db.Enum('keeponly', 'deleteonly', 'none',
@@ -358,6 +388,27 @@ class MastodonInstance(db.Model):
     some popular instances ahead of time
     """
     __tablename__ = 'mastodon_instances'
+
+    instance = db.Column(db.String, primary_key=True)
+    popularity = db.Column(db.Float, server_default='10', nullable=False)
+
+    def bump(self, value=1):
+        self.popularity = (self.popularity or 10) + value
+
+class MisskeyApp(db.Model, TimestampMixin):
+    __tablename__ = 'misskey_apps'
+
+    instance = db.Column(db.String, primary_key=True)
+    protocol = db.Column(db.String, nullable=False)
+    client_secret = db.Column(db.String, nullable=False)
+
+class MisskeyInstance(db.Model):
+    """
+    this is for the autocomplete in the misskey login form
+    it isn't coupled with anything else so that we can seed it with
+    some popular instances ahead of time
+    """
+    __tablename__ = 'misskey_instances'
 
     instance = db.Column(db.String, primary_key=True)
     popularity = db.Column(db.Float, server_default='10', nullable=False)

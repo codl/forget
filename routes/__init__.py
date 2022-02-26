@@ -3,13 +3,16 @@ from flask import render_template, url_for, redirect, request, g,\
 from datetime import datetime, timedelta, timezone
 import libforget.twitter
 import libforget.mastodon
+import libforget.misskey
 from libforget.auth import require_auth, csrf,\
                      get_viewer
-from model import Session, TwitterArchive, MastodonApp
+from libforget.session import make_session
+from model import Session, TwitterArchive, MastodonApp, MisskeyApp
 from app import app, db, sentry, imgproxy
 import tasks
 from zipfile import BadZipFile
 from twitter import TwitterError
+from urllib.parse import urlparse
 from urllib.error import URLError
 import libforget.version
 import libforget.settings
@@ -34,10 +37,12 @@ def index():
 
 @app.route('/about/')
 def about():
-    instances = libforget.mastodon.suggested_instances()
+    mastodon_instances = libforget.mastodon.suggested_instances()
+    misskey_instances = libforget.misskey.suggested_instances()
     return render_template(
             'about.html',
-            mastodon_instances=instances,
+            mastodon_instances=mastodon_instances,
+            misskey_instances=misskey_instances,
             twitter_login_error='twitter_login_error' in request.args)
 
 
@@ -171,6 +176,9 @@ def logout():
     return redirect(url_for('about'))
 
 
+def domain_from_url(url):
+    return urlparse(url).netloc.lower() or urlparse("//"+url).netloc.lower()
+
 @app.route('/login/mastodon', methods=('GET', 'POST'))
 def mastodon_login_step1(instance=None):
 
@@ -188,14 +196,7 @@ def mastodon_login_step1(instance=None):
                 generic_error='error' in request.args
                 )
 
-    instance_url = instance_url.lower()
-    # strip protocol
-    instance_url = re.sub('^https?://', '', instance_url,
-                          count=1, flags=re.IGNORECASE)
-    # strip username
-    instance_url = instance_url.split("@")[-1]
-    # strip trailing path
-    instance_url = instance_url.split('/')[0]
+    instance_url = domain_from_url(instance_url)
 
     callback = url_for('mastodon_login_step2',
                        instance_url=instance_url, _external=True)
@@ -228,6 +229,67 @@ def mastodon_login_step2(instance_url):
                        instance_url=instance_url, _external=True)
 
     token = libforget.mastodon.receive_code(code, app, callback)
+    account = token.account
+
+    session = login(account.id)
+
+    db.session.commit()
+
+    g.viewer = session
+
+    resp = redirect(url_for('index', _anchor='bump_instance'))
+    return resp
+
+
+@app.route('/login/misskey', methods=('GET', 'POST'))
+def misskey_login(instance=None):
+    instance_url = (request.args.get('instance_url', None)
+                    or request.form.get('instance_url', None))
+    
+    if not instance_url:
+        instances = libforget.misskey.suggested_instances(
+            limit = 30,
+            min_popularity = 1
+        )
+        return render_template(
+                'misskey_login.html', instances=instances,
+                address_error=request.method == 'POST',
+                generic_error='error' in request.args
+                )
+
+    instance_url = domain_from_url(instance_url)
+    
+    callback = url_for('misskey_callback',
+                       instance_url=instance_url, _external=True)
+
+    try:
+        session = make_session()
+        app = libforget.misskey.get_or_create_app(
+                instance_url,
+                callback,
+                url_for('index', _external=True),
+                session)
+        db.session.merge(app)
+
+        db.session.commit()
+
+        return redirect(libforget.misskey.login_url(app, callback, session))
+
+    except Exception:
+        if sentry:
+            sentry.captureException()
+        return redirect(url_for('misskey_login', error=True))
+
+
+@app.route('/login/misskey/callback/<instance_url>')
+def misskey_callback(instance_url):
+    # legacy auth and miauth use different parameter names
+    token = request.args.get('token', None) or request.args.get('session', None)
+    app = MisskeyApp.query.get(instance_url)
+    if not token or not app:
+        return redirect(url_for('misskey_login', error=True))
+
+    token = libforget.misskey.receive_token(token, app)
     account = token.account
 
     session = login(account.id)

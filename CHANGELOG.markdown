@@ -1,5 +1,7 @@
 ## vNEXT
 
+* add: Misskey support (Thanks @Johann150 !)
+  <https://github.com/codl/forget/pull/544>
 * fix: lowered database impact of a background task
   <https://github.com/codl/forget/issue/166>
 * fix: wording on "favourited posts" is unclear

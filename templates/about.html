@@ -47,10 +47,36 @@
 {% endif %}
 
 </p>
+
+<p id='misskey_instance_buttons'>
+{% for instance in misskey_instances %}
+<a class='btn primary misskey-colored' href="{{ url_for('misskey_login', instance_url=instance) }}">
+{% if loop.first %}
+    {{picture(st, 'misskey', (20,40,80), ('webp', 'png'))}}
+    Log in with
+{% endif %}
+        {{instance}}
+</a>
+{% else %}
+<a class='btn primary misskey-colored' href="{{ url_for('misskey_login') }}">
+    {{picture(st, 'misskey', (20,40,80), ('webp', 'png'))}}
+    Log in with Misskey
+</a>
+{% endfor %}
+
+
+{% if misskey_instances %}
+<a class='btn secondary' href="{{ url_for('misskey_login') }}">
+    Another Misskey instance
+</a>
+{% endif %}
+
+</p>
 </section>
 
+<!-- Mastodon -->
 
-<script type="application/json" id="top_instances">
+<script type="application/json" id="mastodon_top_instances">
 [
 {% for instance in mastodon_instances %}
     {"instance": "{{instance}}"}
@@ -61,7 +87,7 @@
 ]
 </script>
 
-<script type="text/html+template" id="instance_button_template">
+<script type="text/html+template" id="mastodon_instance_button_template">
     <a class='btn primary mastodon-colored'
         href="{{ url_for('mastodon_login_step1') }}?instance_url=${encodeURIComponent(instance)}">
         ${ !first? '' : `
@@ -72,11 +98,42 @@
     </a>
 </script>
 
-<script type="text/html+template" id="another_instance_button_template">
+<script type="text/html+template" id="mastodon_another_instance_button_template">
     <a class='btn secondary' href="{{ url_for('mastodon_login_step1') }}">
         Another Mastodon instance
     </a>
 </script>
+
+<!-- Misskey -->
+
+<script type="application/json" id="misskey_top_instances">
+[
+{% for instance in misskey_instances %}
+    {"instance": "{{instance}}"}
+    {%- if not loop.last -%}
+    ,
+    {%- endif %}
+{% endfor %}
+]
+</script>
+
+<script type="text/html+template" id="misskey_instance_button_template">
+    <a class='btn primary misskey-colored'
+        href="{{ url_for('misskey_login') }}?instance_url=${encodeURIComponent(instance)}">
+        ${ !first? '' : `
+            {{picture(st, 'misskey', (20,40,80), ('webp', 'png'))}}
+            Log in with
+            `}
+        ${ instance }
+    </a>
+</script>
+
+<script type="text/html+template" id="misskey_another_instance_button_template">
+    <a class='btn secondary' href="{{ url_for('misskey_login') }}">
+        Another Misskey instance
+    </a>
+</script>
+
 
 
 {% endif %}
@@ -86,7 +143,7 @@
 <ul>
     <li>Delete your posts when they cross an age threshold.</li>
     <li>Or keep your post count in check, deleting old posts when you go over.</li>
-    <li>Preserve old posts that matter by giving them a favourite.</li>
+    <li>Preserve old posts that matter by giving them a favourite or a reaction (Misskey only).</li>
     <li>Set it and <i>forget</i> it. Forget works continuously in the background.</li>
 </ul>
 </section>

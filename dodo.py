@@ -60,7 +60,7 @@ def task_service_icon():
     formats = ('webp', 'png')
     for width in widths:
         for image_format in formats:
-            for basename in ('twitter', 'mastodon'):
+            for basename in ('twitter', 'mastodon', 'misskey'):
                 yield dict(
                     name='{}-{}.{}'.format(basename, width, image_format),
                     actions=[(resize_image, (basename, width, image_format))],
