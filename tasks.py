@@ -172,8 +172,10 @@ def fetch_acc(id_):
                 db.desc(Post.created_at)).first())
             if batch_end:
                 account.fetch_current_batch_end_id = batch_end.remote_id
+                account.fetch_current_batch_end_date = batch_end.created_at
             else:
                 account.fetch_current_batch_end_id = None
+                account.fetch_current_batch_end_date = None
             db.session.commit()
 
         else:
