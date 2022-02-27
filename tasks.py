@@ -119,10 +119,10 @@ def fetch_acc(id_):
             else:
                 max_id = None
             since_id = None
-        elif account.fetch_current_batch_end:
+        elif account.fetch_current_batch_end_date:
             oldest = (db.session.query(Post)
                       .with_parent(account, 'posts')
-                      .filter(Post.created_at > account.fetch_current_batch_end.created_at)
+                      .filter(Post.created_at > account.fetch_current_batch_end_date)
                       .order_by(db.asc(Post.created_at))
                       .first())
             # ^ None if this is our first fetch of this batch, otherwise oldest of this batch
@@ -130,7 +130,7 @@ def fetch_acc(id_):
                 max_id = oldest.remote_id
             else:
                 max_id = None
-            since_id = account.fetch_current_batch_end.remote_id
+            since_id = account.fetch_current_batch_end_id
         else:
             # we shouldn't get here unless the user had no posts on the service last time we fetched
             max_id = None
@@ -171,7 +171,7 @@ def fetch_acc(id_):
             batch_end = (Post.query.with_parent(account, 'posts').order_by(
                 db.desc(Post.created_at)).first())
             if batch_end:
-                account.fetch_current_batch_end_id = batch_end.id
+                account.fetch_current_batch_end_id = batch_end.remote_id
             else:
                 account.fetch_current_batch_end_id = None
             db.session.commit()

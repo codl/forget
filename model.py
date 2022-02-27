@@ -146,15 +146,8 @@ class Account(TimestampMixin, RemoteIDMixin):
     fetch_history_complete = db.Column(db.Boolean, server_default='FALSE',
                                        nullable=False)
 
-    @declared_attr
-    def fetch_current_batch_end_id(cls):
-        return db.Column(db.String, db.ForeignKey('posts.id', ondelete='SET NULL'))
-    @declared_attr
-    def fetch_current_batch_end(cls):
-        return db.relationship("Post", foreign_keys=(cls.fetch_current_batch_end_id,))
-    # the declared_attr is necessary because of the foreign key
-    # and because this class is technically one big mixin
-    # https://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/mixins.html#mixing-in-relationships
+    fetch_current_batch_end_id = db.Column(db.String)
+    fetch_current_batch_end_date = db.Column(db.DateTime(timezone=True))
 
     reason = db.Column(db.String)
     dormant = db.Column(db.Boolean, server_default='FALSE', nullable=False)
