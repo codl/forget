@@ -23,6 +23,7 @@ app = Celery(
     'tasks',
     broker=flaskapp.config['CELERY_BROKER'],
     task_serializer='pickle',
+    accept_content={'pickle',},
     task_soft_time_limit=600,
     task_time_limit=1200,
 )
