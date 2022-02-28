@@ -1,4 +1,6 @@
-## vNEXT
+## v2.1.0
+
+Released somewhen
 
 * add: Misskey support (Thanks @Johann150 !)
   <https://github.com/codl/forget/pull/544>
@@ -6,6 +8,8 @@
   <https://github.com/codl/forget/issue/166>
 * fix: wording on "favourited posts" is unclear
   <https://github.com/codl/forget/pull/366>
+* fix: failing to fetch some posts in some circumstances
+  <https://github.com/codl/forget/issue/584>
 
 ## v2.0.0
 
