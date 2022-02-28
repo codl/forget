@@ -21,21 +21,21 @@ depends_on = None
 
 
 def upgrade():
+    op.drop_constraint('fk_accounts_fetch_current_batch_end_id_posts', 'accounts', type_='foreignkey')
     op.add_column('accounts', sa.Column('fetch_current_batch_end_date', sa.DateTime(timezone=True), nullable=True))
     op.execute('''
         UPDATE accounts SET fetch_current_batch_end_date = posts.created_at
-            FROM posts WHERE accounts.fetch_current_batch_end_id == posts.id;
+            FROM posts WHERE accounts.fetch_current_batch_end_id = posts.id;
             ''')
 
     # update ids from "mastodon:69420@chitter.xyz" format to just "69420"
     op.execute('''
         UPDATE accounts SET fetch_current_batch_end_id =
             split_part(
-                split_part(fetch_current_batch_end_id, ':', 2)
+                split_part(fetch_current_batch_end_id, ':', 2),
                     '@', 1);
         ''')
 
-    op.drop_constraint('fk_accounts_fetch_current_batch_end_id_posts', 'accounts', type_='foreignkey')
 
 
 def downgrade():
