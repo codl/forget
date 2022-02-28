@@ -1,4 +1,4 @@
-[![Forget](assets/promo.gif)](https://forget.codl.fr)
+[Forget](assets/promo.gif)
 
 ![User count](https://forget.codl.fr/api/badge/users)
 ![Maintenance status](https://img.shields.io/maintenance/yes/2022.svg)
@@ -6,9 +6,24 @@
 [![Build status](https://img.shields.io/travis/codl/forget.svg)](https://travis-ci.org/codl/forget/)
 [![Test coverage](https://img.shields.io/codecov/c/github/codl/forget.svg)](https://codecov.io/gh/codl/forget)
 
-Forget is a post deleting service for Twitter, Mastodon, and Misskey. It lives
-at <https://forget.codl.fr>.
+Forget is a post deleting service for Twitter, Mastodon, and Misskey.
 
+You can run a copy of it on your server, or use the server run by the
+maintainer at <https://forget.codl.fr/>
+
+
+## Features
+
+  * Delete your posts when they cross an age threshold.
+  * Or keep your post count in check, deleting old posts when you go over.
+  * Preserve old posts that matter by giving them a favourite or a reaction.
+  * Set it and <i>forget</i> it. Forget works continuously in the background.
+
+## Non-features
+
+Forget is not a one-time purging tool. It is designed to prune your account
+continuously, not quickly. If you need a lot of posts gone fast, you may want
+to look for another more-suited tool.
 
 ## Running your own
 
