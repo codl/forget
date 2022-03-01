@@ -1,4 +1,4 @@
-[Forget](assets/promo.gif)
+![Forget](assets/promo.gif)
 
 ![User count](https://forget.codl.fr/api/badge/users)
 ![Maintenance status](https://img.shields.io/maintenance/yes/2022.svg)
