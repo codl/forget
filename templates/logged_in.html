@@ -70,6 +70,26 @@
     <input type=number name=policy_keep_latest min=0 step=1 style='max-width:8ch' value={{g.viewer.account.policy_keep_latest}}>
     most recent posts will be considered for deletion
 </p>
+{% if g.viewer.account.service == 'misskey' %}
+<p>…unless you
+    <span class="radiostrip">
+        <span class="choice">
+        <input type=radio name=policy_keep_favourites value=keeponly id=policy_keep_favourites_keeponly {{ "checked" if g.viewer.account.policy_keep_favourites == 'keeponly' }}>
+        <label for=policy_keep_favourites_keeponly>reacted to them</label>
+        </span>
+
+        <span class="choice">
+        <input type=radio name=policy_keep_favourites value=deleteonly id=policy_keep_favourites_deleteonly {{ "checked" if g.viewer.account.policy_keep_favourites == 'deleteonly' }}>
+        <label for=policy_keep_favourites_deleteonly>have not reacted to them</label>
+        </span>
+
+        <span class="choice">
+        <input type=radio name=policy_keep_favourites value=none id=policy_keep_favourites_none {{ "checked" if g.viewer.account.policy_keep_favourites == 'none' }}>
+        <label for=policy_keep_favourites_none>neither</label>
+        </span>
+    </span>
+</p>
+{%- else %}
 <p>…unless you
     <span class="radiostrip">
         <span class="choice">
@@ -88,6 +108,7 @@
         </span>
     </span>
 </p>
+{%- endif %}
 <p>…or unless they
     <span class="radiostrip">
         <span class="choice">
