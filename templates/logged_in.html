@@ -126,7 +126,7 @@
         <label for=policy_keep_media_none>neither</label>
     </span>
 </p>
-{% if g.viewer.account.service == 'mastodon' || g.viewer.account.service == 'misskey' %}
+{% if g.viewer.account.service == 'mastodon' or g.viewer.account.service == 'misskey' %}
 <p>Keep direct messages:
     <span class="radiostrip">
         <span class="choice">
