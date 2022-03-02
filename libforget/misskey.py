@@ -31,7 +31,7 @@ def get_or_create_app(instance_url, callback, website, session):
         r = session.post('{}://{}/api/app/create'.format(app.protocol, app.instance), json = {
             'name': 'forget',
             'description': website,
-            'permission': ['write:notes'],
+            'permission': ['write:notes', 'read:reactions'],
             'callbackUrl': callback
         })
         r.raise_for_status()
