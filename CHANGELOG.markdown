@@ -1,6 +1,6 @@
 ## v2.1.0
 
-Released somewhen
+Released 2022-03-04
 
 * add: Misskey support (Thanks @Johann150 !)
   <https://github.com/codl/forget/pull/544>
