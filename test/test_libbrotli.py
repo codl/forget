@@ -7,10 +7,10 @@ TIMEOUT_TARGET = 0.2
 
 
 @pytest.fixture
-def app(redisdb):
+def app():
     from flask import Flask
     app_ = Flask(__name__)
-    app_.config['REDIS_URI'] = 'redis://localhost:15487'
+    app_.config['REDIS_URI'] = 'redis://localhost:6379'
     app_.debug = True
 
     @app_.route('/')

@@ -20,6 +20,10 @@ jobs:
       - name: Install node dependencies
         run: npm install
 
+      - name: Start Redis
+        run: docker run --name redis --publish 6379:6379 --detach redis
+
+
       - name: Run tests with pytest
         run: pipenv run pytest --cov=.
 
