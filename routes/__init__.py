@@ -205,15 +205,15 @@ def mastodon_login_step1(instance=None):
                        instance_url=instance_url, _external=True)
 
     try:
-        app = libforget.mastodon.get_or_create_app(
+        mastoapp = libforget.mastodon.get_or_create_app(
                 instance_url,
                 callback,
                 url_for('index', _external=True))
-        db.session.merge(app)
+        db.session.merge(mastoapp)
 
         db.session.commit()
 
-        return redirect(libforget.mastodon.login_url(app, callback))
+        return redirect(libforget.mastodon.login_url(mastoapp, callback))
 
     except Exception:
         if sentry:
@@ -224,14 +224,14 @@ def mastodon_login_step1(instance=None):
 @app.route('/login/mastodon/callback/<instance_url>')
 def mastodon_login_step2(instance_url):
     code = request.args.get('code', None)
-    app = MastodonApp.query.get(instance_url)
-    if not code or not app:
+    mastoapp = MastodonApp.query.get(instance_url)
+    if not code or not mastoapp:
         return redirect(url_for('mastodon_login_step1', error=True))
 
     callback = url_for('mastodon_login_step2',
                        instance_url=instance_url, _external=True)
 
-    token = libforget.mastodon.receive_code(code, app, callback)
+    token = libforget.mastodon.receive_code(code, mastoapp, callback)
     account = token.account
 
     session = login(account.id)
@@ -269,16 +269,16 @@ def misskey_login(instance=None):
 
     try:
         session = make_session()
-        app = libforget.misskey.get_or_create_app(
+        mkapp = libforget.misskey.get_or_create_app(
                 instance_url,
                 callback,
                 url_for('index', _external=True),
                 session)
-        db.session.merge(app)
+        db.session.merge(mkapp)
 
         db.session.commit()
 
-        return redirect(libforget.misskey.login_url(app, callback, session))
+        return redirect(libforget.misskey.login_url(mkapp, callback, session))
 
     except Exception:
         if sentry:
@@ -290,11 +290,11 @@ def misskey_login(instance=None):
 def misskey_callback(instance_url):
     # legacy auth and miauth use different parameter names
     token = request.args.get('token', None) or request.args.get('session', None)
-    app = MisskeyApp.query.get(instance_url)
-    if not token or not app:
+    mkapp = MisskeyApp.query.get(instance_url)
+    if not token or not mkapp:
         return redirect(url_for('misskey_login', error=True))
 
-    token = libforget.misskey.receive_token(token, app)
+    token = libforget.misskey.receive_token(token, mkapp)
     account = token.account
 
     session = login(account.id)
