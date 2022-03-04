@@ -1,3 +1,8 @@
+## vNEXT
+
+* add: instance hidelist
+  <https://github.com/codl/forget/pull/590>
+
 ## v2.1.0
 
 Released 2022-03-04
