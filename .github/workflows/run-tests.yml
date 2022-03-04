@@ -9,9 +9,11 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: "3.6"
+          cache: 'pipenv'
       - uses: actions/setup-node@v2
         with:
           node-version: "10"
+          cache: 'npm'
 
       - name: Install pipenv and python dependencies
         run: |
