@@ -37,8 +37,9 @@ def index():
 
 @app.route('/about/')
 def about():
-    mastodon_instances = libforget.mastodon.suggested_instances()
-    misskey_instances = libforget.misskey.suggested_instances()
+    blocklist = app.config.get('HIDDEN_INSTANCES', '').split()
+    mastodon_instances = libforget.mastodon.suggested_instances(blocklist=blocklist)
+    misskey_instances = libforget.misskey.suggested_instances(blocklist=blocklist)
     return render_template(
             'about.html',
             mastodon_instances=mastodon_instances,
@@ -186,9 +187,11 @@ def mastodon_login_step1(instance=None):
                     or request.form.get('instance_url', None))
 
     if not instance_url:
+        blocklist = app.config.get('HIDDEN_INSTANCES', '').split()
         instances = libforget.mastodon.suggested_instances(
                 limit=30,
-                min_popularity=1
+                min_popularity=1,
+                blocklist=blocklist,
         )
         return render_template(
                 'mastodon_login.html', instances=instances,
@@ -245,11 +248,13 @@ def mastodon_login_step2(instance_url):
 def misskey_login(instance=None):
     instance_url = (request.args.get('instance_url', None)
                     or request.form.get('instance_url', None))
-    
+
     if not instance_url:
+        blocklist = app.config.get('HIDDEN_INSTANCES', '').split()
         instances = libforget.misskey.suggested_instances(
             limit = 30,
-            min_popularity = 1
+            min_popularity = 1,
+            blocklist=blocklist,
         )
         return render_template(
                 'misskey_login.html', instances=instances,
@@ -258,7 +263,7 @@ def misskey_login(instance=None):
                 )
 
     instance_url = domain_from_url(instance_url)
-    
+
     callback = url_for('misskey_callback',
                        instance_url=instance_url, _external=True)
 
