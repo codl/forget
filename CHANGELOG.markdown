@@ -1,5 +1,7 @@
 ## vNEXT
 
+* add: instance hidelist
+  <https://github.com/codl/forget/pull/590>
 * removed: migration path for known instances list from cookie to localstorage
   <https://github.com/codl/forget/pull/545>
 

@@ -47,7 +47,23 @@ SENTRY
 
 If you want to send exceptions to sentry, enter your sentry DSN here
 """
-# SENTRY_DSN=
+# SENTRY_DSN=''
+
+"""
+HIDDEN INSTANCES
+
+The front page shows one-click login buttons for the mastodon and
+misskey instances that see the most heavy use. Instances configured in this
+list will be prevented from appearing in these buttons.
+
+They will still appear if a user has previously logged into them and their
+browser remembers it. A user will still be able to log into them by manually
+typing the address into the log in form.
+
+This is a space-delimited list. Example syntax:
+HIDDEN_INSTANCES='social.example.com pleroma.example.net mk.example.org'
+"""
+# HIDDEN_INSTANCES=''
 
 """
 ADVANCED FLASK CONFIG
