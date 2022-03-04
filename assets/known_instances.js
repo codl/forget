@@ -24,13 +24,21 @@ export function known_save(known){
 }
 
 export function known_load(){
+    const default_ = {
+        mastodon:[{ "instance": "mastodon.social", "hits": 0 }],
+        misskey:[{ "instance": "misskey.io", "hits": 0 }],
+    };
+    // this makes mastodon.social and misskey.io show up on respective first
+    // buttons by default even if they are not the most popular instance
+    // according to the server
+
     let known = localStorage.getItem(STORAGE_KEY);
     if(known){
         known = JSON.parse(known);
     } else {
         known = load_and_migrate_old();
     }
-    return known;
+    return known || default_;
 }
 
 export function normalize_known(known){

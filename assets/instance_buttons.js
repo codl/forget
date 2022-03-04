@@ -20,34 +20,12 @@ import {SLOTS, normalize_known, known_load, known_save} from './known_instances.
     const misskey_top_instances =
         Function('return JSON.parse(`' + document.querySelector('#misskey_top_instances').innerHTML + '`);')();
 
-    async function get_known(){
+    async function replace_buttons(){
         let known = known_load();
-        if(!known){
-            let resp = await fetch('/api/known_instances');
-            if(resp.ok && resp.headers.get('content-type') == 'application/json'){
-                known = await resp.json();
-            }
-            else {
-                known = {
-                    mastodon:[{
-                        "instance": "mastodon.social",
-                        "hits": 0
-                    }],
-                    misskey:[{
-                        "instance": "misskey.io",
-                        "hits": 0
-                    }],
-                };
-            }
-            known_save(known)
-            fetch('/api/known_instances', {method: 'DELETE'})
-        }
 
-        return known;
-    }
+        known = normalize_known(known);
+        known_save(known);
 
-    function replace_buttons(top_instances, known_instances, container,
-            template, template_another_instance){
         let filtered_top_instances = []
         for(let instance of top_instances){
             let found = false;
