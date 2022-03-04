@@ -1,0 +1,26 @@
+name: Run tests on pushes and on PRs
+on: [push, pull_request]
+jobs:
+  run_tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "10"
+
+      - name: Install pipenv and python dependencies
+        run: |
+          pip install -U pip pipenv
+          pipenv sync -d
+      - name: Install node dependencies
+        run: npm install
+
+      - name: Run tests with pytest
+        run: pipenv run pytest --cov=.
+
+      - uses: codecov/codecov-action@v2
