@@ -1,3 +1,8 @@
+## vNEXT
+
+* removed: migration path for known instances list from cookie to localstorage
+  <https://github.com/codl/forget/pull/545>
+
 ## v2.1.0
 
 Released 2022-03-04
