@@ -2,8 +2,12 @@
 
 * add: instance hidelist
   <https://github.com/codl/forget/pull/590>
+* changed: more comprehensive checks in `/api/status_check`
+  <https://github.com/codl/forget/pull/418>
 * removed: migration path for known instances list from cookie to localstorage
   <https://github.com/codl/forget/pull/545>
+
+This release involves a database migration. Run `flask db upgrade` after updating.
 
 ## v2.1.0
 
