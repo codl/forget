@@ -3,6 +3,6 @@
     "rollup": "^2.42.4",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^7.1.0",
-    "svelte": "^3.35.0"
+    "svelte": "^3.46.6"
   }
 }
