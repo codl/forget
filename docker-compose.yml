@@ -2,8 +2,7 @@ version: "3"
 
 services:
   forget:
-    build:
-      context: ./
+    image: shibaobun/forget
     container_name: forget
     restart: always
     environment:
@@ -23,8 +22,7 @@ services:
       - 42157
 
   forget-worker:
-    build:
-      context: ./
+    image: shibaobun/forget
     container_name: forget-worker
     restart: always
     environment:
@@ -48,8 +46,7 @@ services:
       "
 
   forget-beat:
-    build:
-      context: ./
+    image: shibaobun/forget
     container_name: forget-beat
     restart: always
     environment:
