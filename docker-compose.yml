@@ -1,0 +1,80 @@
+version: "3"
+
+services:
+  forget:
+    build:
+      context: ./
+    container_name: forget
+    restart: always
+    environment:
+      - FLASK_APP=forget.py
+    volumes:
+      - ./config.py:/usr/src/app/config.py
+    depends_on:
+      - forget-redis
+      - forget-db
+      - forget-worker
+      - forget-beat
+    command: bash -c "
+        flask db upgrade &&
+        gunicorn -w 9 -t 3600 -b 0.0.0.0:42157 forget:app
+      "
+    expose:
+      - 42157
+
+  forget-worker:
+    build:
+      context: ./
+    container_name: forget-worker
+    restart: always
+    environment:
+      - FLASK_APP=forget.py
+    volumes:
+      - ./config.py:/usr/src/app/config.py
+      - ./celery/log:/var/log/celery
+      - ./celery/run:/var/run/celery
+    depends_on:
+      - forget-redis
+      - forget-db
+    command: bash -c "
+        mkdir -p /var/run/celery /var/log/celery &&
+        chown -R nobody:nogroup /var/run/celery /var/log/celery &&
+        exec celery --app=tasks worker
+                    --loglevel=INFO --logfile=/var/log/celery/worker.log
+                    --statedb=/var/run/celery/worker.state
+                    --hostname=worker
+                    --queues=celery.worker -O fair
+                    --uid=nobody --gid=nogroup
+      "
+
+  forget-beat:
+    build:
+      context: ./
+    container_name: forget-beat
+    restart: always
+    environment:
+      - FLASK_APP=forget.py
+    volumes:
+      - ./config.py:/usr/src/app/config.py
+    depends_on:
+      - forget-redis
+      - forget-db
+    entrypoint: ["celery", "--app=tasks", "beat"]
+
+  forget-redis:
+    container_name: forget-redis
+    image: redis:4.0-alpine
+    restart: always
+    volumes:
+      - ./redis:/data
+
+  forget-db:
+    image: postgres:14-alpine
+    container_name: forget-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=forget
+    volumes:
+      - ./postgres:/var/lib/postgresql/data

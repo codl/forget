@@ -8,3 +8,8 @@ static/*
 .cache/
 .coverage
 .pytest_cache
+
+# docker stuff
+/redis
+/postgres
+/celery
