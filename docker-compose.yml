@@ -63,7 +63,6 @@ services:
         chown -R nobody:nogroup /var/run/celery /var/log/celery &&
         exec celery --app=tasks beat
                     --loglevel=INFO --logfile=/var/log/celery/beat.log
-                    --pidfile="/var/run/celery/beat.pid"
                     --schedule=/var/run/celery/schedule
                     --uid=nobody --gid=nogroup
       "
