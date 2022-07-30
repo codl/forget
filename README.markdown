@@ -129,10 +129,10 @@ This project is also able to be deployed through Docker.
    Feel free to change these if you'd like.
 1. Run `docker-compose up` to start or `docker-compose up -d` to start in the
    background, and use `docker-compose down` to stop.
-1. If you have a reverse proxy on a docker network already, simply add the
+1. If you have a reverse proxy on a Docker network already, simply add the
    Docker network details to `docker-compose.yml` and Forget should be available
    at `http://forget:42157` in the Docker network. Otherwise, you'll need to add
-   something like the following to bind the docker container to a port:
+   something like the following to bind the Docker container to a port:
    ```
    services:
      forget:
