@@ -53,10 +53,20 @@ services:
       - FLASK_APP=forget.py
     volumes:
       - ./config.py:/usr/src/app/config.py
+      - ./celery/log:/var/log/celery
+      - ./celery/run:/var/run/celery
     depends_on:
       - forget-redis
       - forget-db
-    entrypoint: ["celery", "--app=tasks", "beat"]
+    command: bash -c "
+        mkdir -p /var/run/celery /var/log/celery &&
+        chown -R nobody:nogroup /var/run/celery /var/log/celery &&
+        exec celery --app=tasks beat
+                    --loglevel=INFO --logfile=/var/log/celery/beat.log
+                    --pidfile="/var/run/celery/beat.pid"
+                    --schedule=/var/run/celery/schedule
+                    --uid=nobody --gid=nogroup
+      "
 
   forget-redis:
     container_name: forget-redis
