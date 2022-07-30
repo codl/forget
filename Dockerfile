@@ -11,4 +11,4 @@ RUN apt-get update -qq && apt-get install -qq nodejs npm
 RUN npm install --save-dev
 RUN doit
 
-VOLUME ["/var/log/celery", "/var/run/celery"]
+VOLUME ["/var/run/celery"]
