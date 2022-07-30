@@ -43,7 +43,6 @@ services:
                     --loglevel=INFO --logfile=/var/log/celery/worker.log
                     --statedb=/var/run/celery/worker.state
                     --hostname=worker
-                    --queues=celery.worker -O fair
                     --uid=nobody --gid=nogroup
       "
 
