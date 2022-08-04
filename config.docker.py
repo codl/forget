@@ -14,7 +14,7 @@ determines where to connect to the database
 see <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls> for syntax
 only postgresql with psycopg2 driver is officially supported
 """
-SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://postgres:postgres@forget-db/forget'
+SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://postgres:postgres@db/forget'
 
 """
 REDIS URI
@@ -22,7 +22,7 @@ REDIS URI
 see <https://redis-py.readthedocs.io/en/latest/#redis.ConnectionPool.from_url>
 for syntax reference
 """
-REDIS_URI='redis://forget-redis'
+REDIS_URI='redis://redis'
 
 """
 SERVER ADDRESS

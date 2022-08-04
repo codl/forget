@@ -1,40 +1,48 @@
-version: "3"
-
 services:
-  forget:
+  www:
     build:
       context: ./
-    container_name: forget
+    image: codl/forget
+    pull_policy: build
     restart: always
-    environment:
-      - FLASK_APP=forget.py
     volumes:
-      - ./config.py:/usr/src/app/config.py
+      - type: bind
+        source: ./config.py
+        target: /usr/src/app/config.py
+        read_only: true
     depends_on:
-      - forget-redis
-      - forget-db
-      - forget-worker
-      - forget-beat
+      - redis
+      - db
+      - worker
+      - beat
     command: bash -c "
         flask db upgrade &&
         gunicorn -w 9 -t 3600 -b 0.0.0.0:42157 forget:app
       "
+    networks:
+      - forget
     expose:
       - 42157
+    ports:
+      - "127.0.0.1:42157:42157"
 
-  forget-worker:
+  worker:
     build:
       context: ./
-    container_name: forget-worker
+    image: codl/forget
+    pull_policy: build
     restart: always
-    environment:
-      - FLASK_APP=forget.py
     volumes:
-      - ./config.py:/usr/src/app/config.py
-      - ./celery/run:/var/run/celery
+      - type: bind
+        source: ./config.py
+        target: /usr/src/app/config.py
+        read_only: true
+      - ./data/celery/run:/var/run/celery
     depends_on:
-      - forget-redis
-      - forget-db
+      - redis
+      - db
+    networks:
+      - forget
     command: bash -c "
         mkdir -p /var/run/celery &&
         chown -R nobody:nogroup /var/run/celery &&
@@ -45,19 +53,23 @@ services:
                     --uid=nobody --gid=nogroup
       "
 
-  forget-beat:
+  beat:
     build:
       context: ./
-    container_name: forget-beat
+    image: codl/forget
+    pull_policy: build
     restart: always
-    environment:
-      - FLASK_APP=forget.py
     volumes:
-      - ./config.py:/usr/src/app/config.py
-      - ./celery/run:/var/run/celery
+      - type: bind
+        source: ./config.py
+        target: /usr/src/app/config.py
+        read_only: true
+      - ./data/celery/run:/var/run/celery
     depends_on:
-      - forget-redis
-      - forget-db
+      - redis
+      - db
+    networks:
+      - forget
     command: bash -c "
         mkdir -p /var/run/celery &&
         chown -R nobody:nogroup /var/run/celery &&
@@ -67,20 +79,25 @@ services:
                     --uid=nobody --gid=nogroup
       "
 
-  forget-redis:
-    container_name: forget-redis
+  redis:
     image: redis:4.0-alpine
     restart: always
     volumes:
-      - ./redis:/data
+      - ./data/redis:/data
+    networks:
+      - forget
 
-  forget-db:
+  db:
     image: postgres:14-alpine
-    container_name: forget-db
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=forget
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - forget
+
+networks:
+  forget:

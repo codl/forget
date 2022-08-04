@@ -1,0 +1,33 @@
+## uncomment below and change network name to use a reverse proxy on an
+## existing network
+#networks:
+#  mycoolreverseproxynetwork:
+#    external: true
+
+services:
+  www:
+## uncomment below to stop listening on 127.0.0.1
+#    ports: []
+
+    networks:
+      - forget
+## uncomment below and change network name to use a reverse proxy on an
+## existing network
+#      - mycoolreverseproxynetwork
+
+
+## if you wish to change where postgres, redis, and celery persistent data is
+## stored, uncomment below and change the first part of each volume (before the `:`)
+
+#  redis:
+#    volumes:
+#      - /my/cool/redis/path:/data
+#  db:
+#    volumes:
+#      - /my/cool/postgres/path:/var/lib/postgresql/data
+#  worker:
+#    volumes:
+#      - /my/cool/celery/path:/var/run/celery
+#  beat:
+#    volumes:
+#      - /my/cool/celery/path:/var/run/celery

@@ -120,30 +120,21 @@ server will be started and shut down automatically by the test suite.
 
 This project is also able to be deployed through Docker.
 
-1. Copy `docker-compose.yml` and `config.docker.py` into your preferred
-   directory.
-1. Rename `config.docker.py` to `config.py` and add additional configurations to
+1. Copy `config.docker.py` to `config.py` and add additional configurations to
    your liking.
+1. By default, the webapp container will be listening on `127.0.0.1:42157`,
+   which you can point a reverse proxy at.
+   * If your reverse proxy is in another docker network then you'll need a
+     `docker-compose.override.yml` file to attach the `www` service to the
+     right network and not publish any ports. An example override file is
+     provided. The web app will be listening on `http://forget-www-1:42157`.
 1. By default, the `docker-compose.yml` creates relative mounts `./redis`,
    `./postgres`, and `./celery` relative to the `docker-compose.yml` location.
-   Feel free to change these if you'd like.
+   An example `docker-compose.override.yml` file is provided that shows how to
+   change this.
+1. Run `docker-compose build` to build the image.
 1. Run `docker-compose up` to start or `docker-compose up -d` to start in the
    background, and use `docker-compose down` to stop.
-1. If you have a reverse proxy on a Docker network already, simply add the
-   Docker network details to `docker-compose.yml` and Forget should be available
-   at `http://forget:42157` in the Docker network. Otherwise, you'll need to add
-   something like the following to bind the Docker container to a port:
-   ```
-   services:
-     forget:
-       ...lots of stuff...
-       ports:
-         - "127.0.0.1:42157:42157"
-       ...other stuff...
-   ```
-   This will bind the container's port `42157` to `127.0.0.1:42157` on your
-   local machine, which you can then reverse proxy. Make sure to never expose
-   this publically, as it is http and not secure!
 
 ## Contact
 

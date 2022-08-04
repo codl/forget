@@ -18,8 +18,5 @@ config.example.py
 config.docker.py
 forget.example.service
 requirements-dev.txt
-
-redis
-postgres
-celery
+data
 config.py

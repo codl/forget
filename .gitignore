@@ -9,7 +9,7 @@ static/*
 .coverage
 .pytest_cache
 
-# docker stuff
-/redis
-/postgres
-/celery
+data/*
+!data/.keep
+
+docker-compose.override.yml

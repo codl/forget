@@ -29,4 +29,6 @@ FROM deps
 COPY --from=layer-cake / ./
 RUN doit
 
+ENV FLASK_APP=forget.py
+
 VOLUME ["/var/run/celery"]
