@@ -1,7 +1,11 @@
-## vNEXT
+## v2.2.0
+
+Not yet released
 
 * add: instance hidelist
   <https://github.com/codl/forget/pull/590>
+* add: docker deployment support (Thanks @shibaobun !)
+  <https://github.com/codl/forget/pull/612>
 * removed: migration path for known instances list from cookie to localstorage
   <https://github.com/codl/forget/pull/545>
 
