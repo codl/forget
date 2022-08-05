@@ -1,14 +1,19 @@
-FROM python:3.10-bullseye AS deps
+FROM python:3.10.6-bullseye AS pydeps
 WORKDIR /usr/src/app
 
 RUN python -m pip install --upgrade pip==22.2.2
-RUN apt-get update -qq && apt-get install -qq nodejs npm
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+
+FROM pydeps AS pynodedeps
+
+RUN apt-get update -qq && apt-get install -qq nodejs npm \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
-RUN npm install --save-dev
+RUN npm clean-install
 
 
 FROM scratch AS layer-cake
@@ -24,10 +29,14 @@ COPY static static
 COPY templates templates
 
 
-FROM deps
+FROM pynodedeps AS build
 
 COPY --from=layer-cake / ./
 RUN doit
+
+FROM pydeps
+
+COPY --from=build /usr/src/app ./
 
 ENV FLASK_APP=forget.py
 
