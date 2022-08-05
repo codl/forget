@@ -4,7 +4,7 @@
 *.md
 Dockerfile
 docker-compose.yml
-.git
+#.git
 .github
 .codecov.yml
 .coveragerc
