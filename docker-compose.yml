@@ -2,8 +2,8 @@ services:
   www:
     build:
       context: ./
-    image: codl/forget
-    pull_policy: build
+    image: ghcr.io/codl/forget
+    pull_policy: missing
     restart: always
     volumes:
       - type: bind
@@ -29,8 +29,8 @@ services:
   worker:
     build:
       context: ./
-    image: codl/forget
-    pull_policy: build
+    image: ghcr.io/codl/forget
+    pull_policy: missing
     restart: always
     volumes:
       - type: bind
@@ -56,8 +56,8 @@ services:
   beat:
     build:
       context: ./
-    image: codl/forget
-    pull_policy: build
+    image: ghcr.io/codl/forget
+    pull_policy: missing
     restart: always
     volumes:
       - type: bind
