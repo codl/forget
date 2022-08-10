@@ -1,6 +1,6 @@
 ## v2.2.0
 
-Not yet released
+Released 2022-08-10
 
 * add: instance hidelist
   <https://github.com/codl/forget/pull/590>
