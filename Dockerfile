@@ -1,19 +1,25 @@
+# syntax=docker/dockerfile:1.4.2
+
 FROM python:3.10.6-bullseye AS pydeps
 WORKDIR /usr/src/app
 
-RUN python -m pip install --upgrade pip==22.2.2
+RUN --mount=type=cache,target=/root/.cache/pip pip install --upgrade pip==22.2.2
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 
 
 FROM pydeps AS pynodedeps
 
-RUN apt-get update -qq && apt-get install -qq nodejs npm \
-    && rm -rf /var/lib/apt/lists/*
+RUN rm -f /etc/apt/apt.conf.d/docker-clean &&\
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' \
+    > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update -qq && apt-get install -qq nodejs npm
 
 COPY package.json package-lock.json ./
-RUN npm clean-install
+RUN --mount=type=cache,target=/root/.npm npm clean-install
 
 
 FROM scratch AS layer-cake
