@@ -3,10 +3,10 @@
 FROM python:3.10.6-bullseye AS pydeps
 WORKDIR /usr/src/app
 
-RUN --mount=type=cache,target=/root/.cache/pip pip install --upgrade pip==22.2.2
+RUN --mount=type=cache,target=/root/.cache/pip/http pip install --upgrade pip==22.2.2
 
 COPY requirements.txt .
-RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip/http pip install -r requirements.txt
 
 
 FROM pydeps AS pynodedeps
