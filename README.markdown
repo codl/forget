@@ -1,15 +1,11 @@
 ![Forget](assets/promo.gif)
 
-![User count](https://forget.codl.fr/api/badge/users)
-![Maintenance status](https://img.shields.io/maintenance/yes/2022.svg)
+![Maintenance status](https://img.shields.io/maintenance/no/2022.svg)
 
 [![Build status](https://img.shields.io/travis/codl/forget.svg)](https://travis-ci.org/codl/forget/)
 [![Test coverage](https://img.shields.io/codecov/c/github/codl/forget.svg)](https://codecov.io/gh/codl/forget)
 
 Forget is a post deleting service for Twitter, Mastodon, and Misskey.
-
-You can run a copy of it on your server, or use the server run by the
-maintainer at <https://forget.codl.fr/>
 
 
 ## Features
