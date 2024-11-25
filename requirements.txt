@@ -6,7 +6,7 @@
 #
 
 -i https://pypi.python.org/simple
-alembic==1.7.6
+alembic==1.8.1
 amqp==5.0.9; python_version >= '3.6'
 billiard==3.6.4.0
 blinker==1.4
